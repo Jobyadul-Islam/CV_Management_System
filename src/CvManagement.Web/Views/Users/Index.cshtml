@@ -1,0 +1,57 @@
+@model IReadOnlyList<CvManagement.Web.ViewModels.Admin.AdminUserListItemViewModel>
+@using CvManagement.Web.ViewModels.Shared
+@{
+    ViewData["Title"] = "Users";
+
+    var actions = new List<ToolbarAction>
+    {
+        new("Edit Roles", Url.Action("EditRoles", "Users")! + "/{id}", "get", MinSelected: 1, MaxSelected: 1),
+        new("Block", Url.Action("Block", "Users")!, "post", MinSelected: 1, Confirm: "Block the selected user(s)?"),
+        new("Unblock", Url.Action("Unblock", "Users")!, "post", MinSelected: 1),
+        new("Delete", Url.Action("Delete", "Users")!, "post", MinSelected: 1, Confirm: "Delete the selected user(s)? This cannot be undone.", CssClass: "btn-outline-danger")
+    };
+}
+
+<h1 class="h3 mb-3">Users</h1>
+
+@await Component.InvokeAsync("SelectableTableToolbar", new { tableId = "users-table", actions })
+
+<div class="table-responsive">
+    <table id="users-table" class="table table-hover align-middle selectable-table" data-toolbar="users-table-toolbar">
+        <thead>
+            <tr>
+                <th style="width:2rem"><input type="checkbox" class="select-all form-check-input" /></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr data-id="@user.Id">
+                    <td><input type="checkbox" class="row-select form-check-input" value="@user.Id" /></td>
+                    <td>@user.DisplayName</td>
+                    <td>@user.Email</td>
+                    <td>
+                        @foreach (var role in user.Roles)
+                        {
+                            <span class="badge bg-secondary">@role</span>
+                        }
+                    </td>
+                    <td>
+                        @if (user.IsBlocked)
+                        {
+                            <span class="badge bg-danger">Blocked</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
