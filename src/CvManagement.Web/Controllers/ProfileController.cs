@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Controllers;
 
-[Authorize(Roles = $"{RoleNames.Candidate},{RoleNames.Administrator}")]
+[Authorize]
 public class ProfileController(
     IProfileService profile,
     IProfileAutoSaveService autoSave,
@@ -18,7 +18,7 @@ public class ProfileController(
     ApplicationDbContext db,
     UserManager<ApplicationUser> userManager) : Controller
 {
-    [HttpGet]
+    [HttpGet, Authorize(Roles = $"{RoleNames.Candidate},{RoleNames.Administrator}")]
     public async Task<IActionResult> Index(string? tab)
     {
         var userId = userManager.GetUserId(User)!;
@@ -52,7 +52,7 @@ public class ProfileController(
         return View(model);
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Candidate},{RoleNames.Administrator}")]
     public async Task<IActionResult> AddInfoAttribute(int[] attributeIds)
     {
         var userId = userManager.GetUserId(User)!;
@@ -63,18 +63,49 @@ public class ProfileController(
         return RedirectToAction(nameof(Index), new { tab = "info" });
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Candidate},{RoleNames.Administrator}")]
     public async Task<IActionResult> RemoveInfoAttribute(int attributeId)
     {
         await profile.RemoveFromInfoAsync(userManager.GetUserId(User)!, attributeId);
         return RedirectToAction(nameof(Index), new { tab = "info" });
     }
 
-    [HttpPost("/api/profile/autosave"), ValidateAntiForgeryToken]
+    [HttpPost("/api/profile/autosave"), ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Candidate},{RoleNames.Administrator}")]
     public async Task<IActionResult> AutoSave([FromBody] AutoSaveRequest request)
     {
         var userId = userManager.GetUserId(User)!;
         var results = await autoSave.SaveAsync(userId, request.Changes);
         return Json(new { results });
+    }
+
+    /// <summary>Read-only profile view for Recruiters/Admins -- e.g. a discussion post's author link.</summary>
+    [HttpGet("/Profile/View/{userId}"), Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
+    public new async Task<IActionResult> View(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null) return NotFound();
+
+        var publishedCvs = await db.Cvs
+            .Where(c => c.UserId == userId && c.Status == Domain.Enums.CvStatus.Published)
+            .Select(c => new { Summary = new CvSummaryViewModel
+            {
+                Id = c.Id,
+                PositionTitle = c.Position.Title,
+                Status = c.Status.ToString(),
+                LikeCount = c.Likes.Count
+            }, c.PositionId })
+            .ToListAsync();
+
+        var eligibility = await accessEvaluator.IsEligibleForManyAsync(userId, publishedCvs.Select(c => c.PositionId).ToList());
+
+        var model = new ProfileViewViewModel
+        {
+            UserId = userId,
+            DisplayName = user.DisplayName,
+            MeAttributes = await profile.GetMeTabAsync(userId),
+            PublishedCvs = publishedCvs.Where(c => eligibility.GetValueOrDefault(c.PositionId)).Select(c => c.Summary).ToList()
+        };
+
+        return base.View("View", model);
     }
 }
