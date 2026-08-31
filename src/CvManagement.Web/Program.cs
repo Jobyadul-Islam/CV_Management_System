@@ -67,6 +67,10 @@ builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IUserOnboardin
     CvManagement.Web.Services.Implementations.UserOnboardingService>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IAttributeService,
     CvManagement.Web.Services.Implementations.AttributeService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IPositionAccessEvaluator,
+    CvManagement.Web.Services.Implementations.PositionAccessEvaluator>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IPositionService,
+    CvManagement.Web.Services.Implementations.PositionService>();
 
 var app = builder.Build();
 

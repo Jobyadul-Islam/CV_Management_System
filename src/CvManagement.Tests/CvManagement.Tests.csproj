@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CvManagement.Web\CvManagement.Web.csproj" />
+  </ItemGroup>
+
 </Project>

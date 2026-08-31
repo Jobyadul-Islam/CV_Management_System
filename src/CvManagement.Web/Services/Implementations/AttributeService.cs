@@ -206,14 +206,17 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
 
         return await query
             .OrderBy(a => a.Name)
-            .Take(50)
+            .Take(200)
             .Select(a => new AttributePickerItemViewModel
             {
                 Id = a.Id,
                 Name = a.Name,
                 CategoryName = a.Category.Name,
                 DataType = a.DataType,
-                Description = a.Description
+                Description = a.Description,
+                Options = a.Options.OrderBy(o => o.SortOrder)
+                    .Select(o => new AttributePickerOptionViewModel { Id = o.Id, Label = o.Label })
+                    .ToList()
             })
             .ToListAsync(ct);
     }

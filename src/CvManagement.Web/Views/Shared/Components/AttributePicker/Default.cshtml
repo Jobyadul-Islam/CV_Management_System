@@ -1,0 +1,80 @@
+@model IReadOnlyList<CvManagement.Web.ViewModels.Attribute.AttributePickerItemViewModel>
+@{
+    var modalId = (string)ViewBag.ModalId;
+    var categories = (IReadOnlyList<CvManagement.Web.Domain.AttributeCategory>)ViewBag.Categories;
+    var recent = (IReadOnlyList<CvManagement.Web.ViewModels.Attribute.AttributePickerItemViewModel>)ViewBag.Recent;
+}
+
+<div class="modal fade" id="@modalId" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add attribute</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 mb-3">
+                    <div class="col">
+                        <input type="text" class="form-control attribute-picker-search" placeholder="Search by name prefix..." />
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select attribute-picker-category">
+                            <option value="">All categories</option>
+                            @foreach (var category in categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                @if (recent.Count > 0)
+                {
+                    <div class="mb-2">
+                        <div class="small text-secondary mb-1">Recently used</div>
+                        <ul class="list-group attribute-picker-list" data-section="recent">
+                            @foreach (var item in recent)
+                            {
+                                <li class="list-group-item attribute-picker-row" data-name="@item.Name.ToLowerInvariant()" data-category-id="">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="@item.Id" data-name-display="@item.Name" data-category-name="@item.CategoryName" data-type="@item.DataType" id="recent-attr-@item.Id" />
+                                        <label class="form-check-label" for="recent-attr-@item.Id">
+                                            <strong>@item.Name</strong> <span class="badge bg-secondary">@item.CategoryName</span>
+                                        </label>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                        <hr />
+                    </div>
+                }
+
+                <ul class="list-group attribute-picker-list" data-section="all">
+                    @foreach (var item in all())
+                    {
+                        <li class="list-group-item attribute-picker-row" data-name="@item.Name.ToLowerInvariant()" data-category-id="@categories.FirstOrDefault(c => c.Name == item.CategoryName)?.Id">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="@item.Id" data-name-display="@item.Name" data-category-name="@item.CategoryName" data-type="@item.DataType" id="all-attr-@item.Id" />
+                                <label class="form-check-label" for="all-attr-@item.Id">
+                                    <strong>@item.Name</strong> <span class="badge bg-secondary">@item.CategoryName</span>
+                                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                                    {
+                                        <div class="small text-secondary">@item.Description</div>
+                                    }
+                                </label>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary attribute-picker-confirm">Add selected</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    IEnumerable<CvManagement.Web.ViewModels.Attribute.AttributePickerItemViewModel> all() => Model;
+}
