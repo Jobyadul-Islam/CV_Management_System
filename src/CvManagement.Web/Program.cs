@@ -15,7 +15,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = false;
+        // Locally-registered accounts must confirm their email before signing in (the optional
+        // "form auth with email confirmation" requirement). OAuth sign-ins and seeded demo accounts
+        // are created with EmailConfirmed = true, so this only affects the password-registration path.
+        options.SignIn.RequireConfirmedAccount = true;
         options.Password.RequiredLength = 8;
         options.User.RequireUniqueEmail = true;
     })
@@ -95,6 +98,8 @@ builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ISearchService
     CvManagement.Web.Services.Implementations.SearchService>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IAdminUserService,
     CvManagement.Web.Services.Implementations.AdminUserService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IAppEmailSender,
+    CvManagement.Web.Services.Implementations.SmtpEmailSender>();
 
 var app = builder.Build();
 

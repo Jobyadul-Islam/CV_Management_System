@@ -1,0 +1,21 @@
+@model bool
+@{
+    ViewData["Title"] = "Confirm email";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5 text-center py-4">
+        @if (Model)
+        {
+            <h1 class="h3 mb-3 text-success">Email confirmed</h1>
+            <p class="text-secondary">Your account is active. You can now sign in.</p>
+            <a asp-action="Login" class="btn btn-primary">Sign in</a>
+        }
+        else
+        {
+            <h1 class="h3 mb-3 text-danger">Confirmation failed</h1>
+            <p class="text-secondary">This link is invalid or has already been used.</p>
+            <a asp-action="Login" class="btn btn-outline-secondary">Back to sign in</a>
+        }
+    </div>
+</div>

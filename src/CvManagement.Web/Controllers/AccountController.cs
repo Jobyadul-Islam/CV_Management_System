@@ -14,6 +14,7 @@ public class AccountController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     IUserOnboardingService onboarding,
+    IAppEmailSender emailSender,
     ApplicationDbContext db,
     ILogger<AccountController> logger) : Controller
 {
@@ -50,10 +51,64 @@ public class AccountController(
         await onboarding.InitializeNewUserAsync(user);
         await SetBuiltInNameAsync(user.Id, model.FirstName, model.LastName);
 
-        await signInManager.SignInAsync(user, isPersistent: false);
-        logger.LogInformation("New candidate registered: {Email}", user.Email);
+        var confirmationLink = await SendConfirmationEmailAsync(user);
+        logger.LogInformation("New candidate registered (email confirmation pending): {Email}", user.Email);
 
-        return RedirectToLocal(model.ReturnUrl);
+        // Not signed in yet -- RequireConfirmedAccount blocks sign-in until they click the link.
+        return View("RegisterConfirmation", new RegisterConfirmationViewModel
+        {
+            Email = user.Email!,
+            DevConfirmationLink = emailSender.IsConfigured ? null : confirmationLink
+        });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return View("ConfirmEmail", false);
+        }
+
+        var result = await userManager.ConfirmEmailAsync(user, token);
+        return View("ConfirmEmail", result.Succeeded);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResendConfirmation(string email)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+        if (user is not null && !await userManager.IsEmailConfirmedAsync(user))
+        {
+            var link = await SendConfirmationEmailAsync(user);
+            return View("RegisterConfirmation", new RegisterConfirmationViewModel
+            {
+                Email = email,
+                DevConfirmationLink = emailSender.IsConfigured ? null : link
+            });
+        }
+
+        // Deliberately vague if the account doesn't exist or is already confirmed -- don't leak
+        // which emails are registered.
+        return View("RegisterConfirmation", new RegisterConfirmationViewModel { Email = email });
+    }
+
+    private async Task<string> SendConfirmationEmailAsync(ApplicationUser user)
+    {
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var link = Url.Action(nameof(ConfirmEmail), "Account",
+            new { userId = user.Id, token }, protocol: Request.Scheme)!;
+
+        await emailSender.SendAsync(user.Email!, "Confirm your CV Management System account",
+            $"<p>Welcome! Please confirm your account by <a href=\"{link}\">clicking here</a>.</p>");
+
+        return link;
     }
 
     [HttpGet]
@@ -82,9 +137,20 @@ public class AccountController(
             return RedirectToLocal(model.ReturnUrl);
         }
 
-        ModelState.AddModelError(string.Empty, result.IsLockedOut
-            ? "This account is locked. Try again later or contact an administrator."
-            : "Invalid email or password.");
+        if (result.IsNotAllowed)
+        {
+            // RequireConfirmedAccount blocked this sign-in specifically because the email isn't
+            // confirmed yet (as opposed to a wrong password) -- point them at "resend" instead of
+            // a generic error.
+            ModelState.AddModelError(string.Empty, "Please confirm your email before signing in.");
+            ViewBag.UnconfirmedEmail = model.Email;
+        }
+        else
+        {
+            ModelState.AddModelError(string.Empty, result.IsLockedOut
+                ? "This account is locked. Try again later or contact an administrator."
+                : "Invalid email or password.");
+        }
         model.ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         return View(model);
     }

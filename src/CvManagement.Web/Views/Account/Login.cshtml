@@ -30,6 +30,14 @@
             <button type="submit" class="btn btn-primary w-100">@Localizer["Account_LoginButton"]</button>
         </form>
 
+        @if (ViewBag.UnconfirmedEmail is string unconfirmedEmail)
+        {
+            <form asp-action="ResendConfirmation" method="post" class="mt-2">
+                <input type="hidden" name="email" value="@unconfirmedEmail" />
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Resend confirmation email</button>
+            </form>
+        }
+
         @if (Model.ExternalLogins.Count > 0)
         {
             <hr class="my-4" />
