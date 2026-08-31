@@ -1,0 +1,148 @@
+@model CvManagement.Web.ViewModels.Profile.ProfileIndexViewModel
+@using CvManagement.Web.ViewModels.Shared
+@{
+    ViewData["Title"] = "My Profile";
+    var infoAttributeIds = Model.InfoAttributes.Select(a => a.AttributeId).ToList();
+}
+
+<h1 class="h3 mb-3">@(string.IsNullOrWhiteSpace(Model.DisplayName) ? "My Profile" : Model.DisplayName)</h1>
+
+@Html.AntiForgeryToken()
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "me" ? "active" : "")" href="?tab=me">Me</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "info" ? "active" : "")" href="?tab=info">Info</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "projects" ? "active" : "")" href="?tab=projects">Projects</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "cvs" ? "active" : "")" href="?tab=cvs">CVs</a></li>
+</ul>
+
+@if (Model.ActiveTab == "me")
+{
+    <div class="col-lg-8">
+        @foreach (var field in Model.MeAttributes)
+        {
+            <partial name="_AttributeValueInput" model="field" />
+        }
+    </div>
+}
+else if (Model.ActiveTab == "info")
+{
+    <div class="col-lg-8">
+        <p class="text-secondary">Select attributes from the shared library to fill in on your profile.</p>
+        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" data-bs-toggle="modal" data-bs-target="#infoAttributePicker">+ Add attribute</button>
+
+        @await Component.InvokeAsync("AttributePicker", new { modalId = "infoAttributePicker", excludeIds = infoAttributeIds })
+        <form id="infoAttributePicker-post-form" method="post" action="@Url.Action("AddInfoAttribute", "Profile")" style="display:none">
+            @Html.AntiForgeryToken()
+        </form>
+
+        @foreach (var field in Model.InfoAttributes)
+        {
+            <div class="d-flex align-items-start gap-2">
+                <div class="flex-grow-1">
+                    <partial name="_AttributeValueInput" model="field" />
+                </div>
+                <form method="post" asp-action="RemoveInfoAttribute" asp-route-attributeId="@field.AttributeId" class="mt-1">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove from profile">&times;</button>
+                </form>
+            </div>
+        }
+        @if (Model.InfoAttributes.Count == 0)
+        {
+            <p class="text-secondary">No attributes selected yet.</p>
+        }
+    </div>
+
+    <script>
+        AttributePicker.onConfirm("infoAttributePicker", function (selected) {
+            var form = document.getElementById("infoAttributePicker-post-form");
+            selected.forEach(function (attr) {
+                var input = document.createElement("input");
+                input.type = "hidden"; input.name = "attributeIds"; input.value = attr.id;
+                form.appendChild(input);
+            });
+            form.submit();
+        });
+    </script>
+}
+else if (Model.ActiveTab == "projects")
+{
+    var toolbarActions = new List<ToolbarAction>
+    {
+        new("Edit", Url.Action("Edit", "Projects")! + "/{id}", "get", MinSelected: 1, MaxSelected: 1),
+        new("Delete", Url.Action("Delete", "Projects")!, "post", MinSelected: 1, Confirm: "Delete the selected project(s)?", CssClass: "btn-outline-danger")
+    };
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a asp-controller="Projects" asp-action="Create" class="btn btn-primary btn-sm">+ New Project</a>
+    </div>
+
+    @await Component.InvokeAsync("SelectableTableToolbar", new { tableId = "projects-table", actions = toolbarActions })
+
+    <div class="table-responsive">
+        <table id="projects-table" class="table table-hover align-middle selectable-table" data-toolbar="projects-table-toolbar">
+            <thead>
+                <tr>
+                    <th style="width:2rem"><input type="checkbox" class="select-all form-check-input" /></th>
+                    <th>Name</th>
+                    <th>Period</th>
+                    <th>Tags</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var project in Model.Projects)
+                {
+                    <tr data-id="@project.Id">
+                        <td><input type="checkbox" class="row-select form-check-input" value="@project.Id" /></td>
+                        <td><a asp-controller="Projects" asp-action="Edit" asp-route-id="@project.Id">@project.Name</a></td>
+                        <td>@project.PeriodStart.ToString("yyyy-MM") &ndash; @(project.PeriodEnd?.ToString("yyyy-MM") ?? "present")</td>
+                        <td>
+                            @foreach (var tag in project.Tags)
+                            {
+                                <span class="badge bg-secondary">@tag</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (Model.Projects.Count == 0)
+                {
+                    <tr><td colspan="4" class="text-center text-secondary py-4">No projects yet.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else if (Model.ActiveTab == "cvs")
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead><tr><th>Position</th><th>Status</th><th>Likes</th></tr></thead>
+            <tbody>
+                @foreach (var cv in Model.Cvs)
+                {
+                    <tr>
+                        <td><a asp-controller="Cv" asp-action="Details" asp-route-id="@cv.Id">@cv.PositionTitle</a></td>
+                        <td>@cv.Status</td>
+                        <td>@cv.LikeCount</td>
+                    </tr>
+                }
+                @if (Model.Cvs.Count == 0)
+                {
+                    <tr><td colspan="3" class="text-center text-secondary py-4">No CVs yet -- create one from an available position.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+}
+
+@section Scripts {
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script src="~/js/image-upload.js" asp-append-version="true"></script>
+    <script src="~/js/markdown-editor-init.js" asp-append-version="true"></script>
+    <script src="~/js/autosave.js" asp-append-version="true"></script>
+}

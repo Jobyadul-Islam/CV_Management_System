@@ -1,0 +1,72 @@
+@model CvManagement.Web.ViewModels.Profile.ProjectFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+<input type="hidden" asp-for="Id" />
+<input type="hidden" asp-for="RowVersion" />
+
+<div class="mb-3">
+    <label asp-for="Name" class="form-label"></label>
+    <input asp-for="Name" class="form-control" />
+    <span asp-validation-for="Name" class="text-danger"></span>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="PeriodStart" class="form-label">Start date</label>
+        <input asp-for="PeriodStart" type="date" class="form-control" />
+        <span asp-validation-for="PeriodStart" class="text-danger"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="PeriodEnd" class="form-label">End date (leave blank if ongoing)</label>
+        <input asp-for="PeriodEnd" type="date" class="form-control" />
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="DescriptionMarkdown" class="form-label">Description</label>
+    <textarea asp-for="DescriptionMarkdown" class="form-control markdown-editor" rows="6"></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Technology tags</label>
+    <input id="tagsInput" class="form-control" value="@string.Join(",", Model.Tags)" />
+    <div id="tagsHidden"></div>
+</div>
+
+<button type="submit" class="btn btn-primary">Save</button>
+<a asp-controller="Profile" asp-action="Index" asp-route-tab="projects" class="btn btn-outline-secondary">Cancel</a>
+
+<partial name="_ValidationScriptsPartial" />
+<script>
+(function () {
+    var input = document.getElementById("tagsInput");
+    var hiddenContainer = document.getElementById("tagsHidden");
+
+    var tagify = new Tagify(input, {
+        whitelist: [],
+        dropdown: { enabled: 1, maxItems: 10 }
+    });
+
+    fetch("/Projects/TagSuggestions?prefix=")
+        .then(function (r) { return r.json(); })
+        .then(function (names) { tagify.settings.whitelist = names; });
+
+    input.addEventListener("input", function (e) {
+        if (!e.detail || !e.detail.value) return;
+        fetch("/Projects/TagSuggestions?prefix=" + encodeURIComponent(e.detail.value))
+            .then(function (r) { return r.json(); })
+            .then(function (names) { tagify.settings.whitelist = names; tagify.dropdown.show.call(tagify, e.detail.value); });
+    });
+
+    function syncHidden() {
+        hiddenContainer.innerHTML = "";
+        tagify.value.forEach(function (tag, i) {
+            var el = document.createElement("input");
+            el.type = "hidden"; el.name = "Tags[" + i + "]"; el.value = tag.value;
+            hiddenContainer.appendChild(el);
+        });
+    }
+    tagify.on("add", syncHidden).on("remove", syncHidden);
+    syncHidden();
+})();
+</script>

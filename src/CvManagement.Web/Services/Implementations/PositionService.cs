@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class PositionService(ApplicationDbContext db, IPositionAccessEvaluator accessEvaluator) : IPositionService
+public class PositionService(ApplicationDbContext db, IPositionAccessEvaluator accessEvaluator, ITagService tagService) : IPositionService
 {
     public async Task<IReadOnlyList<PositionListItemViewModel>> GetListForRecruiterAsync(CancellationToken ct = default)
         => await db.Positions
@@ -293,33 +293,11 @@ public class PositionService(ApplicationDbContext db, IPositionAccessEvaluator a
 
     private async Task ApplyProjectTagsAsync(Position position, List<string> tagNames, CancellationToken ct)
     {
-        var tags = await ResolveOrCreateTagsAsync(tagNames, ct);
+        var tags = await tagService.ResolveOrCreateTagsAsync(tagNames, ct);
         foreach (var tag in tags)
         {
             position.ProjectTags.Add(new PositionProjectTag { TagId = tag.Id });
         }
-    }
-
-    private async Task<List<Tag>> ResolveOrCreateTagsAsync(List<string> tagNames, CancellationToken ct)
-    {
-        var normalized = tagNames
-            .Select(n => n.Trim())
-            .Where(n => n.Length > 0)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-        if (normalized.Count == 0) return [];
-
-        var existing = await db.Tags.Where(t => normalized.Contains(t.Name)).ToListAsync(ct);
-        var missing = normalized.Where(n => !existing.Any(t => string.Equals(t.Name, n, StringComparison.OrdinalIgnoreCase))).ToList();
-
-        var created = missing.Select(n => new Tag { Name = n }).ToList();
-        if (created.Count > 0)
-        {
-            db.Tags.AddRange(created);
-            await db.SaveChangesAsync(ct);
-        }
-
-        return [.. existing, .. created];
     }
 
     private static string? Validate(PositionFormViewModel form)
