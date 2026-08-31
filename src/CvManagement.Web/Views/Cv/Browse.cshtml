@@ -1,0 +1,34 @@
+@model List<CvManagement.Web.Controllers.CvBrowseItemViewModel>
+@{
+    ViewData["Title"] = "Browse CVs";
+}
+
+<h1 class="h3 mb-3">Browse CVs</h1>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Position</th>
+                <th>Likes</th>
+                <th>Updated</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><a asp-action="Details" asp-route-id="@item.Id">@item.CandidateDisplayName</a></td>
+                    <td>@item.PositionTitle</td>
+                    <td>&#9733; @item.LikeCount</td>
+                    <td>@item.UpdatedAt.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="4" class="text-center text-secondary py-4">No published CVs to show yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

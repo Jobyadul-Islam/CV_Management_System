@@ -5,7 +5,7 @@
   var dirty = new Map(); // attributeId -> { rowVersion, payload }
   var timer = null;
   var inFlight = false;
-  var endpoint = "/api/profile/autosave";
+  var endpoint = window.AUTOSAVE_ENDPOINT || "/api/profile/autosave";
 
   function antiforgeryToken() {
     var el = document.querySelector('input[name="__RequestVerificationToken"]');

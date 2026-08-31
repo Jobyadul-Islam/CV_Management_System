@@ -9,6 +9,9 @@ public class ProjectListItemViewModel
     public DateOnly PeriodStart { get; set; }
     public DateOnly? PeriodEnd { get; set; }
     public List<string> Tags { get; set; } = [];
+
+    /// <summary>Only populated by CV rendering, which shows the full project; the Profile tab's own list doesn't need it.</summary>
+    public string? DescriptionMarkdown { get; set; }
 }
 
 public class ProjectFormViewModel

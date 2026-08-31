@@ -1,0 +1,110 @@
+@model CvManagement.Web.ViewModels.Cv.CvDetailsViewModel
+@using CvManagement.Web.Domain.Enums
+@inject CvManagement.Web.Services.Abstractions.IMarkdownRenderer MarkdownRenderer
+@{
+    ViewData["Title"] = $"{Model.CandidateDisplayName} — {Model.PositionTitle}";
+}
+
+@if (Model.ViewerCanEdit)
+{
+    @Html.AntiForgeryToken()
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h1 class="h3 mb-1">@Model.CandidateDisplayName</h1>
+        <div class="text-secondary">
+            CV for <a asp-controller="Positions" asp-action="Details" asp-route-id="@Model.PositionId">@Model.PositionTitle</a>
+            @if (!string.IsNullOrEmpty(Model.Company)) { <span> &middot; @Model.Company</span> }
+        </div>
+    </div>
+    <div class="text-end">
+        @if (Model.Status == CvStatus.Published)
+        {
+            <span class="badge bg-success mb-2">Published</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary mb-2">Draft</span>
+        }
+        <div>
+            <span title="Likes">&#9733; @Model.LikeCount</span>
+            @if (Model.ViewerCanLike)
+            {
+                <form asp-action="@(Model.ViewerHasLiked ? "Unlike" : "Like")" asp-route-id="@Model.CvId" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-sm @(Model.ViewerHasLiked ? "btn-warning" : "btn-outline-warning") ms-2">
+                        @(Model.ViewerHasLiked ? "Unlike" : "Like")
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.ViewerCanEdit && Model.Status == CvStatus.Draft)
+{
+    <div class="alert @(Model.CanPublish ? "alert-success" : "alert-warning") d-flex justify-content-between align-items-center">
+        <span>@(Model.CanPublish ? "All fields are filled in -- ready to publish." : "Fill in every red-highlighted field below to publish.")</span>
+        <form asp-action="Publish" asp-route-id="@Model.CvId" method="post">
+            <button type="submit" class="btn btn-primary btn-sm" @(Model.CanPublish ? "" : "disabled")>Publish</button>
+        </form>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <h2 class="h5">Attributes</h2>
+        @if (Model.ViewerCanEdit)
+        {
+            foreach (var field in Model.Fields)
+            {
+                <partial name="_AttributeValueInput" model="field" />
+            }
+        }
+        else
+        {
+            foreach (var field in Model.Fields)
+            {
+                <partial name="_AttributeValueDisplay" model="field" />
+            }
+        }
+
+        <h2 class="h5 mt-4">Projects</h2>
+        @if (Model.Projects.Count == 0)
+        {
+            <p class="text-secondary">No matching projects.</p>
+        }
+        else
+        {
+            foreach (var project in Model.Projects)
+            {
+                <div class="mb-3 pb-3 border-bottom">
+                    <div class="fw-semibold">@project.Name</div>
+                    <div class="text-secondary small">
+                        @project.PeriodStart.ToString("yyyy-MM") &ndash; @(project.PeriodEnd?.ToString("yyyy-MM") ?? "present")
+                    </div>
+                    <div>@Html.Raw(MarkdownRenderer.ToSafeHtml(project.DescriptionMarkdown))</div>
+                    @foreach (var tag in project.Tags)
+                    {
+                        <span class="badge bg-secondary">@tag</span>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+}
+@section Scripts {
+    @if (Model.ViewerCanEdit)
+    {
+        <script>window.AUTOSAVE_ENDPOINT = "/api/cv/@Model.CvId/autosave";</script>
+        <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+        <script src="~/js/image-upload.js" asp-append-version="true"></script>
+        <script src="~/js/markdown-editor-init.js" asp-append-version="true"></script>
+        <script src="~/js/autosave.js" asp-append-version="true"></script>
+    }
+}

@@ -83,6 +83,10 @@ builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IProfileAutoSa
     CvManagement.Web.Services.Implementations.ProfileAutoSaveService>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IProjectService,
     CvManagement.Web.Services.Implementations.ProjectService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ICvRenderService,
+    CvManagement.Web.Services.Implementations.CvRenderService>();
+builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.IMarkdownRenderer,
+    CvManagement.Web.Services.Implementations.MarkdownRenderer>();
 
 var app = builder.Build();
 

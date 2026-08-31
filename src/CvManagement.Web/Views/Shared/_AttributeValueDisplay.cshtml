@@ -1,0 +1,41 @@
+@model CvManagement.Web.ViewModels.Profile.AttributeValueViewModel
+@using CvManagement.Web.Domain.Enums
+@inject CvManagement.Web.Services.Abstractions.IMarkdownRenderer MarkdownRenderer
+
+<div class="mb-3">
+    <div class="fw-semibold">@Model.AttributeName</div>
+    @if (Model.IsEmpty)
+    {
+        <div class="value-empty">(not provided)</div>
+    }
+    else
+    {
+        switch (Model.DataType)
+        {
+            case AttributeDataType.String:
+                <div>@Model.ValueString</div>
+                break;
+            case AttributeDataType.Text:
+                <div>@Html.Raw(MarkdownRenderer.ToSafeHtml(Model.ValueText))</div>
+                break;
+            case AttributeDataType.Image:
+                <img src="@Model.ValueImageUrl" style="max-width:120px" class="rounded border" />
+                break;
+            case AttributeDataType.Numeric:
+                <div>@Model.ValueNumeric</div>
+                break;
+            case AttributeDataType.Date:
+                <div>@Model.ValueDate?.ToString("yyyy-MM-dd")</div>
+                break;
+            case AttributeDataType.Period:
+                <div>@Model.ValuePeriodStart?.ToString("yyyy-MM") &ndash; @(Model.ValuePeriodEnd?.ToString("yyyy-MM") ?? "present")</div>
+                break;
+            case AttributeDataType.Boolean:
+                <div>@(Model.ValueBoolean == true ? "Yes" : "No")</div>
+                break;
+            case AttributeDataType.OneOfMany:
+                <div>@Model.Options.FirstOrDefault(o => o.Id == Model.ValueOptionId)?.Label</div>
+                break;
+        }
+    }
+</div>
