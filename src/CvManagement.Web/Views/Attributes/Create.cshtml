@@ -1,0 +1,10 @@
+@model CvManagement.Web.ViewModels.Attribute.AttributeFormViewModel
+@{
+    ViewData["Title"] = "New Attribute";
+}
+
+<h1 class="h3 mb-3">New Attribute</h1>
+
+<form asp-action="Create" method="post" class="col-lg-8">
+    <partial name="_Form" model="Model" />
+</form>

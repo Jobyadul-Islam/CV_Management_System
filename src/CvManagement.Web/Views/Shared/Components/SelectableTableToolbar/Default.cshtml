@@ -1,0 +1,26 @@
+@model IReadOnlyList<CvManagement.Web.ViewModels.Shared.ToolbarAction>
+@{
+    var tableId = (string)ViewBag.TableId;
+    var toolbarId = $"{tableId}-toolbar";
+}
+
+<div id="@toolbarId" class="table-toolbar" data-table-id="@tableId">
+    <span class="selection-count">0 selected</span>
+    @foreach (var action in Model)
+    {
+        <button type="button"
+                class="btn btn-sm @action.CssClass toolbar-action"
+                data-mode="@action.Mode"
+                data-url="@action.Url"
+                data-min-selected="@action.MinSelected"
+                data-max-selected="@(action.MaxSelected?.ToString() ?? "")"
+                @(action.Confirm is not null ? $"data-confirm=\"{action.Confirm}\"" : "")
+                disabled>
+            @action.Label
+        </button>
+    }
+</div>
+
+<form id="@(toolbarId)-post-form" method="post" style="display:none">
+    @Html.AntiForgeryToken()
+</form>

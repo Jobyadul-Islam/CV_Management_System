@@ -65,6 +65,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IUserOnboardingService,
     CvManagement.Web.Services.Implementations.UserOnboardingService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IAttributeService,
+    CvManagement.Web.Services.Implementations.AttributeService>();
 
 var app = builder.Build();
 

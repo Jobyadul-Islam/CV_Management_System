@@ -26,6 +26,7 @@ public static class DbSeeder
         var categories = await SeedCategoriesAsync(db);
         var builtIns = await SeedBuiltInAttributesAsync(db, categories);
         await SeedLibraryAttributesAsync(db, categories);
+        await SeedTagsAsync(db);
         await SeedDemoUsersAsync(userManager, db, onboarding, builtIns);
     }
 
@@ -97,66 +98,110 @@ public static class DbSeeder
     private static async Task SeedLibraryAttributesAsync(
         ApplicationDbContext db, Dictionary<string, AttributeCategory> categories)
     {
-        if (await db.Attributes.AnyAsync(a => !a.IsBuiltIn))
-        {
-            return;
-        }
+        var existingNames = (await db.Attributes.Select(a => a.Name).ToListAsync()).ToHashSet();
 
-        var englishLevel = new AttributeDefinition
-        {
-            Name = "English Level",
-            Description = "Spoken and written English proficiency.",
-            DataType = AttributeDataType.OneOfMany,
-            CategoryId = categories["Domain Knowledge"].Id,
-            Options =
-            [
-                new AttributeOption { Label = "Beginner", SortOrder = 0 },
-                new AttributeOption { Label = "Intermediate", SortOrder = 1 },
-                new AttributeOption { Label = "Advanced", SortOrder = 2 },
-                new AttributeOption { Label = "Fluent", SortOrder = 3 }
-            ]
-        };
-
-        var presentationSkills = new AttributeDefinition
-        {
-            Name = "Presentation Skills",
-            Description = "Ability to present to an audience.",
-            DataType = AttributeDataType.OneOfMany,
-            CategoryId = categories["Soft Skills"].Id,
-            Options =
-            [
-                new AttributeOption { Label = "Beginner", SortOrder = 0 },
-                new AttributeOption { Label = "Intermediate", SortOrder = 1 },
-                new AttributeOption { Label = "Advanced", SortOrder = 2 }
-            ]
-        };
-
-        db.Attributes.AddRange(
-            englishLevel,
-            presentationSkills,
-            new AttributeDefinition
+        List<AttributeDefinition> candidates =
+        [
+            new()
+            {
+                Name = "English Level",
+                Description = "Spoken and written English proficiency.",
+                DataType = AttributeDataType.OneOfMany,
+                CategoryId = categories["Domain Knowledge"].Id,
+                Options =
+                [
+                    new AttributeOption { Label = "Beginner", SortOrder = 0 },
+                    new AttributeOption { Label = "Intermediate", SortOrder = 1 },
+                    new AttributeOption { Label = "Advanced", SortOrder = 2 },
+                    new AttributeOption { Label = "Fluent", SortOrder = 3 }
+                ]
+            },
+            new()
+            {
+                Name = "Presentation Skills",
+                Description = "Ability to present to an audience.",
+                DataType = AttributeDataType.OneOfMany,
+                CategoryId = categories["Soft Skills"].Id,
+                Options =
+                [
+                    new AttributeOption { Label = "Beginner", SortOrder = 0 },
+                    new AttributeOption { Label = "Intermediate", SortOrder = 1 },
+                    new AttributeOption { Label = "Advanced", SortOrder = 2 }
+                ]
+            },
+            new()
             {
                 Name = "GPA",
                 Description = "Grade point average (0-4 scale).",
                 DataType = AttributeDataType.Numeric,
                 CategoryId = categories["Domain Knowledge"].Id
             },
-            new AttributeDefinition
+            new()
             {
                 Name = "IELTS Score",
                 Description = "IELTS band score.",
                 DataType = AttributeDataType.Numeric,
                 CategoryId = categories["Certification"].Id
             },
-            new AttributeDefinition
+            new()
             {
                 Name = "Remote Work Availability",
                 Description = "Willing and able to work remotely.",
                 DataType = AttributeDataType.Boolean,
                 CategoryId = categories["Soft Skills"].Id
-            });
+            },
+            // From the spec's own worked example (CAP / Junior Data Engineer @ Acme Corp.):
+            new()
+            {
+                Name = "CAP",
+                Description = "Certified Analytics Professional exam level.",
+                DataType = AttributeDataType.OneOfMany,
+                CategoryId = categories["Certification"].Id,
+                Options =
+                [
+                    new AttributeOption { Label = "None", SortOrder = 0 },
+                    new AttributeOption { Label = "Essentials", SortOrder = 1 },
+                    new AttributeOption { Label = "Pro", SortOrder = 2 },
+                    new AttributeOption { Label = "Expert", SortOrder = 3 }
+                ]
+            },
+            new()
+            {
+                Name = "Python",
+                Description = "Proficient with Python.",
+                DataType = AttributeDataType.Boolean,
+                CategoryId = categories["Domain Knowledge"].Id
+            },
+            new()
+            {
+                Name = "Apache Hadoop",
+                Description = "Proficient with Apache Hadoop.",
+                DataType = AttributeDataType.Boolean,
+                CategoryId = categories["Domain Knowledge"].Id
+            }
+        ];
 
-        await db.SaveChangesAsync();
+        var toAdd = candidates.Where(a => !existingNames.Contains(a.Name)).ToList();
+        if (toAdd.Count > 0)
+        {
+            db.Attributes.AddRange(toAdd);
+            await db.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedTagsAsync(ApplicationDbContext db)
+    {
+        // Technology tags from the spec's worked example ("SQL, R, and Python as filters..."), plus a
+        // few common ones so Projects/Positions have realistic tag data to demo against.
+        string[] names = ["SQL", "R", "Python", "Apache Hadoop", "Java", "JavaScript", "TypeScript", "C#", "Docker"];
+        var existing = await db.Tags.Select(t => t.Name).ToListAsync();
+        var toAdd = names.Where(n => !existing.Contains(n)).Select(n => new Tag { Name = n }).ToList();
+
+        if (toAdd.Count > 0)
+        {
+            db.Tags.AddRange(toAdd);
+            await db.SaveChangesAsync();
+        }
     }
 
     private static async Task SeedDemoUsersAsync(

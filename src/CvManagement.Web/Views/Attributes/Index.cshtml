@@ -1,0 +1,77 @@
+@model IReadOnlyList<CvManagement.Web.ViewModels.Attribute.AttributeListItemViewModel>
+@using CvManagement.Web.ViewModels.Shared
+@{
+    ViewData["Title"] = "Attribute Library";
+    var categories = (IReadOnlyList<CvManagement.Web.Domain.AttributeCategory>)ViewBag.Categories;
+    var prefix = (string?)ViewBag.Prefix;
+    var categoryId = (int?)ViewBag.CategoryId;
+
+    var actions = new List<ToolbarAction>
+    {
+        new("Edit", Url.Action("Edit", "Attributes")! + "/{id}", "get", MinSelected: 1, MaxSelected: 1),
+        new("Delete", Url.Action("Delete", "Attributes")!, "post", MinSelected: 1, Confirm: "Delete the selected attribute(s)? Built-in and in-use attributes will be skipped.", CssClass: "btn-outline-danger")
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Attribute Library</h1>
+    <a asp-action="Create" class="btn btn-primary">+ New Attribute</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input type="text" name="prefix" value="@prefix" class="form-control" placeholder="Search by name prefix..." />
+    </div>
+    <div class="col-auto">
+        <select name="categoryId" class="form-select" onchange="this.form.submit()">
+            <option value="">All categories</option>
+            @foreach (var category in categories)
+            {
+                <option value="@category.Id" selected="@(category.Id == categoryId)">@category.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-secondary">Filter</button>
+    </div>
+</form>
+
+@await Component.InvokeAsync("SelectableTableToolbar", new { tableId = "attributes-table", actions })
+
+<div class="table-responsive">
+    <table id="attributes-table" class="table table-hover align-middle selectable-table" data-toolbar="attributes-table-toolbar">
+        <thead>
+            <tr>
+                <th style="width:2rem"><input type="checkbox" class="select-all form-check-input" /></th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Used in</th>
+                <th>Updated</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr data-id="@item.Id">
+                    <td><input type="checkbox" class="row-select form-check-input" value="@item.Id" /></td>
+                    <td>
+                        @item.Name
+                        @if (item.IsBuiltIn)
+                        {
+                            <span class="badge bg-secondary ms-1">built-in</span>
+                        }
+                    </td>
+                    <td>@item.CategoryName</td>
+                    <td>@Html.DisplayFor(_ => item.DataType)</td>
+                    <td>@item.PositionUsageCount position(s)</td>
+                    <td>@item.UpdatedAt.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="6" class="text-center text-secondary py-4">No attributes match.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
