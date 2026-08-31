@@ -1,4 +1,5 @@
 @model CvManagement.Web.ViewModels.Profile.ProfileViewViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 @{
     ViewData["Title"] = Model.DisplayName;
 }
@@ -7,17 +8,17 @@
 
 <div class="row">
     <div class="col-lg-6">
-        <h2 class="h5">Profile</h2>
+        <h2 class="h5">@Localizer["ProfileView_Profile"]</h2>
         @foreach (var field in Model.MeAttributes)
         {
             <partial name="_AttributeValueDisplay" model="field" />
         }
     </div>
     <div class="col-lg-6">
-        <h2 class="h5">Published CVs</h2>
+        <h2 class="h5">@Localizer["ProfileView_PublishedCvs"]</h2>
         @if (Model.PublishedCvs.Count == 0)
         {
-            <p class="text-secondary">No published CVs.</p>
+            <p class="text-secondary">@Localizer["ProfileView_NoPublishedCvs"]</p>
         }
         else
         {

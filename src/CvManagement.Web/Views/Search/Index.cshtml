@@ -1,26 +1,27 @@
 @model CvManagement.Web.ViewModels.Home.SearchResultsViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Search";
+    ViewData["Title"] = Localizer["Search_Button"];
 }
 
-<h1 class="h3 mb-3">Search results for "@Model.Query"</h1>
+<h1 class="h3 mb-3">@Localizer["Search_ResultsFor"] "@Model.Query"</h1>
 
 @if (string.IsNullOrWhiteSpace(Model.Query))
 {
-    <p class="text-secondary">Enter a search term in the header above.</p>
+    <p class="text-secondary">@Localizer["Search_EnterTerm"]</p>
 }
 else
 {
-    <h2 class="h5">Positions</h2>
+    <h2 class="h5">@Localizer["Search_Positions"]</h2>
     @if (Model.Positions.Count == 0)
     {
-        <p class="text-secondary">No positions matched.</p>
+        <p class="text-secondary">@Localizer["Search_NoPositions"]</p>
     }
     else
     {
         <div class="table-responsive mb-4">
             <table class="table table-hover align-middle">
-                <thead><tr><th>Title</th><th>Company</th><th>Level</th></tr></thead>
+                <thead><tr><th>@Localizer["Positions_ColTitle"]</th><th>@Localizer["Positions_ColCompany"]</th><th>@Localizer["Positions_ColLevel"]</th></tr></thead>
                 <tbody>
                     @foreach (var position in Model.Positions)
                     {
@@ -37,16 +38,16 @@ else
 
     @if (User.IsInRole(CvManagement.Web.Domain.RoleNames.Recruiter) || User.IsInRole(CvManagement.Web.Domain.RoleNames.Administrator))
     {
-        <h2 class="h5">CVs</h2>
+        <h2 class="h5">@Localizer["Search_Cvs"]</h2>
         @if (Model.Cvs.Count == 0)
         {
-            <p class="text-secondary">No CVs matched.</p>
+            <p class="text-secondary">@Localizer["Search_NoCvs"]</p>
         }
         else
         {
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
-                    <thead><tr><th>Candidate</th><th>Position</th><th>Likes</th></tr></thead>
+                    <thead><tr><th>@Localizer["Cv_ColCandidate"]</th><th>@Localizer["Profile_ColPosition"]</th><th>@Localizer["Profile_ColLikes"]</th></tr></thead>
                     <tbody>
                         @foreach (var cv in Model.Cvs)
                         {

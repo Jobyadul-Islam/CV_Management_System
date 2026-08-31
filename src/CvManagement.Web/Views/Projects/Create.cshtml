@@ -1,9 +1,10 @@
 @model CvManagement.Web.ViewModels.Profile.ProjectFormViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "New Project";
+    ViewData["Title"] = Localizer["ProjectForm_New_Title"];
 }
 
-<h1 class="h3 mb-3">New Project</h1>
+<h1 class="h3 mb-3">@Localizer["ProjectForm_New_Title"]</h1>
 
 <form asp-action="Create" method="post" class="col-lg-8">
     <partial name="_Form" model="Model" />

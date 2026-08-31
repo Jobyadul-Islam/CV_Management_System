@@ -1,19 +1,20 @@
 @model CvManagement.Web.ViewModels.Profile.ProfileIndexViewModel
 @using CvManagement.Web.ViewModels.Shared
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "My Profile";
+    ViewData["Title"] = Localizer["Nav_MyProfile"];
     var infoAttributeIds = Model.InfoAttributes.Select(a => a.AttributeId).ToList();
 }
 
-<h1 class="h3 mb-3">@(string.IsNullOrWhiteSpace(Model.DisplayName) ? "My Profile" : Model.DisplayName)</h1>
+<h1 class="h3 mb-3">@(string.IsNullOrWhiteSpace(Model.DisplayName) ? Localizer["Nav_MyProfile"].Value : Model.DisplayName)</h1>
 
 @Html.AntiForgeryToken()
 
 <ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "me" ? "active" : "")" href="?tab=me">Me</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "info" ? "active" : "")" href="?tab=info">Info</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "projects" ? "active" : "")" href="?tab=projects">Projects</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "cvs" ? "active" : "")" href="?tab=cvs">CVs</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "me" ? "active" : "")" href="?tab=me">@Localizer["Profile_TabMe"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "info" ? "active" : "")" href="?tab=info">@Localizer["Profile_TabInfo"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "projects" ? "active" : "")" href="?tab=projects">@Localizer["Profile_TabProjects"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "cvs" ? "active" : "")" href="?tab=cvs">@Localizer["Profile_TabCvs"]</a></li>
 </ul>
 
 @if (Model.ActiveTab == "me")
@@ -28,8 +29,8 @@
 else if (Model.ActiveTab == "info")
 {
     <div class="col-lg-8">
-        <p class="text-secondary">Select attributes from the shared library to fill in on your profile.</p>
-        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" data-bs-toggle="modal" data-bs-target="#infoAttributePicker">+ Add attribute</button>
+        <p class="text-secondary">@Localizer["Profile_InfoHelp"]</p>
+        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" data-bs-toggle="modal" data-bs-target="#infoAttributePicker">@Localizer["Profile_AddAttribute"]</button>
 
         @await Component.InvokeAsync("AttributePicker", new { modalId = "infoAttributePicker", excludeIds = infoAttributeIds })
         <form id="infoAttributePicker-post-form" method="post" action="@Url.Action("AddInfoAttribute", "Profile")" style="display:none">
@@ -49,7 +50,7 @@ else if (Model.ActiveTab == "info")
         }
         @if (Model.InfoAttributes.Count == 0)
         {
-            <p class="text-secondary">No attributes selected yet.</p>
+            <p class="text-secondary">@Localizer["Profile_NoInfoAttributes"]</p>
         }
     </div>
 
@@ -69,12 +70,12 @@ else if (Model.ActiveTab == "projects")
 {
     var toolbarActions = new List<ToolbarAction>
     {
-        new("Edit", Url.Action("Edit", "Projects")! + "/{id}", "get", MinSelected: 1, MaxSelected: 1),
-        new("Delete", Url.Action("Delete", "Projects")!, "post", MinSelected: 1, Confirm: "Delete the selected project(s)?", CssClass: "btn-outline-danger")
+        new(Localizer["Common_Edit"], Url.Action("Edit", "Projects")! + "/{id}", "get", MinSelected: 1, MaxSelected: 1),
+        new(Localizer["Common_Delete"], Url.Action("Delete", "Projects")!, "post", MinSelected: 1, Confirm: Localizer["ProjectForm_DeleteConfirm"], CssClass: "btn-outline-danger")
     };
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <a asp-controller="Projects" asp-action="Create" class="btn btn-primary btn-sm">+ New Project</a>
+        <a asp-controller="Projects" asp-action="Create" class="btn btn-primary btn-sm">@Localizer["Profile_NewProject"]</a>
     </div>
 
     @await Component.InvokeAsync("SelectableTableToolbar", new { tableId = "projects-table", actions = toolbarActions })
@@ -84,9 +85,9 @@ else if (Model.ActiveTab == "projects")
             <thead>
                 <tr>
                     <th style="width:2rem"><input type="checkbox" class="select-all form-check-input" /></th>
-                    <th>Name</th>
-                    <th>Period</th>
-                    <th>Tags</th>
+                    <th>@Localizer["Profile_ColName"]</th>
+                    <th>@Localizer["Profile_ColPeriod"]</th>
+                    <th>@Localizer["Profile_ColTags"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,7 +96,7 @@ else if (Model.ActiveTab == "projects")
                     <tr data-id="@project.Id">
                         <td><input type="checkbox" class="row-select form-check-input" value="@project.Id" /></td>
                         <td><a asp-controller="Projects" asp-action="Edit" asp-route-id="@project.Id">@project.Name</a></td>
-                        <td>@project.PeriodStart.ToString("yyyy-MM") &ndash; @(project.PeriodEnd?.ToString("yyyy-MM") ?? "present")</td>
+                        <td>@project.PeriodStart.ToString("yyyy-MM") &ndash; @(project.PeriodEnd?.ToString("yyyy-MM") ?? Localizer["Profile_Present"].Value)</td>
                         <td>
                             @foreach (var tag in project.Tags)
                             {
@@ -106,7 +107,7 @@ else if (Model.ActiveTab == "projects")
                 }
                 @if (Model.Projects.Count == 0)
                 {
-                    <tr><td colspan="4" class="text-center text-secondary py-4">No projects yet.</td></tr>
+                    <tr><td colspan="4" class="text-center text-secondary py-4">@Localizer["Profile_NoProjects"]</td></tr>
                 }
             </tbody>
         </table>
@@ -116,19 +117,19 @@ else if (Model.ActiveTab == "cvs")
 {
     <div class="table-responsive">
         <table class="table table-hover align-middle">
-            <thead><tr><th>Position</th><th>Status</th><th>Likes</th></tr></thead>
+            <thead><tr><th>@Localizer["Profile_ColPosition"]</th><th>@Localizer["Profile_ColStatus"]</th><th>@Localizer["Profile_ColLikes"]</th></tr></thead>
             <tbody>
                 @foreach (var cv in Model.Cvs)
                 {
                     <tr>
                         <td><a asp-controller="Cv" asp-action="Details" asp-route-id="@cv.Id">@cv.PositionTitle</a></td>
-                        <td>@cv.Status</td>
+                        <td>@Localizer[cv.Status == "Published" ? "Cv_Published" : "Cv_Draft"]</td>
                         <td>@cv.LikeCount</td>
                     </tr>
                 }
                 @if (Model.Cvs.Count == 0)
                 {
-                    <tr><td colspan="3" class="text-center text-secondary py-4">No CVs yet -- create one from an available position.</td></tr>
+                    <tr><td colspan="3" class="text-center text-secondary py-4">@Localizer["Profile_NoCvs"]</td></tr>
                 }
             </tbody>
         </table>

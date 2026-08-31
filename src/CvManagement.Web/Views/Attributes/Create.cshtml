@@ -1,9 +1,10 @@
 @model CvManagement.Web.ViewModels.Attribute.AttributeFormViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "New Attribute";
+    ViewData["Title"] = Localizer["Attributes_New_Title"];
 }
 
-<h1 class="h3 mb-3">New Attribute</h1>
+<h1 class="h3 mb-3">@Localizer["Attributes_New_Title"]</h1>
 
 <form asp-action="Create" method="post" class="col-lg-8">
     <partial name="_Form" model="Model" />

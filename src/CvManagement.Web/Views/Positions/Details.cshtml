@@ -1,4 +1,5 @@
 @model CvManagement.Web.ViewModels.Position.PositionDetailsViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 @{
     ViewData["Title"] = Model.Title;
     var isManaging = (bool)ViewBag.IsManaging;
@@ -17,33 +18,33 @@
     </div>
     @if (isManaging)
     {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">@Localizer["Common_Edit"]</a>
     }
 </div>
 
 @if (Model.ViewerIsEligible == false)
 {
-    <div class="alert alert-warning">You don't currently meet the access rules for this position.</div>
+    <div class="alert alert-warning">@Localizer["PositionDetails_NotEligible"]</div>
 }
 @if (Model.ViewerExistingCvId is not null)
 {
     <div class="alert alert-info">
-        You already have a CV for this position.
-        <a asp-controller="Cv" asp-action="Details" asp-route-id="@Model.ViewerExistingCvId">View it</a>.
+        @Localizer["PositionDetails_AlreadyHaveCv"]
+        <a asp-controller="Cv" asp-action="Details" asp-route-id="@Model.ViewerExistingCvId">@Localizer["PositionDetails_ViewIt"]</a>.
     </div>
 }
 else if (Model.ViewerIsEligible == true)
 {
     <form asp-controller="Cv" asp-action="Create" asp-route-positionId="@Model.Id" method="post" class="mb-3">
-        <button type="submit" class="btn btn-primary">Create CV for this position</button>
+        <button type="submit" class="btn btn-primary">@Localizer["PositionDetails_CreateCv"]</button>
     </form>
 }
 
 @if (Model.ViewerCanSeeDiscussion)
 {
     <ul class="nav nav-tabs mb-3" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#detailsPane" type="button">Details</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussionPane" type="button">Discussion (@Model.DiscussionPosts.Count)</button></li>
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#detailsPane" type="button">@Localizer["PositionDetails_TabDetails"]</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussionPane" type="button">@Localizer["PositionDetails_TabDiscussion"] (@Model.DiscussionPosts.Count)</button></li>
     </ul>
 }
 
@@ -56,10 +57,10 @@ else if (Model.ViewerIsEligible == true)
 
         <div class="row">
             <div class="col-md-6 mb-4">
-                <h2 class="h5">CV Template Attributes</h2>
+                <h2 class="h5">@Localizer["PositionDetails_TemplateAttributes"]</h2>
                 @if (Model.TemplateAttributeNames.Count == 0)
                 {
-                    <p class="text-secondary">No attributes selected yet.</p>
+                    <p class="text-secondary">@Localizer["PositionDetails_NoAttributes"]</p>
                 }
                 else
                 {
@@ -73,14 +74,14 @@ else if (Model.ViewerIsEligible == true)
             </div>
 
             <div class="col-md-6 mb-4">
-                <h2 class="h5">Access</h2>
+                <h2 class="h5">@Localizer["PositionDetails_Access"]</h2>
                 @if (Model.AccessMode == CvManagement.Web.Domain.Enums.PositionAccessMode.Public)
                 {
-                    <p><span class="badge bg-success">Public</span> Open to all authenticated users.</p>
+                    <p><span class="badge bg-success">@Localizer["Positions_Public"]</span> @Localizer["PositionDetails_PublicDesc"]</p>
                 }
                 else
                 {
-                    <p><span class="badge bg-warning text-dark">Restricted</span></p>
+                    <p><span class="badge bg-warning text-dark">@Localizer["Positions_Restricted"]</span></p>
                     <ul class="list-group">
                         @foreach (var rule in Model.AccessRuleDescriptions)
                         {
@@ -89,10 +90,10 @@ else if (Model.ViewerIsEligible == true)
                     </ul>
                 }
 
-                <h2 class="h5 mt-4">Relevant Project Tags (max @Model.MaxProjects projects)</h2>
+                <h2 class="h5 mt-4">@Localizer["PositionDetails_ProjectTags"] (max @Model.MaxProjects)</h2>
                 @if (Model.ProjectTagNames.Count == 0)
                 {
-                    <p class="text-secondary">No project tags set.</p>
+                    <p class="text-secondary">@Localizer["PositionDetails_NoTags"]</p>
                 }
                 else
                 {
@@ -133,8 +134,8 @@ else if (Model.ViewerIsEligible == true)
                 }
             </div>
             <form id="discussionForm">
-                <textarea id="discussionBody" class="form-control mb-2" rows="2" placeholder="Write a message (Markdown supported)..."></textarea>
-                <button type="submit" class="btn btn-primary btn-sm">Post</button>
+                <textarea id="discussionBody" class="form-control mb-2" rows="2" placeholder="@Localizer["PositionDetails_DiscussionPlaceholder"]"></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">@Localizer["Discussion_Post"]</button>
             </form>
         </div>
     }

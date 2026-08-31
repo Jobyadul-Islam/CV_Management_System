@@ -1,4 +1,5 @@
 @model CvManagement.Web.ViewModels.Profile.ProjectFormViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 
 <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 <input type="hidden" asp-for="Id" />
@@ -12,29 +13,29 @@
 
 <div class="row">
     <div class="col-md-6 mb-3">
-        <label asp-for="PeriodStart" class="form-label">Start date</label>
+        <label asp-for="PeriodStart" class="form-label">@Localizer["ProjectForm_StartDate"]</label>
         <input asp-for="PeriodStart" type="date" class="form-control" />
         <span asp-validation-for="PeriodStart" class="text-danger"></span>
     </div>
     <div class="col-md-6 mb-3">
-        <label asp-for="PeriodEnd" class="form-label">End date (leave blank if ongoing)</label>
+        <label asp-for="PeriodEnd" class="form-label">@Localizer["ProjectForm_EndDate"]</label>
         <input asp-for="PeriodEnd" type="date" class="form-control" />
     </div>
 </div>
 
 <div class="mb-3">
-    <label asp-for="DescriptionMarkdown" class="form-label">Description</label>
+    <label asp-for="DescriptionMarkdown" class="form-label">@Localizer["ProjectForm_Description"]</label>
     <textarea asp-for="DescriptionMarkdown" class="form-control markdown-editor" rows="6"></textarea>
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Technology tags</label>
+    <label class="form-label">@Localizer["ProjectForm_Tags"]</label>
     <input id="tagsInput" class="form-control" value="@string.Join(",", Model.Tags)" />
     <div id="tagsHidden"></div>
 </div>
 
-<button type="submit" class="btn btn-primary">Save</button>
-<a asp-controller="Profile" asp-action="Index" asp-route-tab="projects" class="btn btn-outline-secondary">Cancel</a>
+<button type="submit" class="btn btn-primary">@Localizer["Common_Save"]</button>
+<a asp-controller="Profile" asp-action="Index" asp-route-tab="projects" class="btn btn-outline-secondary">@Localizer["Common_Cancel"]</a>
 
 <partial name="_ValidationScriptsPartial" />
 <script>
