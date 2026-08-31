@@ -12,6 +12,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<AttributeDefinition> Attributes => Set<AttributeDefinition>();
     public DbSet<AttributeOption> AttributeOptions => Set<AttributeOption>();
     public DbSet<UserAttributeValue> UserAttributeValues => Set<UserAttributeValue>();
+    public DbSet<AttributeUsage> AttributeUsages => Set<AttributeUsage>();
 
     public DbSet<Position> Positions => Set<Position>();
     public DbSet<PositionAttribute> PositionAttributes => Set<PositionAttribute>();

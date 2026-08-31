@@ -1,0 +1,95 @@
+@model CvManagement.Web.ViewModels.Attribute.AttributeFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+<input type="hidden" asp-for="Id" />
+<input type="hidden" asp-for="RowVersion" />
+<input type="hidden" asp-for="IsBuiltIn" />
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select" disabled="@Model.IsBuiltIn"></select>
+        @if (Model.IsBuiltIn)
+        {
+            <input type="hidden" asp-for="CategoryId" />
+            <div class="form-text">Built-in attributes keep their category.</div>
+        }
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Description" class="form-label"></label>
+    <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+</div>
+
+<div class="mb-3">
+    <label asp-for="DataType" class="form-label"></label>
+    <select asp-for="DataType" asp-items="Html.GetEnumSelectList<CvManagement.Web.Domain.Enums.AttributeDataType>()"
+            class="form-select" id="dataTypeSelect" disabled="@Model.IsBuiltIn"></select>
+    @if (Model.IsBuiltIn)
+    {
+        <input type="hidden" asp-for="DataType" />
+        <div class="form-text">Built-in attributes keep their data type.</div>
+    }
+</div>
+
+<div id="optionsSection" class="mb-3 border rounded p-3" style="display:none">
+    <label class="form-label fw-semibold">Dropdown options</label>
+    <div id="optionsList"></div>
+    <button type="button" id="addOptionBtn" class="btn btn-sm btn-outline-secondary mt-2">+ Add option</button>
+    <template id="optionRowTemplate">
+        <div class="input-group input-group-sm mb-2 option-row">
+            <input type="hidden" name="Options[__index__].Id" value="0" />
+            <input type="hidden" name="Options[__index__].RowVersion" value="" />
+            <input type="text" name="Options[__index__].Label" class="form-control" placeholder="Option label" />
+            <button type="button" class="btn btn-outline-danger remove-option-btn">&times;</button>
+        </div>
+    </template>
+</div>
+
+<button type="submit" class="btn btn-primary">Save</button>
+<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+
+<partial name="_ValidationScriptsPartial" />
+<script>
+        (function () {
+            var dataTypeSelect = document.getElementById("dataTypeSelect");
+            var optionsSection = document.getElementById("optionsSection");
+            var optionsList = document.getElementById("optionsList");
+            var template = document.getElementById("optionRowTemplate");
+            var oneOfManyValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.OneOfMany)";
+            var rowIndex = optionsList.querySelectorAll(".option-row").length;
+
+            function refreshVisibility() {
+                var isOneOfMany = dataTypeSelect.value === oneOfManyValue;
+                optionsSection.style.display = isOneOfMany ? "" : "none";
+            }
+
+            function addRow(id, rowVersion, label) {
+                var html = template.innerHTML.replace(/__index__/g, rowIndex++);
+                var wrapper = document.createElement("div");
+                wrapper.innerHTML = html.trim();
+                var row = wrapper.firstElementChild;
+                var hiddenInputs = row.querySelectorAll("input[type=hidden]");
+                hiddenInputs[0].value = id || 0;
+                hiddenInputs[1].value = rowVersion || "";
+                row.querySelector("input[type=text]").value = label || "";
+                row.querySelector(".remove-option-btn").addEventListener("click", function () { row.remove(); });
+                optionsList.appendChild(row);
+            }
+
+            document.getElementById("addOptionBtn").addEventListener("click", function () { addRow(0, "", ""); });
+            dataTypeSelect.addEventListener("change", refreshVisibility);
+
+            var existingOptions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Options));
+            existingOptions.forEach(function (o) { addRow(o.Id, o.RowVersion, o.Label); });
+            if (existingOptions.length === 0 && dataTypeSelect.value === oneOfManyValue) { addRow(0, "", ""); }
+
+            refreshVisibility();
+        })();
+</script>
