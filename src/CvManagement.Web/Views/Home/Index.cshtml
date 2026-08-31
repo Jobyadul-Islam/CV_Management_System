@@ -1,8 +1,20 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    ViewData["Title"] = "CV Management System";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="py-5 text-center">
+    <h1 class="display-6">@Localizer["Home_Welcome"]</h1>
+    <p class="lead text-secondary">@Localizer["Home_Tagline"]</p>
+
+    @if (User.Identity?.IsAuthenticated != true)
+    {
+        <a asp-controller="Account" asp-action="Register" class="btn btn-primary me-2">@Localizer["Nav_Register"]</a>
+        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary">@Localizer["Nav_SignIn"]</a>
+    }
+</div>
+
+<div class="alert alert-secondary">
+    Phase 0-2 checkpoint: solution, domain model, and authentication (local + Google/GitHub) are wired up.
+    The Main Page (latest/popular positions, tag cloud, statistics) is built in Phase 8.
 </div>

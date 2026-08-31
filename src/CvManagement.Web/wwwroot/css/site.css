@@ -29,3 +29,68 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* ---------- App-wide conventions ---------- */
+
+/* Value that must be filled in but isn't -- used on CV detail views. */
+.value-empty {
+  color: var(--bs-danger);
+  font-style: italic;
+}
+
+/* Checkbox-select + toolbar table pattern (see wwwroot/js/table-toolbar.js).
+   Positions, Attribute Library, CVs and Admin Users all share this markup so the
+   spec's "no per-row buttons" rule is enforced by one component, not four. */
+.selectable-table tbody tr.row-selected {
+  --bs-table-bg: var(--bs-secondary-bg);
+}
+
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+  padding: .5rem .75rem;
+  margin-bottom: .5rem;
+  background: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: .375rem;
+}
+
+.table-toolbar .selection-count {
+  font-size: .875rem;
+  color: var(--bs-secondary-color);
+  margin-inline-end: auto;
+}
+
+/* Tag cloud (Main Page + Position/CV tag links) */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  align-items: baseline;
+}
+
+.tag-cloud a {
+  text-decoration: none;
+}
+
+.tag-cloud a:hover {
+  text-decoration: underline;
+}
+
+/* Header full-text search, present on every page */
+.site-search-form {
+  min-width: 220px;
+  flex: 1 1 320px;
+  max-width: 480px;
+}
+
+.discussion-post {
+  border-bottom: 1px solid var(--bs-border-color);
+  padding: .75rem 0;
+}
+
+.discussion-post:last-child {
+  border-bottom: none;
+}

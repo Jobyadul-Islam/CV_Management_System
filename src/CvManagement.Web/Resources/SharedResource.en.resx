@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="Nav_Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav_Positions" xml:space="preserve"><value>Positions</value></data>
+  <data name="Nav_AttributeLibrary" xml:space="preserve"><value>Attribute Library</value></data>
+  <data name="Nav_MyProfile" xml:space="preserve"><value>My Profile</value></data>
+  <data name="Nav_BrowseCvs" xml:space="preserve"><value>Browse CVs</value></data>
+  <data name="Nav_Discussions" xml:space="preserve"><value>Discussions</value></data>
+  <data name="Nav_Users" xml:space="preserve"><value>Users</value></data>
+  <data name="Nav_SignIn" xml:space="preserve"><value>Sign in</value></data>
+  <data name="Nav_SignOut" xml:space="preserve"><value>Sign out</value></data>
+  <data name="Nav_Register" xml:space="preserve"><value>Register</value></data>
+
+  <data name="Search_Placeholder" xml:space="preserve"><value>Search positions and CVs...</value></data>
+  <data name="Search_Button" xml:space="preserve"><value>Search</value></data>
+
+  <data name="Theme_Toggle" xml:space="preserve"><value>Toggle theme</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>Light</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>Dark</value></data>
+  <data name="Language_Label" xml:space="preserve"><value>Language</value></data>
+
+  <data name="Footer_Text" xml:space="preserve"><value>CV Management System</value></data>
+
+  <data name="Account_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Account_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Account_ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="Account_FirstName" xml:space="preserve"><value>First name</value></data>
+  <data name="Account_LastName" xml:space="preserve"><value>Last name</value></data>
+  <data name="Account_RememberMe" xml:space="preserve"><value>Remember me</value></data>
+  <data name="Account_LoginButton" xml:space="preserve"><value>Sign in</value></data>
+  <data name="Account_RegisterButton" xml:space="preserve"><value>Create account</value></data>
+  <data name="Account_RegisterTitle" xml:space="preserve"><value>Create your account</value></data>
+  <data name="Account_LoginTitle" xml:space="preserve"><value>Sign in</value></data>
+  <data name="Account_OrSignInWith" xml:space="preserve"><value>Or sign in with</value></data>
+  <data name="Account_NoAccount" xml:space="preserve"><value>Don't have an account?</value></data>
+  <data name="Account_HaveAccount" xml:space="preserve"><value>Already have an account?</value></data>
+  <data name="Account_AccessDeniedTitle" xml:space="preserve"><value>Access denied</value></data>
+  <data name="Account_AccessDeniedMessage" xml:space="preserve"><value>You don't have permission to view this page.</value></data>
+
+  <data name="Home_Welcome" xml:space="preserve"><value>Welcome to the CV Management System</value></data>
+  <data name="Home_Tagline" xml:space="preserve"><value>Build reusable profiles, generate tailored CVs, and find the right candidates.</value></data>
+  <data name="Home_LatestPositions" xml:space="preserve"><value>Latest Positions</value></data>
+  <data name="Home_PopularPositions" xml:space="preserve"><value>Most Popular Positions</value></data>
+  <data name="Home_Stats" xml:space="preserve"><value>Statistics</value></data>
+  <data name="Home_TagCloud" xml:space="preserve"><value>Technology Tags</value></data>
+</root>

@@ -1,0 +1,10 @@
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    ViewData["Title"] = Localizer["Account_AccessDeniedTitle"];
+}
+
+<div class="text-center py-5">
+    <h1 class="h3">@Localizer["Account_AccessDeniedTitle"]</h1>
+    <p class="text-secondary">@Localizer["Account_AccessDeniedMessage"]</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">@Localizer["Nav_Home"]</a>
+</div>

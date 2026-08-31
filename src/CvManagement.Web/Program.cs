@@ -63,6 +63,9 @@ builder.Services.AddSignalR();
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IUserOnboardingService,
+    CvManagement.Web.Services.Implementations.UserOnboardingService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -78,10 +81,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     DefaultRequestCulture = new RequestCulture("en"),
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures,
-    RequestCultureProviders =
-    [
-        new CookieRequestCultureProvider { CookieName = "CvManagement.Culture" }
-    ]
+    RequestCultureProviders = [new CookieRequestCultureProvider()]
 });
 
 if (app.Environment.IsDevelopment())

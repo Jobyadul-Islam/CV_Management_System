@@ -1,26 +1,30 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
-
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+@inject IStringLocalizer<SharedResource> Localizer
+@if (User.Identity?.IsAuthenticated == true)
 {
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            @User.Identity.Name
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+            @if (User.IsInRole(RoleNames.Candidate) || User.IsInRole(RoleNames.Administrator))
+            {
+                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">@Localizer["Nav_MyProfile"]</a></li>
+            }
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="dropdown-item">@Localizer["Nav_SignOut"]</button>
+                </form>
+            </li>
+        </ul>
     </li>
 }
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        <a class="nav-link" asp-controller="Account" asp-action="Login">@Localizer["Nav_SignIn"]</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        <a class="btn btn-primary btn-sm ms-lg-2" asp-controller="Account" asp-action="Register">@Localizer["Nav_Register"]</a>
     </li>
 }
-</ul>
