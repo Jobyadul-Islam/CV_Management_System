@@ -64,4 +64,52 @@ public class PositionAccessEvaluator(ApplicationDbContext db) : IPositionAccessE
 
         return result;
     }
+
+    public async Task<IReadOnlyDictionary<string, bool>> IsEligibleForPositionAsync(
+        int positionId, IReadOnlyCollection<string> userIds, CancellationToken ct = default)
+    {
+        var result = new Dictionary<string, bool>();
+        if (userIds.Count == 0) return result;
+
+        var position = await db.Positions
+            .AsNoTracking()
+            .Include(p => p.AccessRules).ThenInclude(r => r.Attribute)
+            .FirstOrDefaultAsync(p => p.Id == positionId, ct);
+
+        if (position is null)
+        {
+            foreach (var userId in userIds) result[userId] = false;
+            return result;
+        }
+
+        if (position.AccessMode == PositionAccessMode.Public)
+        {
+            foreach (var userId in userIds) result[userId] = true;
+            return result;
+        }
+
+        // A Restricted position with zero rules is never eligible (see IsEligibleForManyAsync).
+        if (position.AccessRules.Count == 0)
+        {
+            foreach (var userId in userIds) result[userId] = false;
+            return result;
+        }
+
+        var attributeIds = position.AccessRules.Select(r => r.AttributeId).Distinct().ToList();
+        var valuesByUser = (await db.UserAttributeValues
+                .AsNoTracking()
+                .Where(v => userIds.Contains(v.UserId) && attributeIds.Contains(v.AttributeId))
+                .ToListAsync(ct))
+            .GroupBy(v => v.UserId)
+            .ToDictionary(g => g.Key, g => g.ToDictionary(v => v.AttributeId));
+
+        foreach (var userId in userIds)
+        {
+            var userValues = valuesByUser.GetValueOrDefault(userId);
+            result[userId] = position.AccessRules.All(rule =>
+                RuleEvaluator.Evaluate(rule, userValues?.GetValueOrDefault(rule.AttributeId)));
+        }
+
+        return result;
+    }
 }

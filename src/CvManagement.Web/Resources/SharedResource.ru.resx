@@ -79,6 +79,8 @@
   <data name="PositionDetails_CreateCv" xml:space="preserve"><value>Создать резюме для этой вакансии</value></data>
   <data name="PositionDetails_TabDetails" xml:space="preserve"><value>Детали</value></data>
   <data name="PositionDetails_TabDiscussion" xml:space="preserve"><value>Обсуждение</value></data>
+  <data name="PositionDetails_TabCvs" xml:space="preserve"><value>Резюме</value></data>
+  <data name="PositionDetails_NoCvs" xml:space="preserve"><value>По этой позиции пока нет резюме.</value></data>
   <data name="PositionDetails_TemplateAttributes" xml:space="preserve"><value>Атрибуты шаблона резюме</value></data>
   <data name="PositionDetails_NoAttributes" xml:space="preserve"><value>Атрибуты ещё не выбраны.</value></data>
   <data name="PositionDetails_Access" xml:space="preserve"><value>Доступ</value></data>
