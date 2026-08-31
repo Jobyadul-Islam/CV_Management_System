@@ -63,6 +63,10 @@ builder.Services.AddSignalR();
 
 builder.Services.AddAuthorization();
 
+// Auto-save posts JSON (not a form), so the antiforgery token travels as a request header --
+// IAntiforgery only reads the form field automatically for form-urlencoded/multipart bodies.
+builder.Services.AddAntiforgery(options => options.HeaderName = "RequestVerificationToken");
+
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IUserOnboardingService,
     CvManagement.Web.Services.Implementations.UserOnboardingService>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IAttributeService,
@@ -71,6 +75,14 @@ builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IPositionAcces
     CvManagement.Web.Services.Implementations.PositionAccessEvaluator>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IPositionService,
     CvManagement.Web.Services.Implementations.PositionService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ITagService,
+    CvManagement.Web.Services.Implementations.TagService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IProfileService,
+    CvManagement.Web.Services.Implementations.ProfileService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IProfileAutoSaveService,
+    CvManagement.Web.Services.Implementations.ProfileAutoSaveService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IProjectService,
+    CvManagement.Web.Services.Implementations.ProjectService>();
 
 var app = builder.Build();
 
