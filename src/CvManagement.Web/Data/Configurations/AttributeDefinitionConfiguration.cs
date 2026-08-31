@@ -13,6 +13,10 @@ public class AttributeDefinitionConfiguration : IEntityTypeConfiguration<Attribu
         builder.HasIndex(a => a.Name).IsUnique();
         builder.Property(a => a.RowVersion).IsRowVersion();
 
+        builder.Property(a => a.RegexPattern).HasMaxLength(500);
+        builder.Property(a => a.MinValue).HasPrecision(18, 4);
+        builder.Property(a => a.MaxValue).HasPrecision(18, 4);
+
         builder.HasOne(a => a.Category)
             .WithMany(c => c.Attributes)
             .HasForeignKey(a => a.CategoryId)

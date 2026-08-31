@@ -114,6 +114,13 @@
   <data name="Attributes_AddOption" xml:space="preserve"><value>+ Add option</value></data>
   <data name="Attributes_BuiltInCategoryNote" xml:space="preserve"><value>Built-in attributes keep their category.</value></data>
   <data name="Attributes_BuiltInTypeNote" xml:space="preserve"><value>Built-in attributes keep their data type.</value></data>
+  <data name="Attributes_TuningTitle" xml:space="preserve"><value>Validation (optional)</value></data>
+  <data name="Attributes_MinLength" xml:space="preserve"><value>Minimum length</value></data>
+  <data name="Attributes_MaxLength" xml:space="preserve"><value>Maximum length</value></data>
+  <data name="Attributes_RegexPattern" xml:space="preserve"><value>Regex pattern</value></data>
+  <data name="Attributes_RegexPatternHelp" xml:space="preserve"><value>Optional regular expression the value must match, e.g. ^[A-Za-z ]+$</value></data>
+  <data name="Attributes_MinValue" xml:space="preserve"><value>Minimum value</value></data>
+  <data name="Attributes_MaxValue" xml:space="preserve"><value>Maximum value</value></data>
 
   <data name="Profile_TabMe" xml:space="preserve"><value>Me</value></data>
   <data name="Profile_TabInfo" xml:space="preserve"><value>Info</value></data>

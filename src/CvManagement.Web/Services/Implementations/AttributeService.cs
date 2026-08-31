@@ -59,6 +59,11 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
             CategoryId = attribute.CategoryId,
             DataType = attribute.DataType,
             IsBuiltIn = attribute.IsBuiltIn,
+            MinLength = attribute.MinLength,
+            MaxLength = attribute.MaxLength,
+            RegexPattern = attribute.RegexPattern,
+            MinValue = attribute.MinValue,
+            MaxValue = attribute.MaxValue,
             RowVersion = Convert.ToBase64String(attribute.RowVersion),
             Options = attribute.Options.Select(o => new AttributeOptionInputModel
             {
@@ -83,7 +88,12 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
             CategoryId = form.CategoryId,
             DataType = form.DataType,
             IsBuiltIn = false,
-            CreatedByUserId = userId
+            CreatedByUserId = userId,
+            MinLength = form.MinLength,
+            MaxLength = form.MaxLength,
+            RegexPattern = form.RegexPattern,
+            MinValue = form.MinValue,
+            MaxValue = form.MaxValue
         };
 
         if (form.DataType == AttributeDataType.OneOfMany)
@@ -111,6 +121,11 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
         attribute.Name = form.Name.Trim();
         attribute.Description = form.Description?.Trim() ?? string.Empty;
         attribute.UpdatedAt = DateTime.UtcNow;
+        attribute.MinLength = form.MinLength;
+        attribute.MaxLength = form.MaxLength;
+        attribute.RegexPattern = form.RegexPattern;
+        attribute.MinValue = form.MinValue;
+        attribute.MaxValue = form.MaxValue;
 
         // Built-in attributes keep their original category/type -- changing "Personal Photo" away
         // from Image, for example, would break Me-tab rendering for every user.
@@ -279,6 +294,55 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
             if (labels.Count == 0) return "A dropdown attribute needs at least one option.";
             if (labels.Distinct(StringComparer.OrdinalIgnoreCase).Count() != labels.Count)
                 return "Dropdown options must have unique labels.";
+        }
+
+        return ValidateTuning(form);
+    }
+
+    // Tuning only applies to the data type it was entered for -- e.g. a length limit typed in while
+    // the type dropdown was on "String" must not silently survive a switch to "Numeric". Clearing the
+    // irrelevant fields here (rather than trusting the form/JS) keeps stored data consistent even if a
+    // request is crafted by hand.
+    private static string? ValidateTuning(AttributeFormViewModel form)
+    {
+        if (form.DataType is AttributeDataType.String or AttributeDataType.Text)
+        {
+            form.MinValue = null;
+            form.MaxValue = null;
+
+            if (form.MinLength is < 0) return "Minimum length cannot be negative.";
+            if (form.MaxLength is < 0) return "Maximum length cannot be negative.";
+            if (form.MinLength is not null && form.MaxLength is not null && form.MinLength > form.MaxLength)
+                return "Minimum length cannot exceed maximum length.";
+
+            if (!string.IsNullOrWhiteSpace(form.RegexPattern))
+            {
+                try
+                {
+                    _ = new System.Text.RegularExpressions.Regex(form.RegexPattern);
+                }
+                catch (ArgumentException)
+                {
+                    return "The regex pattern is not a valid regular expression.";
+                }
+            }
+        }
+        else if (form.DataType == AttributeDataType.Numeric)
+        {
+            form.MinLength = null;
+            form.MaxLength = null;
+            form.RegexPattern = null;
+
+            if (form.MinValue is not null && form.MaxValue is not null && form.MinValue > form.MaxValue)
+                return "Minimum value cannot exceed maximum value.";
+        }
+        else
+        {
+            form.MinLength = null;
+            form.MaxLength = null;
+            form.RegexPattern = null;
+            form.MinValue = null;
+            form.MaxValue = null;
         }
 
         return null;

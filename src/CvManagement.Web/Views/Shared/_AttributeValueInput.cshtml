@@ -18,11 +18,13 @@
     @switch (Model.DataType)
     {
         case AttributeDataType.String:
-            <input type="text" class="form-control autosave-input @(Model.IsEmpty ? "border-danger" : "")" value="@Model.ValueString" />
+            <input type="text" class="form-control autosave-input @(Model.IsEmpty ? "border-danger" : "")" value="@Model.ValueString"
+                   minlength="@Model.MinLength" maxlength="@Model.MaxLength" pattern="@Model.RegexPattern" />
             break;
 
         case AttributeDataType.Text:
-            <textarea class="form-control autosave-input markdown-editor @(Model.IsEmpty ? "border-danger" : "")" rows="4">@Model.ValueText</textarea>
+            <textarea class="form-control autosave-input markdown-editor @(Model.IsEmpty ? "border-danger" : "")" rows="4"
+                      minlength="@Model.MinLength" maxlength="@Model.MaxLength">@Model.ValueText</textarea>
             break;
 
         case AttributeDataType.Image:
@@ -30,7 +32,8 @@
             break;
 
         case AttributeDataType.Numeric:
-            <input type="number" step="any" class="form-control autosave-input @(Model.IsEmpty ? "border-danger" : "")" value="@Model.ValueNumeric" />
+            <input type="number" step="any" class="form-control autosave-input @(Model.IsEmpty ? "border-danger" : "")" value="@Model.ValueNumeric"
+                   min="@Model.MinValue" max="@Model.MaxValue" />
             break;
 
         case AttributeDataType.Date:
