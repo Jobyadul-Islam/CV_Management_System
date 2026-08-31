@@ -1,0 +1,24 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+
+## Rider / VS Code
+.idea/
+.vscode/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Claude Code local tooling state (not project source)
+.claude/
+
+## Lucene search index (rebuilt at runtime, not source)
+src/CvManagement.Web/App_Data/
