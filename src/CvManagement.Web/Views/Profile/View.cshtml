@@ -1,0 +1,35 @@
+@model CvManagement.Web.ViewModels.Profile.ProfileViewViewModel
+@{
+    ViewData["Title"] = Model.DisplayName;
+}
+
+<h1 class="h3 mb-3">@Model.DisplayName</h1>
+
+<div class="row">
+    <div class="col-lg-6">
+        <h2 class="h5">Profile</h2>
+        @foreach (var field in Model.MeAttributes)
+        {
+            <partial name="_AttributeValueDisplay" model="field" />
+        }
+    </div>
+    <div class="col-lg-6">
+        <h2 class="h5">Published CVs</h2>
+        @if (Model.PublishedCvs.Count == 0)
+        {
+            <p class="text-secondary">No published CVs.</p>
+        }
+        else
+        {
+            <ul class="list-group">
+                @foreach (var cv in Model.PublishedCvs)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <a asp-controller="Cv" asp-action="Details" asp-route-id="@cv.Id">@cv.PositionTitle</a>
+                        <span>&#9733; @cv.LikeCount</span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>

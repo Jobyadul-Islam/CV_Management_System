@@ -14,6 +14,7 @@ public class PositionsController(
     IPositionService positions,
     IAttributeService attributes,
     IPositionAccessEvaluator accessEvaluator,
+    IDiscussionService discussions,
     ApplicationDbContext db,
     UserManager<ApplicationUser> userManager) : Controller
 {
@@ -67,6 +68,13 @@ public class PositionsController(
             model.ViewerExistingCvId = model.ViewerIsEligible == true
                 ? await db.Cvs.Where(c => c.UserId == userId && c.PositionId == id).Select(c => (int?)c.Id).FirstOrDefaultAsync()
                 : null;
+        }
+
+        model.ViewerIsRecruiter = isManaging;
+        model.ViewerCanSeeDiscussion = User.Identity?.IsAuthenticated == true;
+        if (model.ViewerCanSeeDiscussion)
+        {
+            model.DiscussionPosts = (await discussions.GetPostsAsync(id)).ToList();
         }
 
         ViewBag.IsManaging = isManaging;

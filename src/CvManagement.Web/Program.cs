@@ -87,6 +87,8 @@ builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ICvRenderServi
     CvManagement.Web.Services.Implementations.CvRenderService>();
 builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.IMarkdownRenderer,
     CvManagement.Web.Services.Implementations.MarkdownRenderer>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IDiscussionService,
+    CvManagement.Web.Services.Implementations.DiscussionService>();
 
 var app = builder.Build();
 
@@ -127,5 +129,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<CvManagement.Web.Hubs.DiscussionHub>("/hubs/discussion");
 
 app.Run();

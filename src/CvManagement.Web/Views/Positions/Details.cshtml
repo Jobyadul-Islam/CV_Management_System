@@ -39,59 +39,111 @@ else if (Model.ViewerIsEligible == true)
     </form>
 }
 
-@if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+@if (Model.ViewerCanSeeDiscussion)
 {
-    <p>@Model.ShortDescription</p>
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#detailsPane" type="button">Details</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussionPane" type="button">Discussion (@Model.DiscussionPosts.Count)</button></li>
+    </ul>
 }
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <h2 class="h5">CV Template Attributes</h2>
-        @if (Model.TemplateAttributeNames.Count == 0)
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="detailsPane">
+        @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
         {
-            <p class="text-secondary">No attributes selected yet.</p>
-        }
-        else
-        {
-            <ul class="list-group">
-                @foreach (var name in Model.TemplateAttributeNames)
-                {
-                    <li class="list-group-item">@name</li>
-                }
-            </ul>
-        }
-    </div>
-
-    <div class="col-md-6 mb-4">
-        <h2 class="h5">Access</h2>
-        @if (Model.AccessMode == CvManagement.Web.Domain.Enums.PositionAccessMode.Public)
-        {
-            <p><span class="badge bg-success">Public</span> Open to all authenticated users.</p>
-        }
-        else
-        {
-            <p><span class="badge bg-warning text-dark">Restricted</span></p>
-            <ul class="list-group">
-                @foreach (var rule in Model.AccessRuleDescriptions)
-                {
-                    <li class="list-group-item">@rule</li>
-                }
-            </ul>
+            <p>@Model.ShortDescription</p>
         }
 
-        <h2 class="h5 mt-4">Relevant Project Tags (max @Model.MaxProjects projects)</h2>
-        @if (Model.ProjectTagNames.Count == 0)
-        {
-            <p class="text-secondary">No project tags set.</p>
-        }
-        else
-        {
-            <div class="tag-cloud">
-                @foreach (var tag in Model.ProjectTagNames)
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <h2 class="h5">CV Template Attributes</h2>
+                @if (Model.TemplateAttributeNames.Count == 0)
                 {
-                    <span class="badge bg-secondary">@tag</span>
+                    <p class="text-secondary">No attributes selected yet.</p>
+                }
+                else
+                {
+                    <ul class="list-group">
+                        @foreach (var name in Model.TemplateAttributeNames)
+                        {
+                            <li class="list-group-item">@name</li>
+                        }
+                    </ul>
                 }
             </div>
-        }
+
+            <div class="col-md-6 mb-4">
+                <h2 class="h5">Access</h2>
+                @if (Model.AccessMode == CvManagement.Web.Domain.Enums.PositionAccessMode.Public)
+                {
+                    <p><span class="badge bg-success">Public</span> Open to all authenticated users.</p>
+                }
+                else
+                {
+                    <p><span class="badge bg-warning text-dark">Restricted</span></p>
+                    <ul class="list-group">
+                        @foreach (var rule in Model.AccessRuleDescriptions)
+                        {
+                            <li class="list-group-item">@rule</li>
+                        }
+                    </ul>
+                }
+
+                <h2 class="h5 mt-4">Relevant Project Tags (max @Model.MaxProjects projects)</h2>
+                @if (Model.ProjectTagNames.Count == 0)
+                {
+                    <p class="text-secondary">No project tags set.</p>
+                }
+                else
+                {
+                    <div class="tag-cloud">
+                        @foreach (var tag in Model.ProjectTagNames)
+                        {
+                            <span class="badge bg-secondary">@tag</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
     </div>
+
+    @if (Model.ViewerCanSeeDiscussion)
+    {
+        <div class="tab-pane fade" id="discussionPane">
+            @Html.AntiForgeryToken()
+            <div id="discussionPosts" class="mb-3" data-position-id="@Model.Id" data-is-recruiter="@Model.ViewerIsRecruiter.ToString().ToLowerInvariant()" style="max-height:28rem; overflow-y:auto;">
+                @foreach (var post in Model.DiscussionPosts)
+                {
+                    <div class="discussion-post">
+                        <div class="d-flex justify-content-between">
+                            <strong>
+                                @if (Model.ViewerIsRecruiter && post.AuthorUserId is not null)
+                                {
+                                    <a asp-controller="Profile" asp-action="View" asp-route-userId="@post.AuthorUserId">@post.AuthorDisplayName</a>
+                                }
+                                else
+                                {
+                                    @post.AuthorDisplayName
+                                }
+                            </strong>
+                            <span class="text-secondary small">@post.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</span>
+                        </div>
+                        <div>@Html.Raw(post.BodyHtml)</div>
+                    </div>
+                }
+            </div>
+            <form id="discussionForm">
+                <textarea id="discussionBody" class="form-control mb-2" rows="2" placeholder="Write a message (Markdown supported)..."></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">Post</button>
+            </form>
+        </div>
+    }
 </div>
+
+@section Scripts {
+    @if (Model.ViewerCanSeeDiscussion)
+    {
+        <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@@8.0.7/dist/browser/signalr.min.js"></script>
+        <script src="~/js/discussion.js" asp-append-version="true"></script>
+    }
+}

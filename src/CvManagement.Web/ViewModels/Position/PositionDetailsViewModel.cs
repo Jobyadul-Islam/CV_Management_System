@@ -1,4 +1,5 @@
 using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.ViewModels.Discussion;
 
 namespace CvManagement.Web.ViewModels.Position;
 
@@ -20,4 +21,8 @@ public class PositionDetailsViewModel
     /// <summary>Set only for the viewing Candidate; null for Recruiter/Admin/anonymous viewers.</summary>
     public bool? ViewerIsEligible { get; set; }
     public int? ViewerExistingCvId { get; set; }
+
+    public bool ViewerCanSeeDiscussion { get; set; }
+    public bool ViewerIsRecruiter { get; set; }
+    public List<DiscussionPostViewModel> DiscussionPosts { get; set; } = [];
 }
