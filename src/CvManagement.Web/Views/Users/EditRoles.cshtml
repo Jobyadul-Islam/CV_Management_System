@@ -1,0 +1,21 @@
+@model CvManagement.Web.ViewModels.Admin.AdminUserEditRolesViewModel
+@{
+    ViewData["Title"] = "Edit Roles";
+}
+
+<h1 class="h3 mb-1">Edit Roles</h1>
+<p class="text-secondary">@Model.DisplayName &lt;@Model.Email&gt;</p>
+
+<form asp-action="EditRoles" asp-route-id="@Model.Id" method="post" class="col-lg-6">
+    @foreach (var role in Model.AllRoles)
+    {
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="roles" value="@role" id="role-@role"
+                   checked="@Model.SelectedRoles.Contains(role)" />
+            <label class="form-check-label" for="role-@role">@role</label>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary mt-3">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary mt-3">Cancel</a>
+</form>

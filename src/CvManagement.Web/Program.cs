@@ -93,6 +93,8 @@ builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.ISearchInde
     CvManagement.Web.Services.Implementations.SearchIndexService>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ISearchService,
     CvManagement.Web.Services.Implementations.SearchService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IAdminUserService,
+    CvManagement.Web.Services.Implementations.AdminUserService>();
 
 var app = builder.Build();
 
