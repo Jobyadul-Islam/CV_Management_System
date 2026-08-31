@@ -1,0 +1,10 @@
+@model CvManagement.Web.ViewModels.Position.PositionFormViewModel
+@{
+    ViewData["Title"] = "New Position";
+}
+
+<h1 class="h3 mb-3">New Position</h1>
+
+<form asp-action="Create" method="post">
+    <partial name="_Form" model="Model" />
+</form>

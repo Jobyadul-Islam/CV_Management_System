@@ -1,0 +1,91 @@
+@model CvManagement.Web.ViewModels.Position.PositionDetailsViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var isManaging = (bool)ViewBag.IsManaging;
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h1 class="h3 mb-1">@Model.Title</h1>
+        <div class="text-secondary">
+            @Model.Company
+            @if (Model.Level is not null)
+            {
+                <span> &middot; @Model.Level</span>
+            }
+        </div>
+    </div>
+    @if (isManaging)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit</a>
+    }
+</div>
+
+@if (Model.ViewerIsEligible == false)
+{
+    <div class="alert alert-warning">You don't currently meet the access rules for this position.</div>
+}
+@if (Model.ViewerExistingCvId is not null)
+{
+    <div class="alert alert-info">
+        You already have a CV for this position.
+        <a asp-controller="Cv" asp-action="Details" asp-route-id="@Model.ViewerExistingCvId">View it</a>.
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+{
+    <p>@Model.ShortDescription</p>
+}
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <h2 class="h5">CV Template Attributes</h2>
+        @if (Model.TemplateAttributeNames.Count == 0)
+        {
+            <p class="text-secondary">No attributes selected yet.</p>
+        }
+        else
+        {
+            <ul class="list-group">
+                @foreach (var name in Model.TemplateAttributeNames)
+                {
+                    <li class="list-group-item">@name</li>
+                }
+            </ul>
+        }
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <h2 class="h5">Access</h2>
+        @if (Model.AccessMode == CvManagement.Web.Domain.Enums.PositionAccessMode.Public)
+        {
+            <p><span class="badge bg-success">Public</span> Open to all authenticated users.</p>
+        }
+        else
+        {
+            <p><span class="badge bg-warning text-dark">Restricted</span></p>
+            <ul class="list-group">
+                @foreach (var rule in Model.AccessRuleDescriptions)
+                {
+                    <li class="list-group-item">@rule</li>
+                }
+            </ul>
+        }
+
+        <h2 class="h5 mt-4">Relevant Project Tags (max @Model.MaxProjects projects)</h2>
+        @if (Model.ProjectTagNames.Count == 0)
+        {
+            <p class="text-secondary">No project tags set.</p>
+        }
+        else
+        {
+            <div class="tag-cloud">
+                @foreach (var tag in Model.ProjectTagNames)
+                {
+                    <span class="badge bg-secondary">@tag</span>
+                }
+            </div>
+        }
+    </div>
+</div>

@@ -9,4 +9,11 @@ public class AttributePickerItemViewModel
     public string CategoryName { get; set; } = string.Empty;
     public AttributeDataType DataType { get; set; }
     public string Description { get; set; } = string.Empty;
+    public List<AttributePickerOptionViewModel> Options { get; set; } = [];
+}
+
+public class AttributePickerOptionViewModel
+{
+    public int Id { get; set; }
+    public string Label { get; set; } = string.Empty;
 }

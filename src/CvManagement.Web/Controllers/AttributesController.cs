@@ -7,9 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CvManagement.Web.Controllers;
 
-[Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
 public class AttributesController(IAttributeService attributes, UserManager<ApplicationUser> userManager) : Controller
 {
+    /// <summary>Any authenticated user can record picker usage (Candidates use the picker too, in Phase 5).</summary>
+    [HttpPost, ValidateAntiForgeryToken, Authorize]
+    public async Task<IActionResult> RecordUsage(int attributeId)
+    {
+        await attributes.RecordUsageAsync(userManager.GetUserId(User)!, attributeId);
+        return Ok();
+    }
+
+    [Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
     [HttpGet]
     public async Task<IActionResult> Index(string? prefix, int? categoryId)
     {
@@ -20,7 +28,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
         return View(items);
     }
 
-    [HttpGet]
+    [HttpGet, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
     public async Task<IActionResult> Create()
     {
         var model = new AttributeFormViewModel();
@@ -28,7 +36,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
         return View(model);
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
     public async Task<IActionResult> Create(AttributeFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -54,7 +62,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
         return RedirectToAction(nameof(Index));
     }
 
-    [HttpGet]
+    [HttpGet, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
     public async Task<IActionResult> Edit(int id)
     {
         var model = await attributes.GetForEditAsync(id);
@@ -62,7 +70,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
         return View(model);
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
     public async Task<IActionResult> Edit(AttributeFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -99,7 +107,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
         }
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
     public async Task<IActionResult> Delete(int[] ids)
     {
         var outcome = await attributes.DeleteAsync(ids);
@@ -116,7 +124,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
     }
 
     /// <summary>JSON endpoint backing the attribute picker (prefix/category search + recently-used).</summary>
-    [HttpGet]
+    [HttpGet, Authorize]
     public async Task<IActionResult> Picker(string? prefix, int? categoryId, [FromQuery] int[]? exclude)
     {
         var userId = userManager.GetUserId(User)!;
