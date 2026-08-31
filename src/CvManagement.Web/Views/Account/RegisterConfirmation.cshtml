@@ -1,0 +1,30 @@
+@model CvManagement.Web.ViewModels.Account.RegisterConfirmationViewModel
+@{
+    ViewData["Title"] = "Check your email";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5 text-center py-4">
+        <h1 class="h3 mb-3">Check your email</h1>
+        <p class="text-secondary">
+            We've sent a confirmation link to <strong>@Model.Email</strong>.
+            Click it to activate your account, then sign in.
+        </p>
+
+        @if (Model.DevConfirmationLink is not null)
+        {
+            <div class="alert alert-warning text-start mt-4">
+                <strong>Email isn't configured on this server.</strong>
+                For local testing, here's the link that would have been emailed:
+                <div class="mt-2"><a href="@Model.DevConfirmationLink" class="text-break">@Model.DevConfirmationLink</a></div>
+            </div>
+        }
+
+        <form asp-action="ResendConfirmation" method="post" class="mt-4">
+            <input type="hidden" name="email" value="@Model.Email" />
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Resend confirmation email</button>
+        </form>
+
+        <a asp-action="Login" class="btn btn-link mt-2">Back to sign in</a>
+    </div>
+</div>
