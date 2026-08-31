@@ -39,6 +39,44 @@
     }
 </div>
 
+<div id="lengthTuningSection" class="mb-3 border rounded p-3" style="display:none">
+    <label class="form-label fw-semibold">@Localizer["Attributes_TuningTitle"]</label>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <label asp-for="MinLength" class="form-label"></label>
+            <input asp-for="MinLength" type="number" min="0" class="form-control" />
+            <span asp-validation-for="MinLength" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label asp-for="MaxLength" class="form-label"></label>
+            <input asp-for="MaxLength" type="number" min="0" class="form-control" />
+            <span asp-validation-for="MaxLength" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-1">
+        <label asp-for="RegexPattern" class="form-label"></label>
+        <input asp-for="RegexPattern" class="form-control" placeholder="^[A-Za-z ]+$" />
+        <div class="form-text">@Localizer["Attributes_RegexPatternHelp"]</div>
+        <span asp-validation-for="RegexPattern" class="text-danger"></span>
+    </div>
+</div>
+
+<div id="numericTuningSection" class="mb-3 border rounded p-3" style="display:none">
+    <label class="form-label fw-semibold">@Localizer["Attributes_TuningTitle"]</label>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <label asp-for="MinValue" class="form-label"></label>
+            <input asp-for="MinValue" type="number" step="any" class="form-control" />
+            <span asp-validation-for="MinValue" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label asp-for="MaxValue" class="form-label"></label>
+            <input asp-for="MaxValue" type="number" step="any" class="form-control" />
+            <span asp-validation-for="MaxValue" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
 <div id="optionsSection" class="mb-3 border rounded p-3" style="display:none">
     <label class="form-label fw-semibold">@Localizer["Attributes_DropdownOptions"]</label>
     <div id="optionsList"></div>
@@ -63,12 +101,19 @@
             var optionsSection = document.getElementById("optionsSection");
             var optionsList = document.getElementById("optionsList");
             var template = document.getElementById("optionRowTemplate");
+            var lengthTuningSection = document.getElementById("lengthTuningSection");
+            var numericTuningSection = document.getElementById("numericTuningSection");
             var oneOfManyValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.OneOfMany)";
+            var stringValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.String)";
+            var textValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.Text)";
+            var numericValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.Numeric)";
             var rowIndex = optionsList.querySelectorAll(".option-row").length;
 
             function refreshVisibility() {
-                var isOneOfMany = dataTypeSelect.value === oneOfManyValue;
-                optionsSection.style.display = isOneOfMany ? "" : "none";
+                var value = dataTypeSelect.value;
+                optionsSection.style.display = value === oneOfManyValue ? "" : "none";
+                lengthTuningSection.style.display = (value === stringValue || value === textValue) ? "" : "none";
+                numericTuningSection.style.display = value === numericValue ? "" : "none";
             }
 
             function addRow(id, rowVersion, label) {

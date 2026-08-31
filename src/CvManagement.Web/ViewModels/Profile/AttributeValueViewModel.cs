@@ -17,6 +17,14 @@ public class AttributeValueViewModel
     public string? RowVersion { get; set; }
     public bool IsEmpty { get; set; }
 
+    // Optional per-attribute tuning, mirrored client-side as native HTML5 validation attributes
+    // (maxlength/pattern/min/max) -- ProfileAutoSaveService re-enforces the same limits server-side.
+    public int? MinLength { get; set; }
+    public int? MaxLength { get; set; }
+    public string? RegexPattern { get; set; }
+    public decimal? MinValue { get; set; }
+    public decimal? MaxValue { get; set; }
+
     public string? ValueString { get; set; }
     public string? ValueText { get; set; }
     public string? ValueImageUrl { get; set; }

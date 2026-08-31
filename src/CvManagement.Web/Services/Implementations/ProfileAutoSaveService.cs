@@ -41,6 +41,12 @@ public class ProfileAutoSaveService(ApplicationDbContext db, ISearchIndexService
         }
         var isSearchableText = attribute.DataType is AttributeDataType.String or AttributeDataType.Text;
 
+        var tuningError = ValidateTuning(attribute, change);
+        if (tuningError is not null)
+        {
+            return (new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "error", ErrorMessage = tuningError }, false);
+        }
+
         var existing = await db.UserAttributeValues
             .FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == change.AttributeId, ct);
 
@@ -106,6 +112,39 @@ public class ProfileAutoSaveService(ApplicationDbContext db, ISearchIndexService
 
         await SyncDisplayNameIfNeededAsync(userId, attribute.Name, ct);
         return (new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "ok", NewRowVersion = Convert.ToBase64String(existing.RowVersion) }, isSearchableText);
+    }
+
+    // Client-side maxlength/pattern/min/max on the input are a convenience, not a guarantee -- a
+    // hand-crafted autosave request must be re-checked here against the same per-attribute tuning.
+    // Clearing a field (empty string / null number) is always allowed; only non-empty values are
+    // checked against Min/Max, since there's no separate "required" concept for these attributes.
+    private static string? ValidateTuning(AttributeDefinition attribute, AutoSaveChangeDto change)
+    {
+        switch (attribute.DataType)
+        {
+            case AttributeDataType.String:
+            case AttributeDataType.Text:
+                var text = attribute.DataType == AttributeDataType.String ? change.ValueString : change.ValueText;
+                if (string.IsNullOrEmpty(text)) return null;
+
+                if (attribute.MinLength is int minLen && text.Length < minLen)
+                    return $"Must be at least {minLen} characters.";
+                if (attribute.MaxLength is int maxLen && text.Length > maxLen)
+                    return $"Must be at most {maxLen} characters.";
+                if (!string.IsNullOrEmpty(attribute.RegexPattern) &&
+                    !System.Text.RegularExpressions.Regex.IsMatch(text, attribute.RegexPattern))
+                    return "Value does not match the required format.";
+                return null;
+
+            case AttributeDataType.Numeric:
+                if (change.ValueNumeric is not { } number) return null;
+                if (attribute.MinValue is { } min && number < min) return $"Must be at least {min}.";
+                if (attribute.MaxValue is { } max && number > max) return $"Must be at most {max}.";
+                return null;
+
+            default:
+                return null;
+        }
     }
 
     private static void ApplyValue(UserAttributeValue entity, AttributeDataType dataType, AutoSaveChangeDto change)

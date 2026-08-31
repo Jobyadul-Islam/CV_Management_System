@@ -114,6 +114,13 @@
   <data name="Attributes_AddOption" xml:space="preserve"><value>+ Добавить вариант</value></data>
   <data name="Attributes_BuiltInCategoryNote" xml:space="preserve"><value>Встроенные атрибуты сохраняют свою категорию.</value></data>
   <data name="Attributes_BuiltInTypeNote" xml:space="preserve"><value>Встроенные атрибуты сохраняют свой тип данных.</value></data>
+  <data name="Attributes_TuningTitle" xml:space="preserve"><value>Проверка (необязательно)</value></data>
+  <data name="Attributes_MinLength" xml:space="preserve"><value>Минимальная длина</value></data>
+  <data name="Attributes_MaxLength" xml:space="preserve"><value>Максимальная длина</value></data>
+  <data name="Attributes_RegexPattern" xml:space="preserve"><value>Регулярное выражение</value></data>
+  <data name="Attributes_RegexPatternHelp" xml:space="preserve"><value>Необязательное регулярное выражение, которому должно соответствовать значение, например ^[A-Za-z ]+$</value></data>
+  <data name="Attributes_MinValue" xml:space="preserve"><value>Минимальное значение</value></data>
+  <data name="Attributes_MaxValue" xml:space="preserve"><value>Максимальное значение</value></data>
 
   <data name="Profile_TabMe" xml:space="preserve"><value>Обо мне</value></data>
   <data name="Profile_TabInfo" xml:space="preserve"><value>Инфо</value></data>

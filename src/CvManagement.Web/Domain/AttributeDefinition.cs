@@ -25,6 +25,16 @@ public class AttributeDefinition
     /// </summary>
     public bool IsBuiltIn { get; set; }
 
+    // Optional per-attribute "tuning" (spec's optional requirement): String/Text length limits and a
+    // regex pattern, Numeric min/max. Enforced server-side in ProfileAutoSaveService and surfaced
+    // client-side as native HTML5 validation attributes (maxlength/pattern/min/max) -- never trusted
+    // from the client alone. Null means "no constraint" for that field.
+    public int? MinLength { get; set; }
+    public int? MaxLength { get; set; }
+    public string? RegexPattern { get; set; }
+    public decimal? MinValue { get; set; }
+    public decimal? MaxValue { get; set; }
+
     public byte[] RowVersion { get; set; } = [];
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

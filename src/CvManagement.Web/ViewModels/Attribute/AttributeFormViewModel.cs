@@ -22,6 +22,21 @@ public class AttributeFormViewModel
 
     public bool IsBuiltIn { get; set; }
 
+    // Optional validation tuning -- only meaningful for String/Text (length + regex) and Numeric
+    // (min/max) attributes; AttributeService ignores/nulls these out for other data types.
+    [Range(0, 100_000)]
+    public int? MinLength { get; set; }
+
+    [Range(0, 100_000)]
+    public int? MaxLength { get; set; }
+
+    [StringLength(500)]
+    public string? RegexPattern { get; set; }
+
+    public decimal? MinValue { get; set; }
+
+    public decimal? MaxValue { get; set; }
+
     public List<AttributeOptionInputModel> Options { get; set; } = [];
 
     /// <summary>Base64-encoded rowversion; null/empty on create.</summary>
