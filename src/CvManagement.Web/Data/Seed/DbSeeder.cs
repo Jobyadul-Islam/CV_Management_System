@@ -1,5 +1,6 @@
 using CvManagement.Web.Domain;
 using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Services.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,12 +20,13 @@ public static class DbSeeder
         var db = services.GetRequiredService<ApplicationDbContext>();
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var onboarding = services.GetRequiredService<IUserOnboardingService>();
 
         await SeedRolesAsync(roleManager);
         var categories = await SeedCategoriesAsync(db);
         var builtIns = await SeedBuiltInAttributesAsync(db, categories);
         await SeedLibraryAttributesAsync(db, categories);
-        await SeedDemoUsersAsync(userManager, db, builtIns);
+        await SeedDemoUsersAsync(userManager, db, onboarding, builtIns);
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
@@ -159,24 +161,24 @@ public static class DbSeeder
 
     private static async Task SeedDemoUsersAsync(
         UserManager<ApplicationUser> userManager, ApplicationDbContext db,
-        Dictionary<string, AttributeDefinition> builtIns)
+        IUserOnboardingService onboarding, Dictionary<string, AttributeDefinition> builtIns)
     {
-        await CreateDemoUserAsync(userManager, db, builtIns,
+        await CreateDemoUserAsync(userManager, db, onboarding, builtIns,
             email: "admin@demo.local", role: RoleNames.Administrator,
             firstName: "Ada", lastName: "Admin", location: "Warsaw, Poland");
 
-        await CreateDemoUserAsync(userManager, db, builtIns,
+        await CreateDemoUserAsync(userManager, db, onboarding, builtIns,
             email: "recruiter@demo.local", role: RoleNames.Recruiter,
             firstName: "Rita", lastName: "Recruiter", location: "Berlin, Germany");
 
-        await CreateDemoUserAsync(userManager, db, builtIns,
+        await CreateDemoUserAsync(userManager, db, onboarding, builtIns,
             email: "candidate@demo.local", role: RoleNames.Candidate,
             firstName: "Cameron", lastName: "Candidate", location: "Kyiv, Ukraine");
     }
 
     private static async Task CreateDemoUserAsync(
         UserManager<ApplicationUser> userManager, ApplicationDbContext db,
-        Dictionary<string, AttributeDefinition> builtIns,
+        IUserOnboardingService onboarding, Dictionary<string, AttributeDefinition> builtIns,
         string email, string role, string firstName, string lastName, string location)
     {
         if (await userManager.FindByEmailAsync(email) is not null)
@@ -199,12 +201,15 @@ public static class DbSeeder
         }
 
         await userManager.AddToRoleAsync(user, role);
+        await onboarding.InitializeNewUserAsync(user);
 
-        db.UserAttributeValues.AddRange(
-            new UserAttributeValue { UserId = user.Id, AttributeId = builtIns["First Name"].Id, ValueString = firstName },
-            new UserAttributeValue { UserId = user.Id, AttributeId = builtIns["Last Name"].Id, ValueString = lastName },
-            new UserAttributeValue { UserId = user.Id, AttributeId = builtIns["Location"].Id, ValueString = location },
-            new UserAttributeValue { UserId = user.Id, AttributeId = builtIns["Personal Photo"].Id });
+        var values = await db.UserAttributeValues
+            .Where(v => v.UserId == user.Id)
+            .ToDictionaryAsync(v => v.AttributeId);
+
+        values[builtIns["First Name"].Id].ValueString = firstName;
+        values[builtIns["Last Name"].Id].ValueString = lastName;
+        values[builtIns["Location"].Id].ValueString = location;
 
         await db.SaveChangesAsync();
     }

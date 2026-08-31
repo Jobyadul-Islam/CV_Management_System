@@ -6,12 +6,8 @@ namespace CvManagement.Web.Controllers;
 
 public class HomeController : Controller
 {
+    // Phase 8 replaces this with the real Main Page (latest/popular positions, tag cloud, stats).
     public IActionResult Index()
-    {
-        return View();
-    }
-
-    public IActionResult Privacy()
     {
         return View();
     }

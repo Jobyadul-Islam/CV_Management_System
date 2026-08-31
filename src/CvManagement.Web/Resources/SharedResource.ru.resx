@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="Nav_Home" xml:space="preserve"><value>Главная</value></data>
+  <data name="Nav_Positions" xml:space="preserve"><value>Вакансии</value></data>
+  <data name="Nav_AttributeLibrary" xml:space="preserve"><value>Библиотека атрибутов</value></data>
+  <data name="Nav_MyProfile" xml:space="preserve"><value>Мой профиль</value></data>
+  <data name="Nav_BrowseCvs" xml:space="preserve"><value>Резюме кандидатов</value></data>
+  <data name="Nav_Discussions" xml:space="preserve"><value>Обсуждения</value></data>
+  <data name="Nav_Users" xml:space="preserve"><value>Пользователи</value></data>
+  <data name="Nav_SignIn" xml:space="preserve"><value>Войти</value></data>
+  <data name="Nav_SignOut" xml:space="preserve"><value>Выйти</value></data>
+  <data name="Nav_Register" xml:space="preserve"><value>Регистрация</value></data>
+
+  <data name="Search_Placeholder" xml:space="preserve"><value>Поиск вакансий и резюме...</value></data>
+  <data name="Search_Button" xml:space="preserve"><value>Найти</value></data>
+
+  <data name="Theme_Toggle" xml:space="preserve"><value>Переключить тему</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>Светлая</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>Тёмная</value></data>
+  <data name="Language_Label" xml:space="preserve"><value>Язык</value></data>
+
+  <data name="Footer_Text" xml:space="preserve"><value>Система управления резюме</value></data>
+
+  <data name="Account_Email" xml:space="preserve"><value>Электронная почта</value></data>
+  <data name="Account_Password" xml:space="preserve"><value>Пароль</value></data>
+  <data name="Account_ConfirmPassword" xml:space="preserve"><value>Подтвердите пароль</value></data>
+  <data name="Account_FirstName" xml:space="preserve"><value>Имя</value></data>
+  <data name="Account_LastName" xml:space="preserve"><value>Фамилия</value></data>
+  <data name="Account_RememberMe" xml:space="preserve"><value>Запомнить меня</value></data>
+  <data name="Account_LoginButton" xml:space="preserve"><value>Войти</value></data>
+  <data name="Account_RegisterButton" xml:space="preserve"><value>Создать аккаунт</value></data>
+  <data name="Account_RegisterTitle" xml:space="preserve"><value>Создание аккаунта</value></data>
+  <data name="Account_LoginTitle" xml:space="preserve"><value>Вход в систему</value></data>
+  <data name="Account_OrSignInWith" xml:space="preserve"><value>Или войдите через</value></data>
+  <data name="Account_NoAccount" xml:space="preserve"><value>Нет аккаунта?</value></data>
+  <data name="Account_HaveAccount" xml:space="preserve"><value>Уже есть аккаунт?</value></data>
+  <data name="Account_AccessDeniedTitle" xml:space="preserve"><value>Доступ запрещён</value></data>
+  <data name="Account_AccessDeniedMessage" xml:space="preserve"><value>У вас нет прав для просмотра этой страницы.</value></data>
+
+  <data name="Home_Welcome" xml:space="preserve"><value>Добро пожаловать в систему управления резюме</value></data>
+  <data name="Home_Tagline" xml:space="preserve"><value>Создавайте профили, формируйте резюме под вакансии и находите нужных кандидатов.</value></data>
+  <data name="Home_LatestPositions" xml:space="preserve"><value>Последние вакансии</value></data>
+  <data name="Home_PopularPositions" xml:space="preserve"><value>Популярные вакансии</value></data>
+  <data name="Home_Stats" xml:space="preserve"><value>Статистика</value></data>
+  <data name="Home_TagCloud" xml:space="preserve"><value>Технологии</value></data>
+</root>
