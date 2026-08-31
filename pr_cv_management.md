@@ -259,3 +259,12 @@ Here are some explaining about optimistic locking used everywhere. It's a good t
   2. you need to show proper messages, resolve conflicts or provide reload/retry functionality for the end-user, etc.  
 * Also, you don't "encapsulate" optimistic locking on the "higher" layers, because you need to "synchronise" different versions somehow.
 
+
+
+Okay, here are few examples. 
+
+The head of the Talent Management department at a large software development company, Acme Corp., wants to know whether candidates for data-related positions have taken the "Certified Analytics Professional" exam. She creates a drop-down attribute called CAP in the "Certificates" category and defines four possible levels: None, Essentials, Pro, and Expert.
+
+A Talent Management employee creates a position called Junior Data Engineer @ Acme Corp. and specifies a set of attributes for that position, such as an English Level drop-down, a numeric GPA field, Python and Apache Hadoop checkboxes, and a CAP drop-down. He then specifies SQL, R, and Python as filters to select the corresponding projects and sets the maximum number of recent projects to 4.
+
+A Data Analyst wants to apply for the Junior Data Engineer @ Acme Corp. position. She creates a CV based on the position. She has already filled out all of the required attributes except CAP; however, it is added automatically during CV creation. She clicks the highlighted empty CAP field in the CV and selects one of the values from the drop-down. She then presses the "Publish" button to mark the CV as complete.
