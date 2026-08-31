@@ -19,32 +19,46 @@ public class PositionsController(
     UserManager<ApplicationUser> userManager) : Controller
 {
     [HttpGet, AllowAnonymous]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? tag)
     {
+        ViewBag.Tag = tag;
+        List<ViewModels.Position.PositionListItemViewModel> list;
+
         if (User.IsInRole(RoleNames.Recruiter) || User.IsInRole(RoleNames.Administrator))
         {
             ViewBag.IsManaging = true;
-            return View(await positions.GetListForRecruiterAsync());
+            list = (await positions.GetListForRecruiterAsync()).ToList();
         }
-
-        if (User.Identity?.IsAuthenticated == true)
+        else if (User.Identity?.IsAuthenticated == true)
         {
             ViewBag.IsManaging = false;
-            return View(await positions.GetEligibleListForCandidateAsync(userManager.GetUserId(User)!));
+            list = (await positions.GetEligibleListForCandidateAsync(userManager.GetUserId(User)!)).ToList();
+        }
+        else
+        {
+            // Anonymous: public positions only, read-only browse.
+            ViewBag.IsManaging = false;
+            list = await db.Positions
+                .Where(p => p.AccessMode == PositionAccessMode.Public)
+                .OrderByDescending(p => p.UpdatedAt)
+                .Select(p => new ViewModels.Position.PositionListItemViewModel
+                {
+                    Id = p.Id, Title = p.Title, Company = p.Company, Level = p.Level,
+                    AccessMode = p.AccessMode, CvCount = p.Cvs.Count, UpdatedAt = p.UpdatedAt
+                })
+                .ToListAsync();
         }
 
-        // Anonymous: public positions only, read-only browse.
-        ViewBag.IsManaging = false;
-        var publicOnly = await db.Positions
-            .Where(p => p.AccessMode == PositionAccessMode.Public)
-            .OrderByDescending(p => p.UpdatedAt)
-            .Select(p => new ViewModels.Position.PositionListItemViewModel
-            {
-                Id = p.Id, Title = p.Title, Company = p.Company, Level = p.Level,
-                AccessMode = p.AccessMode, CvCount = p.Cvs.Count, UpdatedAt = p.UpdatedAt
-            })
-            .ToListAsync();
-        return View(publicOnly);
+        if (!string.IsNullOrWhiteSpace(tag))
+        {
+            var taggedPositionIds = await db.PositionProjectTags
+                .Where(t => t.Tag.Name == tag)
+                .Select(t => t.PositionId)
+                .ToListAsync();
+            list = list.Where(p => taggedPositionIds.Contains(p.Id)).ToList();
+        }
+
+        return View(list);
     }
 
     [HttpGet, AllowAnonymous]

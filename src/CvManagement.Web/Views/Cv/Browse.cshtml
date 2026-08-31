@@ -1,9 +1,20 @@
-@model List<CvManagement.Web.Controllers.CvBrowseItemViewModel>
+@model List<CvManagement.Web.ViewModels.Cv.CvBrowseItemViewModel>
 @{
     ViewData["Title"] = "Browse CVs";
 }
 
 <h1 class="h3 mb-3">Browse CVs</h1>
+
+@{
+    var tagFilter = (string?)ViewBag.Tag;
+}
+@if (!string.IsNullOrWhiteSpace(tagFilter))
+{
+    <div class="alert alert-secondary d-flex justify-content-between align-items-center">
+        <span>Filtered by tag: <strong>@tagFilter</strong></span>
+        <a asp-action="Browse" class="btn btn-sm btn-outline-secondary">Clear</a>
+    </div>
+}
 
 <div class="table-responsive">
     <table class="table table-hover align-middle">

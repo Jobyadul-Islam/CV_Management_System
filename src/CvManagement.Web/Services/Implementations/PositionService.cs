@@ -8,7 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class PositionService(ApplicationDbContext db, IPositionAccessEvaluator accessEvaluator, ITagService tagService) : IPositionService
+public class PositionService(
+    ApplicationDbContext db,
+    IPositionAccessEvaluator accessEvaluator,
+    ITagService tagService,
+    ISearchIndexService searchIndex) : IPositionService
 {
     public async Task<IReadOnlyList<PositionListItemViewModel>> GetListForRecruiterAsync(CancellationToken ct = default)
         => await db.Positions
@@ -141,6 +145,7 @@ public class PositionService(ApplicationDbContext db, IPositionAccessEvaluator a
 
         db.Positions.Add(position);
         await db.SaveChangesAsync(ct);
+        await searchIndex.IndexPositionAsync(position.Id, ct);
         return PositionSaveOutcome.Success(position.Id);
     }
 
@@ -191,6 +196,7 @@ public class PositionService(ApplicationDbContext db, IPositionAccessEvaluator a
             return current is null ? PositionSaveOutcome.NotFound() : PositionSaveOutcome.Conflict(Convert.ToBase64String(current.RowVersion));
         }
 
+        await searchIndex.IndexPositionAsync(position.Id, ct);
         return PositionSaveOutcome.Success(position.Id);
     }
 
@@ -214,6 +220,7 @@ public class PositionService(ApplicationDbContext db, IPositionAccessEvaluator a
             }
 
             await db.Positions.Where(p => p.Id == position.Id).ExecuteDeleteAsync(ct);
+            await searchIndex.RemovePositionAsync(position.Id, ct);
             deleted.Add(position.Id);
         }
 
@@ -261,6 +268,7 @@ public class PositionService(ApplicationDbContext db, IPositionAccessEvaluator a
 
         db.Positions.Add(copy);
         await db.SaveChangesAsync(ct);
+        await searchIndex.IndexPositionAsync(copy.Id, ct);
         return PositionSaveOutcome.Success(copy.Id);
     }
 
