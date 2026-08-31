@@ -32,6 +32,12 @@
         <a asp-controller="Cv" asp-action="Details" asp-route-id="@Model.ViewerExistingCvId">View it</a>.
     </div>
 }
+else if (Model.ViewerIsEligible == true)
+{
+    <form asp-controller="Cv" asp-action="Create" asp-route-positionId="@Model.Id" method="post" class="mb-3">
+        <button type="submit" class="btn btn-primary">Create CV for this position</button>
+    </form>
+}
 
 @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
 {

@@ -48,26 +48,6 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
             .OrderBy(v => v.Attribute.Category.Name).ThenBy(v => v.Attribute.Name)
             .ToListAsync(ct);
 
-        return rows.Select(ToViewModel).ToList();
+        return rows.Select(v => AttributeValueMapper.ToViewModel(v.Attribute, v)).ToList();
     }
-
-    private static AttributeValueViewModel ToViewModel(UserAttributeValue value) => new()
-    {
-        AttributeId = value.AttributeId,
-        AttributeName = value.Attribute.Name,
-        Description = value.Attribute.Description,
-        DataType = value.Attribute.DataType,
-        Options = value.Attribute.Options.Select(o => new AttributePickerOptionViewModel { Id = o.Id, Label = o.Label }).ToList(),
-        RowVersion = Convert.ToBase64String(value.RowVersion),
-        IsEmpty = AttributeEmptiness.IsEmpty(value, value.Attribute.DataType),
-        ValueString = value.ValueString,
-        ValueText = value.ValueText,
-        ValueImageUrl = value.ValueImageUrl,
-        ValueNumeric = value.ValueNumeric,
-        ValueDate = value.ValueDate,
-        ValuePeriodStart = value.ValuePeriodStart,
-        ValuePeriodEnd = value.ValuePeriodEnd,
-        ValueBoolean = value.ValueBoolean,
-        ValueOptionId = value.ValueOptionId
-    };
 }

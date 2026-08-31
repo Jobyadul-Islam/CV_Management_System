@@ -62,10 +62,11 @@ public class PositionsController(
         {
             var userId = userManager.GetUserId(User)!;
             model.ViewerIsEligible = await accessEvaluator.IsEligibleAsync(userId, id);
-            model.ViewerExistingCvId = await db.Cvs
-                .Where(c => c.UserId == userId && c.PositionId == id)
-                .Select(c => (int?)c.Id)
-                .FirstOrDefaultAsync();
+            // Only surface an existing CV link while still eligible -- otherwise the CV is hidden
+            // (per spec, even from its own candidate) and the link would just 404.
+            model.ViewerExistingCvId = model.ViewerIsEligible == true
+                ? await db.Cvs.Where(c => c.UserId == userId && c.PositionId == id).Select(c => (int?)c.Id).FirstOrDefaultAsync()
+                : null;
         }
 
         ViewBag.IsManaging = isManaging;

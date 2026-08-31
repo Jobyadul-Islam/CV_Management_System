@@ -14,6 +14,7 @@ public class ProfileController(
     IProfileService profile,
     IProfileAutoSaveService autoSave,
     IProjectService projects,
+    IPositionAccessEvaluator accessEvaluator,
     ApplicationDbContext db,
     UserManager<ApplicationUser> userManager) : Controller
 {
@@ -23,6 +24,21 @@ public class ProfileController(
         var userId = userManager.GetUserId(User)!;
         var user = await userManager.FindByIdAsync(userId);
 
+        var allCvs = await db.Cvs
+            .Where(c => c.UserId == userId)
+            .OrderByDescending(c => c.UpdatedAt)
+            .Select(c => new { Summary = new CvSummaryViewModel
+            {
+                Id = c.Id,
+                PositionTitle = c.Position.Title,
+                Status = c.Status.ToString(),
+                LikeCount = c.Likes.Count
+            }, c.PositionId })
+            .ToListAsync();
+
+        // A CV whose position access rules no longer match is hidden even from its own candidate.
+        var eligibility = await accessEvaluator.IsEligibleForManyAsync(userId, allCvs.Select(c => c.PositionId).ToList());
+
         var model = new ProfileIndexViewModel
         {
             ActiveTab = tab is "info" or "projects" or "cvs" ? tab : "me",
@@ -30,17 +46,7 @@ public class ProfileController(
             MeAttributes = await profile.GetMeTabAsync(userId),
             InfoAttributes = await profile.GetInfoTabAsync(userId),
             Projects = await projects.GetListAsync(userId),
-            Cvs = await db.Cvs
-                .Where(c => c.UserId == userId)
-                .OrderByDescending(c => c.UpdatedAt)
-                .Select(c => new CvSummaryViewModel
-                {
-                    Id = c.Id,
-                    PositionTitle = c.Position.Title,
-                    Status = c.Status.ToString(),
-                    LikeCount = c.Likes.Count
-                })
-                .ToListAsync()
+            Cvs = allCvs.Where(c => eligibility.GetValueOrDefault(c.PositionId)).Select(c => c.Summary).ToList()
         };
 
         return View(model);
