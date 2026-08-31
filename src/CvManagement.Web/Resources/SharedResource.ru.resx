@@ -48,4 +48,138 @@
   <data name="Home_PopularPositions" xml:space="preserve"><value>Популярные вакансии</value></data>
   <data name="Home_Stats" xml:space="preserve"><value>Статистика</value></data>
   <data name="Home_TagCloud" xml:space="preserve"><value>Технологии</value></data>
+
+  <data name="Common_Save" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Common_Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Common_Duplicate" xml:space="preserve"><value>Дублировать</value></data>
+  <data name="Common_Filter" xml:space="preserve"><value>Фильтр</value></data>
+  <data name="Common_Clear" xml:space="preserve"><value>Очистить</value></data>
+  <data name="Common_Send" xml:space="preserve"><value>Отправить</value></data>
+  <data name="Common_Updated" xml:space="preserve"><value>Обновлено</value></data>
+
+  <data name="Positions_New" xml:space="preserve"><value>+ Новая вакансия</value></data>
+  <data name="Positions_ColTitle" xml:space="preserve"><value>Название</value></data>
+  <data name="Positions_ColCompany" xml:space="preserve"><value>Компания</value></data>
+  <data name="Positions_ColLevel" xml:space="preserve"><value>Уровень</value></data>
+  <data name="Positions_ColAccess" xml:space="preserve"><value>Доступ</value></data>
+  <data name="Positions_ColCvs" xml:space="preserve"><value>Резюме</value></data>
+  <data name="Positions_Empty" xml:space="preserve"><value>Нет вакансий для отображения.</value></data>
+  <data name="Positions_Public" xml:space="preserve"><value>Публичная</value></data>
+  <data name="Positions_Restricted" xml:space="preserve"><value>Ограниченная</value></data>
+  <data name="Positions_FilteredByTag" xml:space="preserve"><value>Фильтр по тегу:</value></data>
+  <data name="Positions_DeleteConfirm" xml:space="preserve"><value>Удалить выбранные вакансии? Вакансии с существующими резюме будут пропущены.</value></data>
+  <data name="Positions_New_Title" xml:space="preserve"><value>Новая вакансия</value></data>
+  <data name="Positions_Edit_Title" xml:space="preserve"><value>Редактирование вакансии</value></data>
+
+  <data name="PositionDetails_NotEligible" xml:space="preserve"><value>Вы в настоящее время не соответствуете правилам доступа для этой вакансии.</value></data>
+  <data name="PositionDetails_AlreadyHaveCv" xml:space="preserve"><value>У вас уже есть резюме для этой вакансии.</value></data>
+  <data name="PositionDetails_ViewIt" xml:space="preserve"><value>Посмотреть</value></data>
+  <data name="PositionDetails_CreateCv" xml:space="preserve"><value>Создать резюме для этой вакансии</value></data>
+  <data name="PositionDetails_TabDetails" xml:space="preserve"><value>Детали</value></data>
+  <data name="PositionDetails_TabDiscussion" xml:space="preserve"><value>Обсуждение</value></data>
+  <data name="PositionDetails_TemplateAttributes" xml:space="preserve"><value>Атрибуты шаблона резюме</value></data>
+  <data name="PositionDetails_NoAttributes" xml:space="preserve"><value>Атрибуты ещё не выбраны.</value></data>
+  <data name="PositionDetails_Access" xml:space="preserve"><value>Доступ</value></data>
+  <data name="PositionDetails_PublicDesc" xml:space="preserve"><value>Открыто для всех авторизованных пользователей.</value></data>
+  <data name="PositionDetails_ProjectTags" xml:space="preserve"><value>Соответствующие теги проектов</value></data>
+  <data name="PositionDetails_NoTags" xml:space="preserve"><value>Теги проектов не заданы.</value></data>
+  <data name="PositionDetails_DiscussionPlaceholder" xml:space="preserve"><value>Напишите сообщение (поддерживается Markdown)...</value></data>
+
+  <data name="PositionForm_TemplateAttributes" xml:space="preserve"><value>Атрибуты шаблона резюме</value></data>
+  <data name="PositionForm_TemplateAttributesHelp" xml:space="preserve"><value>Атрибуты, указанные здесь, становятся полями, которые кандидаты заполняют при создании резюме для этой вакансии.</value></data>
+  <data name="PositionForm_AddAttribute" xml:space="preserve"><value>+ Добавить атрибут</value></data>
+  <data name="PositionForm_AccessRules" xml:space="preserve"><value>Правила доступа</value></data>
+  <data name="PositionForm_AccessRulesHelp" xml:space="preserve"><value>Все правила должны выполняться (И) для того, чтобы кандидат мог видеть или создать резюме для этой вакансии.</value></data>
+  <data name="PositionForm_AddRule" xml:space="preserve"><value>+ Добавить правило</value></data>
+  <data name="PositionForm_ProjectTags" xml:space="preserve"><value>Соответствующие теги проектов</value></data>
+  <data name="PositionForm_ProjectTagsHelp" xml:space="preserve"><value>Проекты кандидата с любым из этих тегов включаются в сгенерированное резюме (до значения Макс. проектов выше).</value></data>
+
+  <data name="Attributes_Title" xml:space="preserve"><value>Библиотека атрибутов</value></data>
+  <data name="Attributes_New" xml:space="preserve"><value>+ Новый атрибут</value></data>
+  <data name="Attributes_SearchPlaceholder" xml:space="preserve"><value>Поиск по началу названия...</value></data>
+  <data name="Attributes_AllCategories" xml:space="preserve"><value>Все категории</value></data>
+  <data name="Attributes_ColName" xml:space="preserve"><value>Название</value></data>
+  <data name="Attributes_ColCategory" xml:space="preserve"><value>Категория</value></data>
+  <data name="Attributes_ColType" xml:space="preserve"><value>Тип</value></data>
+  <data name="Attributes_ColUsedIn" xml:space="preserve"><value>Используется в</value></data>
+  <data name="Attributes_Empty" xml:space="preserve"><value>Атрибуты не найдены.</value></data>
+  <data name="Attributes_BuiltIn" xml:space="preserve"><value>встроенный</value></data>
+  <data name="Attributes_UsedInPositions" xml:space="preserve"><value>вакансии(ях)</value></data>
+  <data name="Attributes_DeleteConfirm" xml:space="preserve"><value>Удалить выбранные атрибуты? Встроенные и используемые атрибуты будут пропущены.</value></data>
+  <data name="Attributes_New_Title" xml:space="preserve"><value>Новый атрибут</value></data>
+  <data name="Attributes_Edit_Title" xml:space="preserve"><value>Редактирование атрибута</value></data>
+  <data name="Attributes_DropdownOptions" xml:space="preserve"><value>Варианты выпадающего списка</value></data>
+  <data name="Attributes_AddOption" xml:space="preserve"><value>+ Добавить вариант</value></data>
+  <data name="Attributes_BuiltInCategoryNote" xml:space="preserve"><value>Встроенные атрибуты сохраняют свою категорию.</value></data>
+  <data name="Attributes_BuiltInTypeNote" xml:space="preserve"><value>Встроенные атрибуты сохраняют свой тип данных.</value></data>
+
+  <data name="Profile_TabMe" xml:space="preserve"><value>Обо мне</value></data>
+  <data name="Profile_TabInfo" xml:space="preserve"><value>Инфо</value></data>
+  <data name="Profile_TabProjects" xml:space="preserve"><value>Проекты</value></data>
+  <data name="Profile_TabCvs" xml:space="preserve"><value>Резюме</value></data>
+  <data name="Profile_InfoHelp" xml:space="preserve"><value>Выберите атрибуты из общей библиотеки, чтобы заполнить их в профиле.</value></data>
+  <data name="Profile_AddAttribute" xml:space="preserve"><value>+ Добавить атрибут</value></data>
+  <data name="Profile_NoInfoAttributes" xml:space="preserve"><value>Атрибуты ещё не выбраны.</value></data>
+  <data name="Profile_NewProject" xml:space="preserve"><value>+ Новый проект</value></data>
+  <data name="Profile_ColName" xml:space="preserve"><value>Название</value></data>
+  <data name="Profile_ColPeriod" xml:space="preserve"><value>Период</value></data>
+  <data name="Profile_ColTags" xml:space="preserve"><value>Теги</value></data>
+  <data name="Profile_NoProjects" xml:space="preserve"><value>Проектов пока нет.</value></data>
+  <data name="Profile_ColPosition" xml:space="preserve"><value>Вакансия</value></data>
+  <data name="Profile_ColStatus" xml:space="preserve"><value>Статус</value></data>
+  <data name="Profile_ColLikes" xml:space="preserve"><value>Лайки</value></data>
+  <data name="Profile_NoCvs" xml:space="preserve"><value>Резюме пока нет -- создайте его на странице доступной вакансии.</value></data>
+  <data name="Profile_Present" xml:space="preserve"><value>по настоящее время</value></data>
+
+  <data name="ProjectForm_New_Title" xml:space="preserve"><value>Новый проект</value></data>
+  <data name="ProjectForm_Edit_Title" xml:space="preserve"><value>Редактирование проекта</value></data>
+  <data name="ProjectForm_StartDate" xml:space="preserve"><value>Дата начала</value></data>
+  <data name="ProjectForm_EndDate" xml:space="preserve"><value>Дата окончания (оставьте пустым, если продолжается)</value></data>
+  <data name="ProjectForm_Description" xml:space="preserve"><value>Описание</value></data>
+  <data name="ProjectForm_Tags" xml:space="preserve"><value>Технологические теги</value></data>
+  <data name="ProjectForm_DeleteConfirm" xml:space="preserve"><value>Удалить выбранные проекты?</value></data>
+
+  <data name="Cv_Draft" xml:space="preserve"><value>Черновик</value></data>
+  <data name="Cv_Published" xml:space="preserve"><value>Опубликовано</value></data>
+  <data name="Cv_Like" xml:space="preserve"><value>Лайк</value></data>
+  <data name="Cv_Unlike" xml:space="preserve"><value>Убрать лайк</value></data>
+  <data name="Cv_ReadyToPublish" xml:space="preserve"><value>Все поля заполнены -- можно публиковать.</value></data>
+  <data name="Cv_FillFieldsToPublish" xml:space="preserve"><value>Заполните все выделенные красным поля ниже, чтобы опубликовать.</value></data>
+  <data name="Cv_Publish" xml:space="preserve"><value>Опубликовать</value></data>
+  <data name="Cv_Attributes" xml:space="preserve"><value>Атрибуты</value></data>
+  <data name="Cv_Projects" xml:space="preserve"><value>Проекты</value></data>
+  <data name="Cv_NoProjects" xml:space="preserve"><value>Подходящих проектов нет.</value></data>
+  <data name="Cv_For" xml:space="preserve"><value>Резюме для</value></data>
+  <data name="Cv_Browse_Title" xml:space="preserve"><value>Резюме кандидатов</value></data>
+  <data name="Cv_ColCandidate" xml:space="preserve"><value>Кандидат</value></data>
+  <data name="Cv_Browse_Empty" xml:space="preserve"><value>Опубликованных резюме пока нет.</value></data>
+
+  <data name="Users_Title" xml:space="preserve"><value>Пользователи</value></data>
+  <data name="Users_ColName" xml:space="preserve"><value>Имя</value></data>
+  <data name="Users_ColEmail" xml:space="preserve"><value>Эл. почта</value></data>
+  <data name="Users_ColRoles" xml:space="preserve"><value>Роли</value></data>
+  <data name="Users_ColStatus" xml:space="preserve"><value>Статус</value></data>
+  <data name="Users_Active" xml:space="preserve"><value>Активен</value></data>
+  <data name="Users_Blocked" xml:space="preserve"><value>Заблокирован</value></data>
+  <data name="Users_EditRoles" xml:space="preserve"><value>Изменить роли</value></data>
+  <data name="Users_Block" xml:space="preserve"><value>Заблокировать</value></data>
+  <data name="Users_Unblock" xml:space="preserve"><value>Разблокировать</value></data>
+  <data name="Users_BlockConfirm" xml:space="preserve"><value>Заблокировать выбранных пользователей?</value></data>
+  <data name="Users_DeleteConfirm" xml:space="preserve"><value>Удалить выбранных пользователей? Это необратимо.</value></data>
+  <data name="Users_EditRolesTitle" xml:space="preserve"><value>Изменение ролей</value></data>
+
+  <data name="Search_ResultsFor" xml:space="preserve"><value>Результаты поиска по запросу</value></data>
+  <data name="Search_EnterTerm" xml:space="preserve"><value>Введите поисковый запрос в шапке страницы.</value></data>
+  <data name="Search_Positions" xml:space="preserve"><value>Вакансии</value></data>
+  <data name="Search_NoPositions" xml:space="preserve"><value>Вакансии не найдены.</value></data>
+  <data name="Search_Cvs" xml:space="preserve"><value>Резюме</value></data>
+  <data name="Search_NoCvs" xml:space="preserve"><value>Резюме не найдены.</value></data>
+
+  <data name="Discussion_Post" xml:space="preserve"><value>Отправить</value></data>
+
+  <data name="ProfileView_Profile" xml:space="preserve"><value>Профиль</value></data>
+  <data name="ProfileView_PublishedCvs" xml:space="preserve"><value>Опубликованные резюме</value></data>
+  <data name="ProfileView_NoPublishedCvs" xml:space="preserve"><value>Опубликованных резюме нет.</value></data>
 </root>

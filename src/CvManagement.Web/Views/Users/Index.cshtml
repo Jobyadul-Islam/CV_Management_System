@@ -1,18 +1,19 @@
 @model IReadOnlyList<CvManagement.Web.ViewModels.Admin.AdminUserListItemViewModel>
 @using CvManagement.Web.ViewModels.Shared
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = Localizer["Users_Title"];
 
     var actions = new List<ToolbarAction>
     {
-        new("Edit Roles", Url.Action("EditRoles", "Users")! + "/{id}", "get", MinSelected: 1, MaxSelected: 1),
-        new("Block", Url.Action("Block", "Users")!, "post", MinSelected: 1, Confirm: "Block the selected user(s)?"),
-        new("Unblock", Url.Action("Unblock", "Users")!, "post", MinSelected: 1),
-        new("Delete", Url.Action("Delete", "Users")!, "post", MinSelected: 1, Confirm: "Delete the selected user(s)? This cannot be undone.", CssClass: "btn-outline-danger")
+        new(Localizer["Users_EditRoles"], Url.Action("EditRoles", "Users")! + "/{id}", "get", MinSelected: 1, MaxSelected: 1),
+        new(Localizer["Users_Block"], Url.Action("Block", "Users")!, "post", MinSelected: 1, Confirm: Localizer["Users_BlockConfirm"]),
+        new(Localizer["Users_Unblock"], Url.Action("Unblock", "Users")!, "post", MinSelected: 1),
+        new(Localizer["Common_Delete"], Url.Action("Delete", "Users")!, "post", MinSelected: 1, Confirm: Localizer["Users_DeleteConfirm"], CssClass: "btn-outline-danger")
     };
 }
 
-<h1 class="h3 mb-3">Users</h1>
+<h1 class="h3 mb-3">@Localizer["Users_Title"]</h1>
 
 @await Component.InvokeAsync("SelectableTableToolbar", new { tableId = "users-table", actions })
 
@@ -21,10 +22,10 @@
         <thead>
             <tr>
                 <th style="width:2rem"><input type="checkbox" class="select-all form-check-input" /></th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Roles</th>
-                <th>Status</th>
+                <th>@Localizer["Users_ColName"]</th>
+                <th>@Localizer["Users_ColEmail"]</th>
+                <th>@Localizer["Users_ColRoles"]</th>
+                <th>@Localizer["Users_ColStatus"]</th>
             </tr>
         </thead>
         <tbody>
@@ -43,11 +44,11 @@
                     <td>
                         @if (user.IsBlocked)
                         {
-                            <span class="badge bg-danger">Blocked</span>
+                            <span class="badge bg-danger">@Localizer["Users_Blocked"]</span>
                         }
                         else
                         {
-                            <span class="badge bg-success">Active</span>
+                            <span class="badge bg-success">@Localizer["Users_Active"]</span>
                         }
                     </td>
                 </tr>

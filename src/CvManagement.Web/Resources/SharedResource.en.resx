@@ -48,4 +48,138 @@
   <data name="Home_PopularPositions" xml:space="preserve"><value>Most Popular Positions</value></data>
   <data name="Home_Stats" xml:space="preserve"><value>Statistics</value></data>
   <data name="Home_TagCloud" xml:space="preserve"><value>Technology Tags</value></data>
+
+  <data name="Common_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Common_Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="Common_Filter" xml:space="preserve"><value>Filter</value></data>
+  <data name="Common_Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="Common_Send" xml:space="preserve"><value>Send</value></data>
+  <data name="Common_Updated" xml:space="preserve"><value>Updated</value></data>
+
+  <data name="Positions_New" xml:space="preserve"><value>+ New Position</value></data>
+  <data name="Positions_ColTitle" xml:space="preserve"><value>Title</value></data>
+  <data name="Positions_ColCompany" xml:space="preserve"><value>Company</value></data>
+  <data name="Positions_ColLevel" xml:space="preserve"><value>Level</value></data>
+  <data name="Positions_ColAccess" xml:space="preserve"><value>Access</value></data>
+  <data name="Positions_ColCvs" xml:space="preserve"><value>CVs</value></data>
+  <data name="Positions_Empty" xml:space="preserve"><value>No positions to show.</value></data>
+  <data name="Positions_Public" xml:space="preserve"><value>Public</value></data>
+  <data name="Positions_Restricted" xml:space="preserve"><value>Restricted</value></data>
+  <data name="Positions_FilteredByTag" xml:space="preserve"><value>Filtered by tag:</value></data>
+  <data name="Positions_DeleteConfirm" xml:space="preserve"><value>Delete the selected position(s)? Positions with existing CVs will be skipped.</value></data>
+  <data name="Positions_New_Title" xml:space="preserve"><value>New Position</value></data>
+  <data name="Positions_Edit_Title" xml:space="preserve"><value>Edit Position</value></data>
+
+  <data name="PositionDetails_NotEligible" xml:space="preserve"><value>You don't currently meet the access rules for this position.</value></data>
+  <data name="PositionDetails_AlreadyHaveCv" xml:space="preserve"><value>You already have a CV for this position.</value></data>
+  <data name="PositionDetails_ViewIt" xml:space="preserve"><value>View it</value></data>
+  <data name="PositionDetails_CreateCv" xml:space="preserve"><value>Create CV for this position</value></data>
+  <data name="PositionDetails_TabDetails" xml:space="preserve"><value>Details</value></data>
+  <data name="PositionDetails_TabDiscussion" xml:space="preserve"><value>Discussion</value></data>
+  <data name="PositionDetails_TemplateAttributes" xml:space="preserve"><value>CV Template Attributes</value></data>
+  <data name="PositionDetails_NoAttributes" xml:space="preserve"><value>No attributes selected yet.</value></data>
+  <data name="PositionDetails_Access" xml:space="preserve"><value>Access</value></data>
+  <data name="PositionDetails_PublicDesc" xml:space="preserve"><value>Open to all authenticated users.</value></data>
+  <data name="PositionDetails_ProjectTags" xml:space="preserve"><value>Relevant Project Tags</value></data>
+  <data name="PositionDetails_NoTags" xml:space="preserve"><value>No project tags set.</value></data>
+  <data name="PositionDetails_DiscussionPlaceholder" xml:space="preserve"><value>Write a message (Markdown supported)...</value></data>
+
+  <data name="PositionForm_TemplateAttributes" xml:space="preserve"><value>CV Template Attributes</value></data>
+  <data name="PositionForm_TemplateAttributesHelp" xml:space="preserve"><value>Attributes shown here become the fields candidates fill in when they create a CV for this position.</value></data>
+  <data name="PositionForm_AddAttribute" xml:space="preserve"><value>+ Add attribute</value></data>
+  <data name="PositionForm_AccessRules" xml:space="preserve"><value>Access Rules</value></data>
+  <data name="PositionForm_AccessRulesHelp" xml:space="preserve"><value>All rules must pass (AND) for a Candidate to see or create a CV for this position.</value></data>
+  <data name="PositionForm_AddRule" xml:space="preserve"><value>+ Add rule</value></data>
+  <data name="PositionForm_ProjectTags" xml:space="preserve"><value>Relevant Project Tags</value></data>
+  <data name="PositionForm_ProjectTagsHelp" xml:space="preserve"><value>Candidate projects tagged with any of these are included in the generated CV (up to Max Projects above).</value></data>
+
+  <data name="Attributes_Title" xml:space="preserve"><value>Attribute Library</value></data>
+  <data name="Attributes_New" xml:space="preserve"><value>+ New Attribute</value></data>
+  <data name="Attributes_SearchPlaceholder" xml:space="preserve"><value>Search by name prefix...</value></data>
+  <data name="Attributes_AllCategories" xml:space="preserve"><value>All categories</value></data>
+  <data name="Attributes_ColName" xml:space="preserve"><value>Name</value></data>
+  <data name="Attributes_ColCategory" xml:space="preserve"><value>Category</value></data>
+  <data name="Attributes_ColType" xml:space="preserve"><value>Type</value></data>
+  <data name="Attributes_ColUsedIn" xml:space="preserve"><value>Used in</value></data>
+  <data name="Attributes_Empty" xml:space="preserve"><value>No attributes match.</value></data>
+  <data name="Attributes_BuiltIn" xml:space="preserve"><value>built-in</value></data>
+  <data name="Attributes_UsedInPositions" xml:space="preserve"><value>position(s)</value></data>
+  <data name="Attributes_DeleteConfirm" xml:space="preserve"><value>Delete the selected attribute(s)? Built-in and in-use attributes will be skipped.</value></data>
+  <data name="Attributes_New_Title" xml:space="preserve"><value>New Attribute</value></data>
+  <data name="Attributes_Edit_Title" xml:space="preserve"><value>Edit Attribute</value></data>
+  <data name="Attributes_DropdownOptions" xml:space="preserve"><value>Dropdown options</value></data>
+  <data name="Attributes_AddOption" xml:space="preserve"><value>+ Add option</value></data>
+  <data name="Attributes_BuiltInCategoryNote" xml:space="preserve"><value>Built-in attributes keep their category.</value></data>
+  <data name="Attributes_BuiltInTypeNote" xml:space="preserve"><value>Built-in attributes keep their data type.</value></data>
+
+  <data name="Profile_TabMe" xml:space="preserve"><value>Me</value></data>
+  <data name="Profile_TabInfo" xml:space="preserve"><value>Info</value></data>
+  <data name="Profile_TabProjects" xml:space="preserve"><value>Projects</value></data>
+  <data name="Profile_TabCvs" xml:space="preserve"><value>CVs</value></data>
+  <data name="Profile_InfoHelp" xml:space="preserve"><value>Select attributes from the shared library to fill in on your profile.</value></data>
+  <data name="Profile_AddAttribute" xml:space="preserve"><value>+ Add attribute</value></data>
+  <data name="Profile_NoInfoAttributes" xml:space="preserve"><value>No attributes selected yet.</value></data>
+  <data name="Profile_NewProject" xml:space="preserve"><value>+ New Project</value></data>
+  <data name="Profile_ColName" xml:space="preserve"><value>Name</value></data>
+  <data name="Profile_ColPeriod" xml:space="preserve"><value>Period</value></data>
+  <data name="Profile_ColTags" xml:space="preserve"><value>Tags</value></data>
+  <data name="Profile_NoProjects" xml:space="preserve"><value>No projects yet.</value></data>
+  <data name="Profile_ColPosition" xml:space="preserve"><value>Position</value></data>
+  <data name="Profile_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="Profile_ColLikes" xml:space="preserve"><value>Likes</value></data>
+  <data name="Profile_NoCvs" xml:space="preserve"><value>No CVs yet -- create one from an available position.</value></data>
+  <data name="Profile_Present" xml:space="preserve"><value>present</value></data>
+
+  <data name="ProjectForm_New_Title" xml:space="preserve"><value>New Project</value></data>
+  <data name="ProjectForm_Edit_Title" xml:space="preserve"><value>Edit Project</value></data>
+  <data name="ProjectForm_StartDate" xml:space="preserve"><value>Start date</value></data>
+  <data name="ProjectForm_EndDate" xml:space="preserve"><value>End date (leave blank if ongoing)</value></data>
+  <data name="ProjectForm_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="ProjectForm_Tags" xml:space="preserve"><value>Technology tags</value></data>
+  <data name="ProjectForm_DeleteConfirm" xml:space="preserve"><value>Delete the selected project(s)?</value></data>
+
+  <data name="Cv_Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Cv_Published" xml:space="preserve"><value>Published</value></data>
+  <data name="Cv_Like" xml:space="preserve"><value>Like</value></data>
+  <data name="Cv_Unlike" xml:space="preserve"><value>Unlike</value></data>
+  <data name="Cv_ReadyToPublish" xml:space="preserve"><value>All fields are filled in -- ready to publish.</value></data>
+  <data name="Cv_FillFieldsToPublish" xml:space="preserve"><value>Fill in every red-highlighted field below to publish.</value></data>
+  <data name="Cv_Publish" xml:space="preserve"><value>Publish</value></data>
+  <data name="Cv_Attributes" xml:space="preserve"><value>Attributes</value></data>
+  <data name="Cv_Projects" xml:space="preserve"><value>Projects</value></data>
+  <data name="Cv_NoProjects" xml:space="preserve"><value>No matching projects.</value></data>
+  <data name="Cv_For" xml:space="preserve"><value>CV for</value></data>
+  <data name="Cv_Browse_Title" xml:space="preserve"><value>Browse CVs</value></data>
+  <data name="Cv_ColCandidate" xml:space="preserve"><value>Candidate</value></data>
+  <data name="Cv_Browse_Empty" xml:space="preserve"><value>No published CVs to show yet.</value></data>
+
+  <data name="Users_Title" xml:space="preserve"><value>Users</value></data>
+  <data name="Users_ColName" xml:space="preserve"><value>Name</value></data>
+  <data name="Users_ColEmail" xml:space="preserve"><value>Email</value></data>
+  <data name="Users_ColRoles" xml:space="preserve"><value>Roles</value></data>
+  <data name="Users_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="Users_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Users_Blocked" xml:space="preserve"><value>Blocked</value></data>
+  <data name="Users_EditRoles" xml:space="preserve"><value>Edit Roles</value></data>
+  <data name="Users_Block" xml:space="preserve"><value>Block</value></data>
+  <data name="Users_Unblock" xml:space="preserve"><value>Unblock</value></data>
+  <data name="Users_BlockConfirm" xml:space="preserve"><value>Block the selected user(s)?</value></data>
+  <data name="Users_DeleteConfirm" xml:space="preserve"><value>Delete the selected user(s)? This cannot be undone.</value></data>
+  <data name="Users_EditRolesTitle" xml:space="preserve"><value>Edit Roles</value></data>
+
+  <data name="Search_ResultsFor" xml:space="preserve"><value>Search results for</value></data>
+  <data name="Search_EnterTerm" xml:space="preserve"><value>Enter a search term in the header above.</value></data>
+  <data name="Search_Positions" xml:space="preserve"><value>Positions</value></data>
+  <data name="Search_NoPositions" xml:space="preserve"><value>No positions matched.</value></data>
+  <data name="Search_Cvs" xml:space="preserve"><value>CVs</value></data>
+  <data name="Search_NoCvs" xml:space="preserve"><value>No CVs matched.</value></data>
+
+  <data name="Discussion_Post" xml:space="preserve"><value>Post</value></data>
+
+  <data name="ProfileView_Profile" xml:space="preserve"><value>Profile</value></data>
+  <data name="ProfileView_PublishedCvs" xml:space="preserve"><value>Published CVs</value></data>
+  <data name="ProfileView_NoPublishedCvs" xml:space="preserve"><value>No published CVs.</value></data>
 </root>

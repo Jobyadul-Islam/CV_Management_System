@@ -1,9 +1,10 @@
 @model CvManagement.Web.ViewModels.Admin.AdminUserEditRolesViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Edit Roles";
+    ViewData["Title"] = Localizer["Users_EditRolesTitle"];
 }
 
-<h1 class="h3 mb-1">Edit Roles</h1>
+<h1 class="h3 mb-1">@Localizer["Users_EditRolesTitle"]</h1>
 <p class="text-secondary">@Model.DisplayName &lt;@Model.Email&gt;</p>
 
 <form asp-action="EditRoles" asp-route-id="@Model.Id" method="post" class="col-lg-6">
@@ -16,6 +17,6 @@
         </div>
     }
 
-    <button type="submit" class="btn btn-primary mt-3">Save</button>
-    <a asp-action="Index" class="btn btn-outline-secondary mt-3">Cancel</a>
+    <button type="submit" class="btn btn-primary mt-3">@Localizer["Common_Save"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary mt-3">@Localizer["Common_Cancel"]</a>
 </form>

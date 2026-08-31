@@ -1,6 +1,7 @@
 @model CvManagement.Web.ViewModels.Cv.CvDetailsViewModel
 @using CvManagement.Web.Domain.Enums
 @inject CvManagement.Web.Services.Abstractions.IMarkdownRenderer MarkdownRenderer
+@inject IStringLocalizer<SharedResource> Localizer
 @{
     ViewData["Title"] = $"{Model.CandidateDisplayName} — {Model.PositionTitle}";
 }
@@ -14,26 +15,26 @@
     <div>
         <h1 class="h3 mb-1">@Model.CandidateDisplayName</h1>
         <div class="text-secondary">
-            CV for <a asp-controller="Positions" asp-action="Details" asp-route-id="@Model.PositionId">@Model.PositionTitle</a>
+            @Localizer["Cv_For"] <a asp-controller="Positions" asp-action="Details" asp-route-id="@Model.PositionId">@Model.PositionTitle</a>
             @if (!string.IsNullOrEmpty(Model.Company)) { <span> &middot; @Model.Company</span> }
         </div>
     </div>
     <div class="text-end">
         @if (Model.Status == CvStatus.Published)
         {
-            <span class="badge bg-success mb-2">Published</span>
+            <span class="badge bg-success mb-2">@Localizer["Cv_Published"]</span>
         }
         else
         {
-            <span class="badge bg-secondary mb-2">Draft</span>
+            <span class="badge bg-secondary mb-2">@Localizer["Cv_Draft"]</span>
         }
         <div>
-            <span title="Likes">&#9733; @Model.LikeCount</span>
+            <span title="@Localizer["Profile_ColLikes"]">&#9733; @Model.LikeCount</span>
             @if (Model.ViewerCanLike)
             {
                 <form asp-action="@(Model.ViewerHasLiked ? "Unlike" : "Like")" asp-route-id="@Model.CvId" method="post" class="d-inline">
                     <button type="submit" class="btn btn-sm @(Model.ViewerHasLiked ? "btn-warning" : "btn-outline-warning") ms-2">
-                        @(Model.ViewerHasLiked ? "Unlike" : "Like")
+                        @(Model.ViewerHasLiked ? Localizer["Cv_Unlike"] : Localizer["Cv_Like"])
                     </button>
                 </form>
             }
@@ -44,16 +45,16 @@
 @if (Model.ViewerCanEdit && Model.Status == CvStatus.Draft)
 {
     <div class="alert @(Model.CanPublish ? "alert-success" : "alert-warning") d-flex justify-content-between align-items-center">
-        <span>@(Model.CanPublish ? "All fields are filled in -- ready to publish." : "Fill in every red-highlighted field below to publish.")</span>
+        <span>@(Model.CanPublish ? Localizer["Cv_ReadyToPublish"] : Localizer["Cv_FillFieldsToPublish"])</span>
         <form asp-action="Publish" asp-route-id="@Model.CvId" method="post">
-            <button type="submit" class="btn btn-primary btn-sm" @(Model.CanPublish ? "" : "disabled")>Publish</button>
+            <button type="submit" class="btn btn-primary btn-sm" @(Model.CanPublish ? "" : "disabled")>@Localizer["Cv_Publish"]</button>
         </form>
     </div>
 }
 
 <div class="row">
     <div class="col-lg-8">
-        <h2 class="h5">Attributes</h2>
+        <h2 class="h5">@Localizer["Cv_Attributes"]</h2>
         @if (Model.ViewerCanEdit)
         {
             foreach (var field in Model.Fields)
@@ -69,10 +70,10 @@
             }
         }
 
-        <h2 class="h5 mt-4">Projects</h2>
+        <h2 class="h5 mt-4">@Localizer["Cv_Projects"]</h2>
         @if (Model.Projects.Count == 0)
         {
-            <p class="text-secondary">No matching projects.</p>
+            <p class="text-secondary">@Localizer["Cv_NoProjects"]</p>
         }
         else
         {
@@ -81,7 +82,7 @@
                 <div class="mb-3 pb-3 border-bottom">
                     <div class="fw-semibold">@project.Name</div>
                     <div class="text-secondary small">
-                        @project.PeriodStart.ToString("yyyy-MM") &ndash; @(project.PeriodEnd?.ToString("yyyy-MM") ?? "present")
+                        @project.PeriodStart.ToString("yyyy-MM") &ndash; @(project.PeriodEnd?.ToString("yyyy-MM") ?? Localizer["Profile_Present"].Value)
                     </div>
                     <div>@Html.Raw(MarkdownRenderer.ToSafeHtml(project.DescriptionMarkdown))</div>
                     @foreach (var tag in project.Tags)

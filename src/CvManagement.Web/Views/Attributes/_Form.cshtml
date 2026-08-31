@@ -1,4 +1,5 @@
 @model CvManagement.Web.ViewModels.Attribute.AttributeFormViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 
 <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 <input type="hidden" asp-for="Id" />
@@ -17,7 +18,7 @@
         @if (Model.IsBuiltIn)
         {
             <input type="hidden" asp-for="CategoryId" />
-            <div class="form-text">Built-in attributes keep their category.</div>
+            <div class="form-text">@Localizer["Attributes_BuiltInCategoryNote"]</div>
         }
     </div>
 </div>
@@ -34,14 +35,14 @@
     @if (Model.IsBuiltIn)
     {
         <input type="hidden" asp-for="DataType" />
-        <div class="form-text">Built-in attributes keep their data type.</div>
+        <div class="form-text">@Localizer["Attributes_BuiltInTypeNote"]</div>
     }
 </div>
 
 <div id="optionsSection" class="mb-3 border rounded p-3" style="display:none">
-    <label class="form-label fw-semibold">Dropdown options</label>
+    <label class="form-label fw-semibold">@Localizer["Attributes_DropdownOptions"]</label>
     <div id="optionsList"></div>
-    <button type="button" id="addOptionBtn" class="btn btn-sm btn-outline-secondary mt-2">+ Add option</button>
+    <button type="button" id="addOptionBtn" class="btn btn-sm btn-outline-secondary mt-2">@Localizer["Attributes_AddOption"]</button>
     <template id="optionRowTemplate">
         <div class="input-group input-group-sm mb-2 option-row">
             <input type="hidden" name="Options[__index__].Id" value="0" />
@@ -52,8 +53,8 @@
     </template>
 </div>
 
-<button type="submit" class="btn btn-primary">Save</button>
-<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+<button type="submit" class="btn btn-primary">@Localizer["Common_Save"]</button>
+<a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Common_Cancel"]</a>
 
 <partial name="_ValidationScriptsPartial" />
 <script>

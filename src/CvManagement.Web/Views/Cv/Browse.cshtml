@@ -1,9 +1,10 @@
 @model List<CvManagement.Web.ViewModels.Cv.CvBrowseItemViewModel>
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Browse CVs";
+    ViewData["Title"] = Localizer["Cv_Browse_Title"];
 }
 
-<h1 class="h3 mb-3">Browse CVs</h1>
+<h1 class="h3 mb-3">@Localizer["Cv_Browse_Title"]</h1>
 
 @{
     var tagFilter = (string?)ViewBag.Tag;
@@ -11,8 +12,8 @@
 @if (!string.IsNullOrWhiteSpace(tagFilter))
 {
     <div class="alert alert-secondary d-flex justify-content-between align-items-center">
-        <span>Filtered by tag: <strong>@tagFilter</strong></span>
-        <a asp-action="Browse" class="btn btn-sm btn-outline-secondary">Clear</a>
+        <span>@Localizer["Positions_FilteredByTag"] <strong>@tagFilter</strong></span>
+        <a asp-action="Browse" class="btn btn-sm btn-outline-secondary">@Localizer["Common_Clear"]</a>
     </div>
 }
 
@@ -20,10 +21,10 @@
     <table class="table table-hover align-middle">
         <thead>
             <tr>
-                <th>Candidate</th>
-                <th>Position</th>
-                <th>Likes</th>
-                <th>Updated</th>
+                <th>@Localizer["Cv_ColCandidate"]</th>
+                <th>@Localizer["Profile_ColPosition"]</th>
+                <th>@Localizer["Profile_ColLikes"]</th>
+                <th>@Localizer["Common_Updated"]</th>
             </tr>
         </thead>
         <tbody>
@@ -38,7 +39,7 @@
             }
             @if (Model.Count == 0)
             {
-                <tr><td colspan="4" class="text-center text-secondary py-4">No published CVs to show yet.</td></tr>
+                <tr><td colspan="4" class="text-center text-secondary py-4">@Localizer["Cv_Browse_Empty"]</td></tr>
             }
         </tbody>
     </table>

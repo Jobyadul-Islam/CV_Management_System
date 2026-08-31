@@ -1,5 +1,6 @@
 @model CvManagement.Web.ViewModels.Position.PositionFormViewModel
 @using CvManagement.Web.Domain.Enums
+@inject IStringLocalizer<SharedResource> Localizer
 
 <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 <input type="hidden" asp-for="Id" />
@@ -39,35 +40,35 @@
 
 <hr class="my-4" />
 
-<h2 class="h5">CV Template Attributes</h2>
-<p class="text-secondary small">Attributes shown here become the fields candidates fill in when they create a CV for this position.</p>
+<h2 class="h5">@Localizer["PositionForm_TemplateAttributes"]</h2>
+<p class="text-secondary small">@Localizer["PositionForm_TemplateAttributesHelp"]</p>
 <div id="templateAttributeChips" class="mb-2 d-flex flex-wrap gap-2"></div>
 <div id="templateAttributeInputs"></div>
-<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#templateAttributePicker">+ Add attribute</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#templateAttributePicker">@Localizer["PositionForm_AddAttribute"]</button>
 
 @await Component.InvokeAsync("AttributePicker", new { modalId = "templateAttributePicker" })
 
 <hr class="my-4" />
 
 <div id="accessRulesSection" style="display:none">
-    <h2 class="h5">Access Rules</h2>
-    <p class="text-secondary small">All rules must pass (AND) for a Candidate to see or create a CV for this position.</p>
+    <h2 class="h5">@Localizer["PositionForm_AccessRules"]</h2>
+    <p class="text-secondary small">@Localizer["PositionForm_AccessRulesHelp"]</p>
     <div id="accessRulesList"></div>
-    <button type="button" id="addRuleBtn" class="btn btn-sm btn-outline-secondary">+ Add rule</button>
+    <button type="button" id="addRuleBtn" class="btn btn-sm btn-outline-secondary">@Localizer["PositionForm_AddRule"]</button>
 </div>
 
 <hr class="my-4" />
 
-<h2 class="h5">Relevant Project Tags</h2>
-<p class="text-secondary small">Candidate projects tagged with any of these are included in the generated CV (up to Max Projects above).</p>
+<h2 class="h5">@Localizer["PositionForm_ProjectTags"]</h2>
+<p class="text-secondary small">@Localizer["PositionForm_ProjectTagsHelp"]</p>
 <div class="mb-3">
     <input type="text" id="projectTagsInput" class="form-control" placeholder="e.g. SQL, R, Python (comma-separated)"
            value="@string.Join(", ", Model.ProjectTags)" />
 </div>
 <div id="projectTagsHidden"></div>
 
-<button type="submit" class="btn btn-primary">Save</button>
-<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+<button type="submit" class="btn btn-primary">@Localizer["Common_Save"]</button>
+<a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Common_Cancel"]</a>
 
 <partial name="_ValidationScriptsPartial" />
 <script>
