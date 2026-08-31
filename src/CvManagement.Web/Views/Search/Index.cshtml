@@ -1,40 +1,64 @@
-@model List<Position>
+@model CvManagement.Web.ViewModels.Home.SearchResultsViewModel
 @{
     ViewData["Title"] = "Search";
-    var query = ViewData["Query"] as string;
 }
 
-<h1 class="h3 mb-3">Search results for "@query"</h1>
+<h1 class="h3 mb-3">Search results for "@Model.Query"</h1>
 
-@if (string.IsNullOrWhiteSpace(query))
+@if (string.IsNullOrWhiteSpace(Model.Query))
 {
     <p class="text-secondary">Enter a search term in the header above.</p>
 }
-else if (Model.Count == 0)
-{
-    <p class="text-secondary">No positions matched your search.</p>
-}
 else
 {
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Company</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var position in Model)
-                {
-                    <tr>
-                        <td><a asp-controller="Positions" asp-action="Details" asp-route-id="@position.Id">@position.Title</a></td>
-                        <td>@position.Company</td>
-                        <td>@position.ShortDescription</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    <h2 class="h5">Positions</h2>
+    @if (Model.Positions.Count == 0)
+    {
+        <p class="text-secondary">No positions matched.</p>
+    }
+    else
+    {
+        <div class="table-responsive mb-4">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>Title</th><th>Company</th><th>Level</th></tr></thead>
+                <tbody>
+                    @foreach (var position in Model.Positions)
+                    {
+                        <tr>
+                            <td><a asp-controller="Positions" asp-action="Details" asp-route-id="@position.Id">@position.Title</a></td>
+                            <td>@position.Company</td>
+                            <td>@position.Level</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (User.IsInRole(CvManagement.Web.Domain.RoleNames.Recruiter) || User.IsInRole(CvManagement.Web.Domain.RoleNames.Administrator))
+    {
+        <h2 class="h5">CVs</h2>
+        @if (Model.Cvs.Count == 0)
+        {
+            <p class="text-secondary">No CVs matched.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>Candidate</th><th>Position</th><th>Likes</th></tr></thead>
+                    <tbody>
+                        @foreach (var cv in Model.Cvs)
+                        {
+                            <tr>
+                                <td><a asp-controller="Cv" asp-action="Details" asp-route-id="@cv.Id">@cv.CandidateDisplayName</a></td>
+                                <td>@cv.PositionTitle</td>
+                                <td>&#9733; @cv.LikeCount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class ProjectService(ApplicationDbContext db, ITagService tagService) : IProjectService
+public class ProjectService(ApplicationDbContext db, ITagService tagService, ISearchIndexService searchIndex) : IProjectService
 {
     public async Task<IReadOnlyList<ProjectListItemViewModel>> GetListAsync(string userId, CancellationToken ct = default)
         => await db.Projects
@@ -67,6 +67,7 @@ public class ProjectService(ApplicationDbContext db, ITagService tagService) : I
 
         db.Projects.Add(project);
         await db.SaveChangesAsync(ct);
+        await searchIndex.IndexCandidateAsync(userId, ct);
         return ProjectSaveOutcome.Success(project.Id);
     }
 
@@ -108,9 +109,13 @@ public class ProjectService(ApplicationDbContext db, ITagService tagService) : I
             return current is null ? ProjectSaveOutcome.NotFound() : ProjectSaveOutcome.Conflict(Convert.ToBase64String(current.RowVersion));
         }
 
+        await searchIndex.IndexCandidateAsync(userId, ct);
         return ProjectSaveOutcome.Success(project.Id);
     }
 
     public async Task DeleteAsync(IReadOnlyList<int> ids, string userId, CancellationToken ct = default)
-        => await db.Projects.Where(p => ids.Contains(p.Id) && p.UserId == userId).ExecuteDeleteAsync(ct);
+    {
+        await db.Projects.Where(p => ids.Contains(p.Id) && p.UserId == userId).ExecuteDeleteAsync(ct);
+        await searchIndex.IndexCandidateAsync(userId, ct);
+    }
 }

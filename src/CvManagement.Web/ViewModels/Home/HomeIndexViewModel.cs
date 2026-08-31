@@ -1,0 +1,22 @@
+using CvManagement.Web.ViewModels.Position;
+
+namespace CvManagement.Web.ViewModels.Home;
+
+public class HomeIndexViewModel
+{
+    public List<PositionListItemViewModel> LatestPositions { get; set; } = [];
+    public List<PositionListItemViewModel> PopularPositions { get; set; } = [];
+    public List<TagCloudEntry> TagCloud { get; set; } = [];
+    public SiteStats Stats { get; set; } = new();
+}
+
+public record TagCloudEntry(string Name, int Count);
+
+public class SiteStats
+{
+    public int CvsCreatedLast24h { get; set; }
+    public int TotalPositions { get; set; }
+    public int TotalCandidates { get; set; }
+    public int TotalRecruiters { get; set; }
+    public int TotalCvs { get; set; }
+}

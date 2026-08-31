@@ -89,6 +89,10 @@ builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.IMarkdownRe
     CvManagement.Web.Services.Implementations.MarkdownRenderer>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IDiscussionService,
     CvManagement.Web.Services.Implementations.DiscussionService>();
+builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.ISearchIndexService,
+    CvManagement.Web.Services.Implementations.SearchIndexService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ISearchService,
+    CvManagement.Web.Services.Implementations.SearchService>();
 
 var app = builder.Build();
 
@@ -97,6 +101,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await db.Database.MigrateAsync();
     await CvManagement.Web.Data.Seed.DbSeeder.SeedAsync(scope.ServiceProvider);
+
+    var searchIndex = scope.ServiceProvider.GetRequiredService<CvManagement.Web.Services.Abstractions.ISearchIndexService>();
+    await searchIndex.RebuildAllAsync();
 }
 
 var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("ru") };

@@ -7,26 +7,39 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class ProfileAutoSaveService(ApplicationDbContext db) : IProfileAutoSaveService
+public class ProfileAutoSaveService(ApplicationDbContext db, ISearchIndexService searchIndex) : IProfileAutoSaveService
 {
     public async Task<List<AutoSaveResultDto>> SaveAsync(string userId, List<AutoSaveChangeDto> changes, CancellationToken ct = default)
     {
         var results = new List<AutoSaveResultDto>();
+        var searchableTextChanged = false;
+
         foreach (var change in changes)
         {
-            results.Add(await SaveOneAsync(userId, change, ct));
+            var (result, isSearchableText) = await SaveOneAsync(userId, change, ct);
+            results.Add(result);
+            if (result.Status == "ok" && isSearchableText) searchableTextChanged = true;
         }
+
+        // One re-index for the whole batch, not per field -- and only when a String/Text value
+        // (the only ones that actually feed the search index) was among the successful saves.
+        if (searchableTextChanged)
+        {
+            await searchIndex.IndexCandidateAsync(userId, ct);
+        }
+
         return results;
     }
 
-    private async Task<AutoSaveResultDto> SaveOneAsync(string userId, AutoSaveChangeDto change, CancellationToken ct)
+    private async Task<(AutoSaveResultDto Result, bool IsSearchableText)> SaveOneAsync(string userId, AutoSaveChangeDto change, CancellationToken ct)
     {
         var attribute = await db.Attributes.AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == change.AttributeId, ct);
         if (attribute is null)
         {
-            return new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "error", ErrorMessage = "Unknown attribute." };
+            return (new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "error", ErrorMessage = "Unknown attribute." }, false);
         }
+        var isSearchableText = attribute.DataType is AttributeDataType.String or AttributeDataType.Text;
 
         var existing = await db.UserAttributeValues
             .FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == change.AttributeId, ct);
@@ -38,7 +51,7 @@ public class ProfileAutoSaveService(ApplicationDbContext db) : IProfileAutoSaveS
             db.UserAttributeValues.Add(created);
             await db.SaveChangesAsync(ct);
             await SyncDisplayNameIfNeededAsync(userId, attribute.Name, ct);
-            return new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "ok", NewRowVersion = Convert.ToBase64String(created.RowVersion) };
+            return (new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "ok", NewRowVersion = Convert.ToBase64String(created.RowVersion) }, isSearchableText);
         }
 
         byte[] originalRowVersion;
@@ -66,10 +79,10 @@ public class ProfileAutoSaveService(ApplicationDbContext db) : IProfileAutoSaveS
                 .FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == change.AttributeId, ct);
             if (current is null)
             {
-                return new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "error", ErrorMessage = "Value was deleted." };
+                return (new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "error", ErrorMessage = "Value was deleted." }, false);
             }
 
-            return new AutoSaveResultDto
+            return (new AutoSaveResultDto
             {
                 AttributeId = change.AttributeId,
                 Status = "conflict",
@@ -88,11 +101,11 @@ public class ProfileAutoSaveService(ApplicationDbContext db) : IProfileAutoSaveS
                     ValueBoolean = current.ValueBoolean,
                     ValueOptionId = current.ValueOptionId
                 }
-            };
+            }, false);
         }
 
         await SyncDisplayNameIfNeededAsync(userId, attribute.Name, ct);
-        return new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "ok", NewRowVersion = Convert.ToBase64String(existing.RowVersion) };
+        return (new AutoSaveResultDto { AttributeId = change.AttributeId, Status = "ok", NewRowVersion = Convert.ToBase64String(existing.RowVersion) }, isSearchableText);
     }
 
     private static void ApplyValue(UserAttributeValue entity, AttributeDataType dataType, AutoSaveChangeDto change)

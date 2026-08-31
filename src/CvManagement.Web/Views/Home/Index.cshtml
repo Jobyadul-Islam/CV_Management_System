@@ -1,9 +1,12 @@
+@model CvManagement.Web.ViewModels.Home.HomeIndexViewModel
 @inject IStringLocalizer<SharedResource> Localizer
 @{
     ViewData["Title"] = "CV Management System";
+    var isRecruiter = User.IsInRole(CvManagement.Web.Domain.RoleNames.Recruiter) || User.IsInRole(CvManagement.Web.Domain.RoleNames.Administrator);
+    var maxTagCount = Model.TagCloud.Count > 0 ? Model.TagCloud.Max(t => t.Count) : 1;
 }
 
-<div class="py-5 text-center">
+<div class="py-4 text-center">
     <h1 class="display-6">@Localizer["Home_Welcome"]</h1>
     <p class="lead text-secondary">@Localizer["Home_Tagline"]</p>
 
@@ -14,7 +17,102 @@
     }
 </div>
 
-<div class="alert alert-secondary">
-    Phase 0-2 checkpoint: solution, domain model, and authentication (local + Google/GitHub) are wired up.
-    The Main Page (latest/popular positions, tag cloud, statistics) is built in Phase 8.
+<div class="row mb-4 g-3 text-center">
+    <div class="col-6 col-md-2">
+        <div class="border rounded p-3">
+            <div class="fs-4 fw-bold">@Model.Stats.CvsCreatedLast24h</div>
+            <div class="small text-secondary">CVs (24h)</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="border rounded p-3">
+            <div class="fs-4 fw-bold">@Model.Stats.TotalPositions</div>
+            <div class="small text-secondary">Positions</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="border rounded p-3">
+            <div class="fs-4 fw-bold">@Model.Stats.TotalCandidates</div>
+            <div class="small text-secondary">Candidates</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="border rounded p-3">
+            <div class="fs-4 fw-bold">@Model.Stats.TotalRecruiters</div>
+            <div class="small text-secondary">Recruiters</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="border rounded p-3">
+            <div class="fs-4 fw-bold">@Model.Stats.TotalCvs</div>
+            <div class="small text-secondary">CVs total</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-7 mb-4">
+        <h2 class="h5">@Localizer["Home_LatestPositions"]</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>Title</th><th>Company</th><th>Updated</th></tr></thead>
+                <tbody>
+                    @foreach (var position in Model.LatestPositions)
+                    {
+                        <tr>
+                            <td><a asp-controller="Positions" asp-action="Details" asp-route-id="@position.Id">@position.Title</a></td>
+                            <td>@position.Company</td>
+                            <td>@position.UpdatedAt.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                    }
+                    @if (Model.LatestPositions.Count == 0)
+                    {
+                        <tr><td colspan="3" class="text-center text-secondary py-3">No positions yet.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="h5 mt-4">@Localizer["Home_PopularPositions"]</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>Title</th><th>Company</th><th>CVs</th></tr></thead>
+                <tbody>
+                    @foreach (var position in Model.PopularPositions)
+                    {
+                        <tr>
+                            <td><a asp-controller="Positions" asp-action="Details" asp-route-id="@position.Id">@position.Title</a></td>
+                            <td>@position.Company</td>
+                            <td>@position.CvCount</td>
+                        </tr>
+                    }
+                    @if (Model.PopularPositions.Count == 0)
+                    {
+                        <tr><td colspan="3" class="text-center text-secondary py-3">No positions yet.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-lg-5 mb-4">
+        <h2 class="h5">@Localizer["Home_TagCloud"]</h2>
+        @if (Model.TagCloud.Count == 0)
+        {
+            <p class="text-secondary">No tags yet.</p>
+        }
+        else
+        {
+            <div class="tag-cloud">
+                @foreach (var tag in Model.TagCloud)
+                {
+                    var size = 0.85 + (tag.Count / (double)maxTagCount) * 1.15;
+                    <a style="font-size:@(size.ToString("0.00"))rem"
+                       asp-controller="@(isRecruiter ? "Cv" : "Positions")"
+                       asp-action="@(isRecruiter ? "Browse" : "Index")"
+                       asp-route-tag="@tag.Name">@tag.Name</a>
+                }
+            </div>
+        }
+    </div>
 </div>

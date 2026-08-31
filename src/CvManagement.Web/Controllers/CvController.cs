@@ -111,8 +111,10 @@ public class CvController(
     }
 
     [HttpGet, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
-    public async Task<IActionResult> Browse()
+    public async Task<IActionResult> Browse(string? tag)
     {
+        ViewBag.Tag = tag;
+
         var published = await db.Cvs
             .AsNoTracking()
             .Where(c => c.Status == CvStatus.Published)
@@ -126,6 +128,18 @@ public class CvController(
         {
             var eligibility = await accessEvaluator.IsEligibleForManyAsync(group.Key, group.Select(c => c.PositionId).ToList());
             visibleCvIds.AddRange(group.Where(c => eligibility.GetValueOrDefault(c.PositionId)).Select(c => c.Id));
+        }
+
+        if (!string.IsNullOrWhiteSpace(tag))
+        {
+            // Tag cloud links Recruiters to CVs whose candidate has a project tagged with that tech.
+            var taggedUserIds = await db.ProjectTags
+                .Where(pt => pt.Tag.Name == tag)
+                .Select(pt => pt.Project.UserId)
+                .Distinct()
+                .ToListAsync();
+            visibleCvIds = await db.Cvs.Where(c => visibleCvIds.Contains(c.Id) && taggedUserIds.Contains(c.UserId))
+                .Select(c => c.Id).ToListAsync();
         }
 
         var items = await db.Cvs
@@ -190,13 +204,4 @@ public class CvController(
         var stillEligible = await accessEvaluator.IsEligibleAsync(cv.UserId, cv.PositionId);
         return (stillEligible, stillEligible);
     }
-}
-
-public class CvBrowseItemViewModel
-{
-    public int Id { get; set; }
-    public string CandidateDisplayName { get; set; } = string.Empty;
-    public string PositionTitle { get; set; } = string.Empty;
-    public int LikeCount { get; set; }
-    public DateTime UpdatedAt { get; set; }
 }
