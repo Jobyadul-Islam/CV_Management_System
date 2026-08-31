@@ -91,8 +91,45 @@ public class PositionsController(
             model.DiscussionPosts = (await discussions.GetPostsAsync(id)).ToList();
         }
 
+        if (isManaging)
+        {
+            model.Cvs = await GetCvsForPositionAsync(id, isAdmin: User.IsInRole(RoleNames.Administrator));
+        }
+
         ViewBag.IsManaging = isManaging;
         return View(model);
+    }
+
+    /// <summary>
+    /// Admins see every CV for the position regardless of status/eligibility (they view every page as
+    /// if they were the owner). Recruiters see only Published CVs whose candidate is still eligible --
+    /// the same rule CvController.GetAccessAsync/Browse already enforce for CV visibility.
+    /// </summary>
+    private async Task<List<PositionCvListItemViewModel>> GetCvsForPositionAsync(int positionId, bool isAdmin)
+    {
+        var rows = await db.Cvs.AsNoTracking()
+            .Where(c => c.PositionId == positionId)
+            .Select(c => new { c.Id, c.UserId, c.User.DisplayName, Status = c.Status.ToString(), LikeCount = c.Likes.Count, c.UpdatedAt })
+            .ToListAsync();
+
+        var candidates = isAdmin ? rows : rows.Where(c => c.Status == nameof(CvStatus.Published)).ToList();
+
+        var eligibleUserIds = isAdmin
+            ? null
+            : await accessEvaluator.IsEligibleForPositionAsync(positionId, candidates.Select(c => c.UserId).Distinct().ToList());
+
+        return candidates
+            .Where(c => isAdmin || eligibleUserIds!.GetValueOrDefault(c.UserId))
+            .OrderByDescending(c => c.UpdatedAt)
+            .Select(c => new PositionCvListItemViewModel
+            {
+                Id = c.Id,
+                CandidateDisplayName = c.DisplayName,
+                Status = c.Status,
+                LikeCount = c.LikeCount,
+                UpdatedAt = c.UpdatedAt
+            })
+            .ToList();
     }
 
     [HttpGet, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]

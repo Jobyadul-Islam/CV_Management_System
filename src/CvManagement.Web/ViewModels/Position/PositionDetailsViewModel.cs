@@ -25,4 +25,7 @@ public class PositionDetailsViewModel
     public bool ViewerCanSeeDiscussion { get; set; }
     public bool ViewerIsRecruiter { get; set; }
     public List<DiscussionPostViewModel> DiscussionPosts { get; set; } = [];
+
+    /// <summary>Recruiter/Admin only -- CVs created from this position. Empty for Candidates/anonymous.</summary>
+    public List<PositionCvListItemViewModel> Cvs { get; set; } = [];
 }

@@ -40,11 +40,18 @@ else if (Model.ViewerIsEligible == true)
     </form>
 }
 
-@if (Model.ViewerCanSeeDiscussion)
+@if (Model.ViewerCanSeeDiscussion || isManaging)
 {
     <ul class="nav nav-tabs mb-3" role="tablist">
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#detailsPane" type="button">@Localizer["PositionDetails_TabDetails"]</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussionPane" type="button">@Localizer["PositionDetails_TabDiscussion"] (@Model.DiscussionPosts.Count)</button></li>
+        @if (Model.ViewerCanSeeDiscussion)
+        {
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussionPane" type="button">@Localizer["PositionDetails_TabDiscussion"] (@Model.DiscussionPosts.Count)</button></li>
+        }
+        @if (isManaging)
+        {
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#cvsPane" type="button">@Localizer["PositionDetails_TabCvs"] (@Model.Cvs.Count)</button></li>
+        }
     </ul>
 }
 
@@ -137,6 +144,39 @@ else if (Model.ViewerIsEligible == true)
                 <textarea id="discussionBody" class="form-control mb-2" rows="2" placeholder="@Localizer["PositionDetails_DiscussionPlaceholder"]"></textarea>
                 <button type="submit" class="btn btn-primary btn-sm">@Localizer["Discussion_Post"]</button>
             </form>
+        </div>
+    }
+
+    @if (isManaging)
+    {
+        <div class="tab-pane fade" id="cvsPane">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>@Localizer["Cv_ColCandidate"]</th>
+                            <th>@Localizer["Profile_ColStatus"]</th>
+                            <th>@Localizer["Profile_ColLikes"]</th>
+                            <th>@Localizer["Common_Updated"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cv in Model.Cvs)
+                        {
+                            <tr>
+                                <td><a asp-controller="Cv" asp-action="Details" asp-route-id="@cv.Id">@cv.CandidateDisplayName</a></td>
+                                <td>@Localizer[cv.Status == "Published" ? "Cv_Published" : "Cv_Draft"]</td>
+                                <td>@cv.LikeCount</td>
+                                <td>@cv.UpdatedAt.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                        @if (Model.Cvs.Count == 0)
+                        {
+                            <tr><td colspan="4" class="text-center text-secondary py-4">@Localizer["PositionDetails_NoCvs"]</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     }
 </div>

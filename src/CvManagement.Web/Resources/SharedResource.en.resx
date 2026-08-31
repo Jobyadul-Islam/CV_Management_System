@@ -79,6 +79,8 @@
   <data name="PositionDetails_CreateCv" xml:space="preserve"><value>Create CV for this position</value></data>
   <data name="PositionDetails_TabDetails" xml:space="preserve"><value>Details</value></data>
   <data name="PositionDetails_TabDiscussion" xml:space="preserve"><value>Discussion</value></data>
+  <data name="PositionDetails_TabCvs" xml:space="preserve"><value>CVs</value></data>
+  <data name="PositionDetails_NoCvs" xml:space="preserve"><value>No CVs created from this position yet.</value></data>
   <data name="PositionDetails_TemplateAttributes" xml:space="preserve"><value>CV Template Attributes</value></data>
   <data name="PositionDetails_NoAttributes" xml:space="preserve"><value>No attributes selected yet.</value></data>
   <data name="PositionDetails_Access" xml:space="preserve"><value>Access</value></data>
