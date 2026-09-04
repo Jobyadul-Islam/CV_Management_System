@@ -4,17 +4,29 @@
 @{
     ViewData["Title"] = Localizer["Nav_MyProfile"];
     var infoAttributeIds = Model.InfoAttributes.Select(a => a.AttributeId).ToList();
+    var uid = Model.UserId;
+    var qs = Model.IsOwner ? "" : "&userId=" + Uri.EscapeDataString(uid);
 }
 
 <h1 class="h3 mb-3">@(string.IsNullOrWhiteSpace(Model.DisplayName) ? Localizer["Nav_MyProfile"].Value : Model.DisplayName)</h1>
 
+@if (!Model.IsOwner)
+{
+    <div class="alert alert-warning">@Localizer["Profile_EditingAsAdmin"]</div>
+}
+
+<div class="mb-3">
+    <img src="@Url.Action("Badges", "Profile", new { userId = uid })" alt="@Localizer["Profile_Achievements"]" class="d-block mb-1" style="max-width:100%" />
+    <a href="@Url.Action("Badges", "Profile", new { userId = uid, download = true })" class="small">@Localizer["Profile_DownloadBadges"]</a>
+</div>
+
 @Html.AntiForgeryToken()
 
 <ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "me" ? "active" : "")" href="?tab=me">@Localizer["Profile_TabMe"]</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "info" ? "active" : "")" href="?tab=info">@Localizer["Profile_TabInfo"]</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "projects" ? "active" : "")" href="?tab=projects">@Localizer["Profile_TabProjects"]</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "cvs" ? "active" : "")" href="?tab=cvs">@Localizer["Profile_TabCvs"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "me" ? "active" : "")" href="?tab=me@qs">@Localizer["Profile_TabMe"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "info" ? "active" : "")" href="?tab=info@qs">@Localizer["Profile_TabInfo"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "projects" ? "active" : "")" href="?tab=projects@qs">@Localizer["Profile_TabProjects"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "cvs" ? "active" : "")" href="?tab=cvs@qs">@Localizer["Profile_TabCvs"]</a></li>
 </ul>
 
 @if (Model.ActiveTab == "me")
@@ -35,6 +47,7 @@ else if (Model.ActiveTab == "info")
         @await Component.InvokeAsync("AttributePicker", new { modalId = "infoAttributePicker", excludeIds = infoAttributeIds })
         <form id="infoAttributePicker-post-form" method="post" action="@Url.Action("AddInfoAttribute", "Profile")" style="display:none">
             @Html.AntiForgeryToken()
+            <input type="hidden" name="userId" value="@uid" />
         </form>
 
         @foreach (var field in Model.InfoAttributes)
@@ -43,7 +56,7 @@ else if (Model.ActiveTab == "info")
                 <div class="flex-grow-1">
                     <partial name="_AttributeValueInput" model="field" />
                 </div>
-                <form method="post" asp-action="RemoveInfoAttribute" asp-route-attributeId="@field.AttributeId" class="mt-1">
+                <form method="post" asp-action="RemoveInfoAttribute" asp-route-attributeId="@field.AttributeId" asp-route-userId="@uid" class="mt-1">
                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove from profile">&times;</button>
                 </form>
             </div>
@@ -70,12 +83,12 @@ else if (Model.ActiveTab == "projects")
 {
     var toolbarActions = new List<ToolbarAction>
     {
-        new(Localizer["Common_Edit"], Url.Action("Edit", "Projects")! + "/{id}", "get", MinSelected: 1, MaxSelected: 1),
-        new(Localizer["Common_Delete"], Url.Action("Delete", "Projects")!, "post", MinSelected: 1, Confirm: Localizer["ProjectForm_DeleteConfirm"], CssClass: "btn-outline-danger")
+        new(Localizer["Common_Edit"], Url.Action("Edit", "Projects")! + "/{id}" + (Model.IsOwner ? "" : "?userId=" + Uri.EscapeDataString(uid)), "get", MinSelected: 1, MaxSelected: 1),
+        new(Localizer["Common_Delete"], Url.Action("Delete", "Projects")! + (Model.IsOwner ? "" : "?userId=" + Uri.EscapeDataString(uid)), "post", MinSelected: 1, Confirm: Localizer["ProjectForm_DeleteConfirm"], CssClass: "btn-outline-danger")
     };
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <a asp-controller="Projects" asp-action="Create" class="btn btn-primary btn-sm">@Localizer["Profile_NewProject"]</a>
+        <a asp-controller="Projects" asp-action="Create" asp-route-userId="@uid" class="btn btn-primary btn-sm">@Localizer["Profile_NewProject"]</a>
     </div>
 
     @await Component.InvokeAsync("SelectableTableToolbar", new { tableId = "projects-table", actions = toolbarActions })
@@ -95,7 +108,7 @@ else if (Model.ActiveTab == "projects")
                 {
                     <tr data-id="@project.Id">
                         <td><input type="checkbox" class="row-select form-check-input" value="@project.Id" /></td>
-                        <td><a asp-controller="Projects" asp-action="Edit" asp-route-id="@project.Id">@project.Name</a></td>
+                        <td><a asp-controller="Projects" asp-action="Edit" asp-route-id="@project.Id" asp-route-userId="@uid">@project.Name</a></td>
                         <td>@project.PeriodStart.ToString("yyyy-MM") &ndash; @(project.PeriodEnd?.ToString("yyyy-MM") ?? Localizer["Profile_Present"].Value)</td>
                         <td>
                             @foreach (var tag in project.Tags)
@@ -115,13 +128,28 @@ else if (Model.ActiveTab == "projects")
 }
 else if (Model.ActiveTab == "cvs")
 {
+    var cvToolbarActions = new List<ToolbarAction>
+    {
+        new(Localizer["Common_Delete"], Url.Action("Delete", "Cv")! + (Model.IsOwner ? "" : "?userId=" + Uri.EscapeDataString(uid)), "post", MinSelected: 1, Confirm: Localizer["Cv_DeleteConfirm"], CssClass: "btn-outline-danger")
+    };
+
+    @await Component.InvokeAsync("SelectableTableToolbar", new { tableId = "cvs-table", actions = cvToolbarActions })
+
     <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead><tr><th>@Localizer["Profile_ColPosition"]</th><th>@Localizer["Profile_ColStatus"]</th><th>@Localizer["Profile_ColLikes"]</th></tr></thead>
+        <table id="cvs-table" class="table table-hover align-middle selectable-table" data-toolbar="cvs-table-toolbar">
+            <thead>
+                <tr>
+                    <th style="width:2rem"><input type="checkbox" class="select-all form-check-input" /></th>
+                    <th>@Localizer["Profile_ColPosition"]</th>
+                    <th>@Localizer["Profile_ColStatus"]</th>
+                    <th>@Localizer["Profile_ColLikes"]</th>
+                </tr>
+            </thead>
             <tbody>
                 @foreach (var cv in Model.Cvs)
                 {
-                    <tr>
+                    <tr data-id="@cv.Id">
+                        <td><input type="checkbox" class="row-select form-check-input" value="@cv.Id" /></td>
                         <td><a asp-controller="Cv" asp-action="Details" asp-route-id="@cv.Id">@cv.PositionTitle</a></td>
                         <td>@Localizer[cv.Status == "Published" ? "Cv_Published" : "Cv_Draft"]</td>
                         <td>@cv.LikeCount</td>
@@ -129,7 +157,7 @@ else if (Model.ActiveTab == "cvs")
                 }
                 @if (Model.Cvs.Count == 0)
                 {
-                    <tr><td colspan="3" class="text-center text-secondary py-4">@Localizer["Profile_NoCvs"]</td></tr>
+                    <tr><td colspan="4" class="text-center text-secondary py-4">@Localizer["Profile_NoCvs"]</td></tr>
                 }
             </tbody>
         </table>
@@ -141,6 +169,7 @@ else if (Model.ActiveTab == "cvs")
 }
 
 @section Scripts {
+    <script>window.AUTOSAVE_ENDPOINT = "/api/profile/autosave/@uid";</script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
     <script src="~/js/image-upload.js" asp-append-version="true"></script>

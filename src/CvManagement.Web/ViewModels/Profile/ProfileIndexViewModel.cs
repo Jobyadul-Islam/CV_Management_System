@@ -3,6 +3,7 @@ namespace CvManagement.Web.ViewModels.Profile;
 public class ProfileIndexViewModel
 {
     public string ActiveTab { get; set; } = "me";
+    public string UserId { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
     public bool IsOwner { get; set; } = true;
 

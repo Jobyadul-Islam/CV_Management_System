@@ -4,7 +4,18 @@
     ViewData["Title"] = Model.DisplayName;
 }
 
-<h1 class="h3 mb-3">@Model.DisplayName</h1>
+@{ var isAdmin = User.IsInRole("Administrator"); }
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <h1 class="h3 mb-0">@Model.DisplayName</h1>
+    @if (isAdmin)
+    {
+        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@Model.UserId" class="btn btn-outline-secondary btn-sm">@Localizer["ProfileView_EditAsAdmin"]</a>
+    }
+</div>
+
+<div class="mb-3">
+    <img src="@Url.Action("Badges", "Profile", new { userId = Model.UserId })" alt="@Localizer["Profile_Achievements"]" class="d-block" style="max-width:100%" />
+</div>
 
 <div class="row">
     <div class="col-lg-6">

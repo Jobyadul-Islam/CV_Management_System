@@ -81,6 +81,7 @@
   <data name="PositionDetails_TabDiscussion" xml:space="preserve"><value>Обсуждение</value></data>
   <data name="PositionDetails_TabCvs" xml:space="preserve"><value>Резюме</value></data>
   <data name="PositionDetails_NoCvs" xml:space="preserve"><value>По этой позиции пока нет резюме.</value></data>
+  <data name="PositionDetails_ExportCsv" xml:space="preserve"><value>Экспорт CSV</value></data>
   <data name="PositionDetails_TemplateAttributes" xml:space="preserve"><value>Атрибуты шаблона резюме</value></data>
   <data name="PositionDetails_NoAttributes" xml:space="preserve"><value>Атрибуты ещё не выбраны.</value></data>
   <data name="PositionDetails_Access" xml:space="preserve"><value>Доступ</value></data>
@@ -154,6 +155,8 @@
   <data name="Cv_Published" xml:space="preserve"><value>Опубликовано</value></data>
   <data name="Cv_Like" xml:space="preserve"><value>Лайк</value></data>
   <data name="Cv_Unlike" xml:space="preserve"><value>Убрать лайк</value></data>
+  <data name="Cv_DownloadPdf" xml:space="preserve"><value>Скачать PDF</value></data>
+  <data name="Cv_DeleteConfirm" xml:space="preserve"><value>Удалить выбранные резюме? Это действие нельзя отменить.</value></data>
   <data name="Cv_ReadyToPublish" xml:space="preserve"><value>Все поля заполнены -- можно публиковать.</value></data>
   <data name="Cv_FillFieldsToPublish" xml:space="preserve"><value>Заполните все выделенные красным поля ниже, чтобы опубликовать.</value></data>
   <data name="Cv_Publish" xml:space="preserve"><value>Опубликовать</value></data>
@@ -189,6 +192,10 @@
   <data name="Discussion_Post" xml:space="preserve"><value>Отправить</value></data>
 
   <data name="ProfileView_Profile" xml:space="preserve"><value>Профиль</value></data>
+  <data name="ProfileView_EditAsAdmin" xml:space="preserve"><value>Редактировать как администратор</value></data>
+  <data name="Profile_EditingAsAdmin" xml:space="preserve"><value>Вы редактируете этот профиль как администратор.</value></data>
+  <data name="Profile_Achievements" xml:space="preserve"><value>Достижения</value></data>
+  <data name="Profile_DownloadBadges" xml:space="preserve"><value>Скачать значки (SVG)</value></data>
   <data name="ProfileView_PublishedCvs" xml:space="preserve"><value>Опубликованные резюме</value></data>
   <data name="ProfileView_NoPublishedCvs" xml:space="preserve"><value>Опубликованных резюме нет.</value></data>
 </root>

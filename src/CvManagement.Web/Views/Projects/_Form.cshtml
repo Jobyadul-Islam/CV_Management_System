@@ -4,6 +4,7 @@
 <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 <input type="hidden" asp-for="Id" />
 <input type="hidden" asp-for="RowVersion" />
+<input type="hidden" asp-for="UserId" />
 
 <div class="mb-3">
     <label asp-for="Name" class="form-label"></label>
@@ -35,7 +36,7 @@
 </div>
 
 <button type="submit" class="btn btn-primary">@Localizer["Common_Save"]</button>
-<a asp-controller="Profile" asp-action="Index" asp-route-tab="projects" class="btn btn-outline-secondary">@Localizer["Common_Cancel"]</a>
+<a asp-controller="Profile" asp-action="Index" asp-route-tab="projects" asp-route-userId="@Model.UserId" class="btn btn-outline-secondary">@Localizer["Common_Cancel"]</a>
 
 <partial name="_ValidationScriptsPartial" />
 <script>

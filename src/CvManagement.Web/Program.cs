@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -100,6 +102,14 @@ builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IAdminUserServ
     CvManagement.Web.Services.Implementations.AdminUserService>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IAppEmailSender,
     CvManagement.Web.Services.Implementations.SmtpEmailSender>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ICvPdfExportService,
+    CvManagement.Web.Services.Implementations.CvPdfExportService>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.IBadgeService,
+    CvManagement.Web.Services.Implementations.BadgeService>();
+builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.IBadgeSvgRenderer,
+    CvManagement.Web.Services.Implementations.BadgeSvgRenderer>();
+builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ICvExportService,
+    CvManagement.Web.Services.Implementations.CvExportService>();
 
 var app = builder.Build();
 
