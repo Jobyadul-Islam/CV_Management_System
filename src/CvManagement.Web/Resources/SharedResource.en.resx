@@ -81,6 +81,7 @@
   <data name="PositionDetails_TabDiscussion" xml:space="preserve"><value>Discussion</value></data>
   <data name="PositionDetails_TabCvs" xml:space="preserve"><value>CVs</value></data>
   <data name="PositionDetails_NoCvs" xml:space="preserve"><value>No CVs created from this position yet.</value></data>
+  <data name="PositionDetails_ExportCsv" xml:space="preserve"><value>Export CSV</value></data>
   <data name="PositionDetails_TemplateAttributes" xml:space="preserve"><value>CV Template Attributes</value></data>
   <data name="PositionDetails_NoAttributes" xml:space="preserve"><value>No attributes selected yet.</value></data>
   <data name="PositionDetails_Access" xml:space="preserve"><value>Access</value></data>
@@ -154,6 +155,8 @@
   <data name="Cv_Published" xml:space="preserve"><value>Published</value></data>
   <data name="Cv_Like" xml:space="preserve"><value>Like</value></data>
   <data name="Cv_Unlike" xml:space="preserve"><value>Unlike</value></data>
+  <data name="Cv_DownloadPdf" xml:space="preserve"><value>Download PDF</value></data>
+  <data name="Cv_DeleteConfirm" xml:space="preserve"><value>Delete the selected CV(s)? This cannot be undone.</value></data>
   <data name="Cv_ReadyToPublish" xml:space="preserve"><value>All fields are filled in -- ready to publish.</value></data>
   <data name="Cv_FillFieldsToPublish" xml:space="preserve"><value>Fill in every red-highlighted field below to publish.</value></data>
   <data name="Cv_Publish" xml:space="preserve"><value>Publish</value></data>
@@ -189,6 +192,10 @@
   <data name="Discussion_Post" xml:space="preserve"><value>Post</value></data>
 
   <data name="ProfileView_Profile" xml:space="preserve"><value>Profile</value></data>
+  <data name="ProfileView_EditAsAdmin" xml:space="preserve"><value>Edit as Administrator</value></data>
+  <data name="Profile_EditingAsAdmin" xml:space="preserve"><value>You are editing this profile as Administrator.</value></data>
+  <data name="Profile_Achievements" xml:space="preserve"><value>Achievements</value></data>
+  <data name="Profile_DownloadBadges" xml:space="preserve"><value>Download badges (SVG)</value></data>
   <data name="ProfileView_PublishedCvs" xml:space="preserve"><value>Published CVs</value></data>
   <data name="ProfileView_NoPublishedCvs" xml:space="preserve"><value>No published CVs.</value></data>
 </root>

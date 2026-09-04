@@ -16,6 +16,7 @@ public class CvController(
     ICvRenderService cvRender,
     IProfileAutoSaveService autoSave,
     IPositionAccessEvaluator accessEvaluator,
+    ICvPdfExportService pdfExport,
     ApplicationDbContext db,
     UserManager<ApplicationUser> userManager) : Controller
 {
@@ -63,6 +64,26 @@ public class CvController(
         }
 
         return View(model);
+    }
+
+    [HttpGet, AllowAnonymous]
+    public async Task<IActionResult> ExportPdf(int id)
+    {
+        var cv = await db.Cvs.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+        if (cv is null) return NotFound();
+
+        var (canView, _) = await GetAccessAsync(cv, User);
+        if (!canView) return NotFound();
+
+        var model = await cvRender.BuildAsync(id);
+        if (model is null) return NotFound();
+
+        var qrUrl = Url.Action(nameof(Details), "Cv", new { id }, protocol: Request.Scheme)!;
+        var pdfBytes = pdfExport.Generate(model, qrUrl);
+
+        var safeName = string.Concat($"{model.CandidateDisplayName}-{model.PositionTitle}"
+            .Select(ch => char.IsLetterOrDigit(ch) || ch is '-' or ' ' ? ch : '-'));
+        return File(pdfBytes, "application/pdf", $"CV-{safeName}.pdf");
     }
 
     [HttpPost("/api/cv/{id:int}/autosave"), ValidateAntiForgeryToken, Authorize]
@@ -179,6 +200,32 @@ public class CvController(
         var userId = userManager.GetUserId(User)!;
         await db.CvLikes.Where(l => l.CvId == id && l.RecruiterUserId == userId).ExecuteDeleteAsync();
         return RedirectToAction(nameof(Details), new { id });
+    }
+
+    /// <summary>
+    /// "Existing CVs can be edited or deleted" (spec, Profile CVs tab). Bounded to the caller's
+    /// checkbox selection, same per-id-then-set-based-delete shape used by Attribute/Position/User
+    /// bulk delete elsewhere -- CvLikes cascade at the DB level (CvConfiguration), so deleting the Cv
+    /// row is the only statement needed per CV.
+    /// </summary>
+    [HttpPost, ValidateAntiForgeryToken, Authorize]
+    public async Task<IActionResult> Delete(int[] ids, string? userId)
+    {
+        var deletedCount = 0;
+        foreach (var id in ids)
+        {
+            var cv = await db.Cvs.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+            if (cv is null) continue;
+
+            var (_, canEdit) = await GetAccessAsync(cv, User);
+            if (!canEdit) continue;
+
+            await db.Cvs.Where(c => c.Id == id).ExecuteDeleteAsync();
+            deletedCount++;
+        }
+
+        TempData["StatusMessage"] = $"Deleted {deletedCount} CV(s).";
+        return RedirectToAction("Index", "Profile", new { tab = "cvs", userId });
     }
 
     /// <summary>

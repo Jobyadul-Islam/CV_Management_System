@@ -150,6 +150,10 @@ else if (Model.ViewerIsEligible == true)
     @if (isManaging)
     {
         <div class="tab-pane fade" id="cvsPane">
+            @if (Model.Cvs.Count > 0)
+            {
+                <a asp-action="ExportCvsCsv" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary mb-2">@Localizer["PositionDetails_ExportCsv"]</a>
+            }
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>

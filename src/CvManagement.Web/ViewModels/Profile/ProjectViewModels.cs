@@ -31,4 +31,8 @@ public class ProjectFormViewModel
     public List<string> Tags { get; set; } = [];
 
     public string? RowVersion { get; set; }
+
+    /// <summary>Round-tripped through the form so an Administrator editing another candidate's
+    /// project (acting as owner) keeps operating on that candidate across GET and POST.</summary>
+    public string? UserId { get; set; }
 }

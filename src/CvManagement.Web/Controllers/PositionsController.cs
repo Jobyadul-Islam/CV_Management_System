@@ -15,6 +15,7 @@ public class PositionsController(
     IAttributeService attributes,
     IPositionAccessEvaluator accessEvaluator,
     IDiscussionService discussions,
+    ICvExportService cvExport,
     ApplicationDbContext db,
     UserManager<ApplicationUser> userManager) : Controller
 {
@@ -130,6 +131,16 @@ public class PositionsController(
                 UpdatedAt = c.UpdatedAt
             })
             .ToList();
+    }
+
+    [HttpGet, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
+    public async Task<IActionResult> ExportCvsCsv(int id)
+    {
+        var csv = await cvExport.BuildCsvAsync(id, isAdmin: User.IsInRole(RoleNames.Administrator));
+        if (csv is null) return NotFound();
+
+        var bytes = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(csv)).ToArray();
+        return File(bytes, "text/csv", $"position-{id}-cvs.csv");
     }
 
     [HttpGet, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
