@@ -31,7 +31,7 @@ public class HomeController(
             .Select(p => new PositionListItemViewModel
             {
                 Id = p.Id, Title = p.Title, Company = p.Company, Level = p.Level,
-                AccessMode = p.AccessMode, CvCount = p.Cvs.Count, UpdatedAt = p.UpdatedAt
+                AccessMode = p.AccessMode, CvCount = p.Cvs.Count(c => c.Status == CvStatus.Published), UpdatedAt = p.UpdatedAt
             })
             .ToListAsync();
 
@@ -45,7 +45,7 @@ public class HomeController(
                     .Select(p => new PositionListItemViewModel
                     {
                         Id = p.Id, Title = p.Title, Company = p.Company, Level = p.Level,
-                        AccessMode = p.AccessMode, CvCount = p.Cvs.Count, UpdatedAt = p.UpdatedAt
+                        AccessMode = p.AccessMode, CvCount = p.Cvs.Count(c => c.Status == CvStatus.Published), UpdatedAt = p.UpdatedAt
                     })
                     .ToListAsync(),
                 isManaging);
@@ -69,7 +69,9 @@ public class HomeController(
             TotalPositions = await db.Positions.CountAsync(),
             TotalCandidates = await CountInRoleAsync(RoleNames.Candidate),
             TotalRecruiters = await CountInRoleAsync(RoleNames.Recruiter),
-            TotalCvs = await db.Cvs.CountAsync()
+            // "Submitted" (spec's own word, distinct from "created" just above) means Published --
+            // a Draft is a private scratch, not yet submitted for a Recruiter's consideration.
+            TotalCvs = await db.Cvs.CountAsync(c => c.Status == CvStatus.Published)
         };
 
         var model = new HomeIndexViewModel
