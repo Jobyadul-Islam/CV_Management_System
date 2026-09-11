@@ -48,6 +48,11 @@
   <data name="Home_PopularPositions" xml:space="preserve"><value>Most Popular Positions</value></data>
   <data name="Home_Stats" xml:space="preserve"><value>Statistics</value></data>
   <data name="Home_TagCloud" xml:space="preserve"><value>Technology Tags</value></data>
+  <data name="Home_TagCloud_Empty" xml:space="preserve"><value>No tags yet.</value></data>
+  <data name="Home_StatCvs24h" xml:space="preserve"><value>CVs (24h)</value></data>
+  <data name="Home_StatCandidates" xml:space="preserve"><value>Candidates</value></data>
+  <data name="Home_StatRecruiters" xml:space="preserve"><value>Recruiters</value></data>
+  <data name="Home_StatSubmittedCvs" xml:space="preserve"><value>Submitted CVs</value></data>
 
   <data name="Common_Save" xml:space="preserve"><value>Save</value></data>
   <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
