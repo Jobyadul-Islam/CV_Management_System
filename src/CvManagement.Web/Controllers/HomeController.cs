@@ -1,8 +1,8 @@
 using System.Diagnostics;
+using System.Linq.Expressions;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
 using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Home;
 using CvManagement.Web.ViewModels.Position;
@@ -17,50 +17,35 @@ public class HomeController(
     IPositionAccessEvaluator accessEvaluator,
     UserManager<ApplicationUser> userManager) : Controller
 {
+    private const int LatestCount = 8;
+    private const int PopularCount = 5;
+    private const int ChartDays = 14;
+
     public async Task<IActionResult> Index()
     {
-        var isManaging = User.IsInRole(RoleNames.Recruiter) || User.IsInRole(RoleNames.Administrator);
+        // Positions this viewer may open: everything for Recruiters/Admins; Public ones for anonymous
+        // visitors; Public + the Restricted ones whose rules they meet for a signed-in Candidate. Built
+        // once as a SQL predicate, so Latest and Most Popular are both ranked across *all* visible
+        // positions by the database (ORDER BY ... TOP n), never from a pre-trimmed or fully loaded list.
+        var visible = await BuildVisibilityFilterAsync();
 
-        // Candidates/anonymous only ever see positions they're actually allowed to open -- fetch a
-        // slightly larger candidate pool, filter by visibility, then trim to the display count, so a
-        // restricted position never appears here for a viewer who'd get a 404 clicking into it.
-        var candidatePool = await db.Positions
-            .AsNoTracking()
-            .OrderByDescending(p => p.UpdatedAt)
-            .Take(isManaging ? 8 : 30)
-            .Select(p => new PositionListItemViewModel
-            {
-                Id = p.Id, Title = p.Title, Company = p.Company, Level = p.Level,
-                AccessMode = p.AccessMode, CvCount = p.Cvs.Count(c => c.Status == CvStatus.Published), UpdatedAt = p.UpdatedAt
-            })
+        var latest = await ProjectList(db.Positions.Where(visible).OrderByDescending(p => p.UpdatedAt))
+            .Take(LatestCount)
             .ToListAsync();
 
-        var visiblePool = await FilterVisibleAsync(candidatePool, isManaging);
-        var latest = visiblePool.Take(8).ToList();
-
-        var popularPool = isManaging
-            ? candidatePool
-            : await FilterVisibleAsync(
-                await db.Positions.AsNoTracking()
-                    .Select(p => new PositionListItemViewModel
-                    {
-                        Id = p.Id, Title = p.Title, Company = p.Company, Level = p.Level,
-                        AccessMode = p.AccessMode, CvCount = p.Cvs.Count(c => c.Status == CvStatus.Published), UpdatedAt = p.UpdatedAt
-                    })
-                    .ToListAsync(),
-                isManaging);
-        var popular = popularPool.OrderByDescending(p => p.CvCount).ThenByDescending(p => p.UpdatedAt).Take(5).ToList();
-
-        var tagCounts = await db.Tags
-            .AsNoTracking()
-            .Select(t => new { t.Name, Count = t.ProjectTags.Count })
+        var popular = await ProjectList(db.Positions.Where(visible)
+                .OrderByDescending(p => p.Cvs.Count(c => c.Status == CvStatus.Published))
+                .ThenByDescending(p => p.UpdatedAt))
+            .Take(PopularCount)
             .ToListAsync();
-        var tagCloud = tagCounts
-            .Where(t => t.Count > 0)
-            .OrderByDescending(t => t.Count)
+
+        var tagCloud = await db.Tags
+            .AsNoTracking()
+            .Where(t => t.ProjectTags.Any())
+            .OrderByDescending(t => t.ProjectTags.Count)
             .Take(25)
-            .Select(t => new TagCloudEntry(t.Name, t.Count))
-            .ToList();
+            .Select(t => new TagCloudEntry(t.Name, t.ProjectTags.Count))
+            .ToListAsync();
 
         var since = DateTime.UtcNow.AddHours(-24);
         var stats = new SiteStats
@@ -79,7 +64,9 @@ public class HomeController(
             LatestPositions = latest,
             PopularPositions = popular,
             TagCloud = tagCloud,
-            Stats = stats
+            Stats = stats,
+            CvsPerDay = await GetCvsPerDayAsync(),
+            PositionsByLevel = await GetPositionsByLevelAsync()
         };
 
         return View(model);
@@ -91,18 +78,71 @@ public class HomeController(
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-    private async Task<List<PositionListItemViewModel>> FilterVisibleAsync(List<PositionListItemViewModel> positions, bool isManaging)
+    private async Task<Expression<Func<Position, bool>>> BuildVisibilityFilterAsync()
     {
-        if (isManaging) return positions;
-
-        if (User.Identity?.IsAuthenticated == true)
+        if (User.IsInRole(RoleNames.Recruiter) || User.IsInRole(RoleNames.Administrator))
         {
-            var userId = userManager.GetUserId(User)!;
-            var eligibility = await accessEvaluator.IsEligibleForManyAsync(userId, positions.Select(p => p.Id).ToList());
-            return positions.Where(p => eligibility.GetValueOrDefault(p.Id)).ToList();
+            return p => true;
         }
 
-        return positions.Where(p => p.AccessMode == PositionAccessMode.Public).ToList();
+        if (User.Identity?.IsAuthenticated != true)
+        {
+            return p => p.AccessMode == PositionAccessMode.Public;
+        }
+
+        // Rules are evaluated in C# (RuleEvaluator), so resolve which Restricted positions this
+        // candidate qualifies for once -- three queries total -- and hand the ids to SQL.
+        var userId = userManager.GetUserId(User)!;
+        var restrictedIds = await db.Positions
+            .Where(p => p.AccessMode == PositionAccessMode.Restricted)
+            .Select(p => p.Id)
+            .ToListAsync();
+        var eligible = await accessEvaluator.FilterEligibleAsync(restrictedIds.Select(id => (userId, id)).ToList());
+        var eligibleIds = eligible.Select(e => e.PositionId).ToList();
+
+        return p => p.AccessMode == PositionAccessMode.Public || eligibleIds.Contains(p.Id);
+    }
+
+    private static IQueryable<PositionListItemViewModel> ProjectList(IQueryable<Position> positions)
+        => positions.AsNoTracking().Select(p => new PositionListItemViewModel
+        {
+            Id = p.Id,
+            Title = p.Title,
+            Company = p.Company,
+            Level = p.Level,
+            AccessMode = p.AccessMode,
+            CvCount = p.Cvs.Count(c => c.Status == CvStatus.Published),
+            UpdatedAt = p.UpdatedAt
+        });
+
+    /// <summary>One GROUP BY query; days with no CVs are zero-filled so the chart's x-axis is continuous.</summary>
+    private async Task<List<ChartPoint>> GetCvsPerDayAsync()
+    {
+        var firstDay = DateTime.UtcNow.Date.AddDays(-(ChartDays - 1));
+        var counts = await db.Cvs
+            .Where(c => c.CreatedAt >= firstDay)
+            .GroupBy(c => c.CreatedAt.Date)
+            .Select(g => new { Day = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(g => g.Day, g => g.Count);
+
+        return Enumerable.Range(0, ChartDays)
+            .Select(i => firstDay.AddDays(i))
+            .Select(day => new ChartPoint(day.ToString("MMM d"), counts.GetValueOrDefault(day)))
+            .ToList();
+    }
+
+    private async Task<List<ChartPoint>> GetPositionsByLevelAsync()
+    {
+        var counts = await db.Positions
+            .GroupBy(p => p.Level)
+            .Select(g => new { Level = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        return Enum.GetValues<PositionLevel>()
+            // Labels are enum names; the view localizes them (Level_Junior, ..., Level_Unspecified).
+            .Select(level => new ChartPoint(level.ToString(), counts.FirstOrDefault(c => c.Level == level)?.Count ?? 0))
+            .Append(new ChartPoint("Unspecified", counts.FirstOrDefault(c => c.Level == null)?.Count ?? 0))
+            .ToList();
     }
 
     private async Task<int> CountInRoleAsync(string roleName)

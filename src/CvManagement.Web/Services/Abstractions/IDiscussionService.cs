@@ -6,5 +6,8 @@ namespace CvManagement.Web.Services.Abstractions;
 public interface IDiscussionService
 {
     Task<IReadOnlyList<DiscussionPostViewModel>> GetPostsAsync(int positionId, CancellationToken ct = default);
-    Task<DiscussionPostViewModel> PostAsync(int positionId, string userId, string bodyMarkdown, CancellationToken ct = default);
+    public const int MaxBodyLength = 4000;
+
+    /// <summary>Null when the position doesn't exist (e.g. deleted while the page was open).</summary>
+    Task<DiscussionPostViewModel?> PostAsync(int positionId, string userId, string bodyMarkdown, CancellationToken ct = default);
 }

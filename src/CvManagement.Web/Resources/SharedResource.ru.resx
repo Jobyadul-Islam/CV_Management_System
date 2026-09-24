@@ -74,7 +74,7 @@
   <data name="Positions_Public" xml:space="preserve"><value>Публичная</value></data>
   <data name="Positions_Restricted" xml:space="preserve"><value>Ограниченная</value></data>
   <data name="Positions_FilteredByTag" xml:space="preserve"><value>Фильтр по тегу:</value></data>
-  <data name="Positions_DeleteConfirm" xml:space="preserve"><value>Удалить выбранные вакансии? Вакансии с существующими резюме будут пропущены.</value></data>
+  <data name="Positions_DeleteConfirm" xml:space="preserve"><value>Удалить выбранные вакансии? Их резюме, лайки и обсуждения тоже будут удалены. Это необратимо.</value></data>
   <data name="Positions_New_Title" xml:space="preserve"><value>Новая вакансия</value></data>
   <data name="Positions_Edit_Title" xml:space="preserve"><value>Редактирование вакансии</value></data>
 
@@ -203,4 +203,688 @@
   <data name="Profile_DownloadBadges" xml:space="preserve"><value>Скачать значки (SVG)</value></data>
   <data name="ProfileView_PublishedCvs" xml:space="preserve"><value>Опубликованные резюме</value></data>
   <data name="ProfileView_NoPublishedCvs" xml:space="preserve"><value>Опубликованных резюме нет.</value></data>
+  <data name="Upload_Photo" xml:space="preserve">
+    <value>Загрузить фото</value>
+  </data>
+  <data name="Upload_NotConfigured" xml:space="preserve">
+    <value>Загрузка изображений ещё не настроена (нужны cloud name и unsigned upload preset Cloudinary).</value>
+  </data>
+  <data name="Autosave_Empty" xml:space="preserve">
+    <value>не заполнено</value>
+  </data>
+  <data name="Autosave_NotAnswered" xml:space="preserve">
+    <value>Нет ответа</value>
+  </data>
+  <data name="Autosave_Select" xml:space="preserve">
+    <value>-- выберите --</value>
+  </data>
+  <data name="Autosave_PeriodStart" xml:space="preserve">
+    <value>Начало</value>
+  </data>
+  <data name="Autosave_PeriodEnd" xml:space="preserve">
+    <value>Конец</value>
+  </data>
+  <data name="Autosave_ChangedElsewhere" xml:space="preserve">
+    <value>Значение изменено в другом месте после загрузки страницы.</value>
+  </data>
+  <data name="Autosave_KeepMine" xml:space="preserve">
+    <value>Оставить моё</value>
+  </data>
+  <data name="Autosave_ReloadPage" xml:space="preserve">
+    <value>Перезагрузить</value>
+  </data>
+  <data name="Autosave_Unsaved" xml:space="preserve">
+    <value>Несохранённые изменения...</value>
+  </data>
+  <data name="Autosave_Saving" xml:space="preserve">
+    <value>Сохранение...</value>
+  </data>
+  <data name="Autosave_Saved" xml:space="preserve">
+    <value>Сохранено</value>
+  </data>
+  <data name="Autosave_Conflict" xml:space="preserve">
+    <value>Конфликт</value>
+  </data>
+  <data name="Autosave_Failed" xml:space="preserve">
+    <value>Не удалось сохранить</value>
+  </data>
+  <data name="Autosave_Offline" xml:space="preserve">
+    <value>Нет связи -- повторим попытку</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="Profile_RemoveSelected" xml:space="preserve">
+    <value>Удалить выбранные</value>
+  </data>
+  <data name="Profile_RemoveInfoConfirm" xml:space="preserve">
+    <value>Удалить выбранные атрибуты и их значения из профиля?</value>
+  </data>
+  <data name="Profile_SelectAttribute" xml:space="preserve">
+    <value>Выбрать</value>
+  </data>
+  <data name="Home_ChartCvsPerDay" xml:space="preserve">
+    <value>Новые резюме по дням (последние 14 дней)</value>
+  </data>
+  <data name="Home_ChartCvsSeries" xml:space="preserve">
+    <value>Новые резюме</value>
+  </data>
+  <data name="Home_ChartPositionsByLevel" xml:space="preserve">
+    <value>Вакансии по уровню</value>
+  </data>
+  <data name="Level_Junior" xml:space="preserve">
+    <value>Junior</value>
+  </data>
+  <data name="Level_Middle" xml:space="preserve">
+    <value>Middle</value>
+  </data>
+  <data name="Level_Senior" xml:space="preserve">
+    <value>Senior</value>
+  </data>
+  <data name="Level_CLevel" xml:space="preserve">
+    <value>C-level</value>
+  </data>
+  <data name="Level_Unspecified" xml:space="preserve">
+    <value>Не указан</value>
+  </data>
+  <data name="Nav_GetStarted" xml:space="preserve">
+    <value>Начать</value>
+  </data>
+  <data name="Nav_Language" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="Footer_Rights" xml:space="preserve">
+    <value>Все права защищены.</value>
+  </data>
+  <data name="Hero_Eyebrow" xml:space="preserve">
+    <value>Система управления резюме</value>
+  </data>
+  <data name="Hero_Title" xml:space="preserve">
+    <value>Превращайте профили в готовые резюме</value>
+  </data>
+  <data name="Hero_Text" xml:space="preserve">
+    <value>Ведите один профиль, создавайте резюме под каждую вакансию в один клик и помогайте рекрутерам находить нужных кандидатов с помощью поиска, лайков и обсуждений.</value>
+  </data>
+  <data name="Hero_CtaGuest" xml:space="preserve">
+    <value>Начать бесплатно</value>
+  </data>
+  <data name="Hero_CtaCandidate" xml:space="preserve">
+    <value>Найти вакансию</value>
+  </data>
+  <data name="Hero_CtaRecruiter" xml:space="preserve">
+    <value>Создать вакансию</value>
+  </data>
+  <data name="Hero_ArtLabel" xml:space="preserve">
+    <value>Профили кандидатов превращаются в готовые резюме</value>
+  </data>
+  <data name="Auth_SignInSubtitle" xml:space="preserve">
+    <value>для доступа к CV Management</value>
+  </data>
+  <data name="Auth_RegisterSubtitle" xml:space="preserve">
+    <value>и создавайте резюме под любую вакансию из одного профиля</value>
+  </data>
+  <data name="Auth_SignInUsing" xml:space="preserve">
+    <value>Войти через</value>
+  </data>
+  <data name="Auth_SignUpNow" xml:space="preserve">
+    <value>Зарегистрируйтесь</value>
+  </data>
+  <data name="Auth_BrowsePositions" xml:space="preserve">
+    <value>Смотреть вакансии</value>
+  </data>
+  <data name="Auth_Slide1Title" xml:space="preserve">
+    <value>Один профиль — любые резюме</value>
+  </data>
+  <data name="Auth_Slide1Text" xml:space="preserve">
+    <value>Заполните данные один раз — каждое новое резюме собирается из них автоматически.</value>
+  </data>
+  <data name="Auth_Slide2Title" xml:space="preserve">
+    <value>Ни одной потерянной правки</value>
+  </data>
+  <data name="Auth_Slide2Text" xml:space="preserve">
+    <value>Изменения сохраняются сами каждые несколько секунд, а конфликтующие правки не затираются.</value>
+  </data>
+  <data name="Auth_Slide3Title" xml:space="preserve">
+    <value>Обсуждайте вживую</value>
+  </data>
+  <data name="Auth_Slide3Text" xml:space="preserve">
+    <value>У каждой вакансии своё обсуждение. Новые сообщения появляются у всех за пару секунд.</value>
+  </data>
+  <data name="Auth_ResendConfirmation" xml:space="preserve">
+    <value>Отправить письмо ещё раз</value>
+  </data>
+  <data name="Auth_CheckEmailTitle" xml:space="preserve">
+    <value>Проверьте почту</value>
+  </data>
+  <data name="Auth_CheckEmailText" xml:space="preserve">
+    <value>Мы отправили ссылку для подтверждения на {0}. Перейдите по ней, чтобы активировать аккаунт, затем войдите.</value>
+  </data>
+  <data name="Auth_DevEmailTitle" xml:space="preserve">
+    <value>Почта на этом сервере не настроена.</value>
+  </data>
+  <data name="Auth_DevEmailText" xml:space="preserve">
+    <value>Для локальной проверки — ссылка, которая была бы отправлена:</value>
+  </data>
+  <data name="Auth_BackToSignIn" xml:space="preserve">
+    <value>Вернуться ко входу</value>
+  </data>
+  <data name="Auth_EmailConfirmedTitle" xml:space="preserve">
+    <value>Почта подтверждена</value>
+  </data>
+  <data name="Auth_EmailConfirmedText" xml:space="preserve">
+    <value>Ваш аккаунт активен. Теперь можно войти.</value>
+  </data>
+  <data name="Auth_ConfirmFailedTitle" xml:space="preserve">
+    <value>Не удалось подтвердить</value>
+  </data>
+  <data name="Auth_ConfirmFailedText" xml:space="preserve">
+    <value>Ссылка недействительна или уже использована.</value>
+  </data>
+  <data name="Validation_Required" xml:space="preserve">
+    <value>Поле «{0}» обязательно для заполнения.</value>
+  </data>
+  <data name="Validation_StringLength" xml:space="preserve">
+    <value>«{0}»: не более {1} символов.</value>
+  </data>
+  <data name="Validation_StringLengthRange" xml:space="preserve">
+    <value>«{0}»: от {2} до {1} символов.</value>
+  </data>
+  <data name="Validation_Range" xml:space="preserve">
+    <value>«{0}»: значение должно быть от {1} до {2}.</value>
+  </data>
+  <data name="Validation_Email" xml:space="preserve">
+    <value>Введите корректный адрес электронной почты.</value>
+  </data>
+  <data name="Validation_PasswordsMatch" xml:space="preserve">
+    <value>Пароли не совпадают.</value>
+  </data>
+  <data name="Validation_EndBeforeStart" xml:space="preserve">
+    <value>Дата окончания не может быть раньше даты начала.</value>
+  </data>
+  <data name="Validation_MaxChars" xml:space="preserve">
+    <value>Не более {0} символов.</value>
+  </data>
+  <data name="Validation_MinChars" xml:space="preserve">
+    <value>Не менее {0} символов.</value>
+  </data>
+  <data name="Validation_Format" xml:space="preserve">
+    <value>Значение не соответствует требуемому формату.</value>
+  </data>
+  <data name="Validation_FormatTimeout" xml:space="preserve">
+    <value>Не удалось проверить значение на соответствие формату.</value>
+  </data>
+  <data name="Validation_MinValue" xml:space="preserve">
+    <value>Значение должно быть не меньше {0}.</value>
+  </data>
+  <data name="Validation_MaxValue" xml:space="preserve">
+    <value>Значение должно быть не больше {0}.</value>
+  </data>
+  <data name="Validation_SelectOption" xml:space="preserve">
+    <value>Выберите один из предложенных вариантов.</value>
+  </data>
+  <data name="Binding_ValueRequired" xml:space="preserve">
+    <value>Значение «{0}» недопустимо.</value>
+  </data>
+  <data name="Binding_MissingValue" xml:space="preserve">
+    <value>Не указано значение для «{0}».</value>
+  </data>
+  <data name="Binding_KeyOrValueRequired" xml:space="preserve">
+    <value>Требуется значение.</value>
+  </data>
+  <data name="Binding_BodyRequired" xml:space="preserve">
+    <value>Требуется непустое тело запроса.</value>
+  </data>
+  <data name="Binding_InvalidValueFor" xml:space="preserve">
+    <value>Значение «{0}» недопустимо для поля «{1}».</value>
+  </data>
+  <data name="Binding_InvalidValue" xml:space="preserve">
+    <value>Значение «{0}» недопустимо.</value>
+  </data>
+  <data name="Binding_UnknownValueFor" xml:space="preserve">
+    <value>Указанное значение недопустимо для поля «{0}».</value>
+  </data>
+  <data name="Binding_UnknownValue" xml:space="preserve">
+    <value>Указанное значение недопустимо.</value>
+  </data>
+  <data name="Binding_MustBeNumber" xml:space="preserve">
+    <value>Поле «{0}» должно быть числом.</value>
+  </data>
+  <data name="Binding_MustBeNumberGeneric" xml:space="preserve">
+    <value>Поле должно быть числом.</value>
+  </data>
+  <data name="Identity_DefaultError" xml:space="preserve">
+    <value>Произошла неизвестная ошибка.</value>
+  </data>
+  <data name="Identity_ConcurrencyFailure" xml:space="preserve">
+    <value>Запись была изменена другим пользователем. Попробуйте ещё раз.</value>
+  </data>
+  <data name="Identity_DuplicateEmail" xml:space="preserve">
+    <value>Адрес «{0}» уже зарегистрирован.</value>
+  </data>
+  <data name="Identity_DuplicateUserName" xml:space="preserve">
+    <value>Имя пользователя «{0}» уже занято.</value>
+  </data>
+  <data name="Identity_InvalidEmail" xml:space="preserve">
+    <value>Адрес «{0}» недействителен.</value>
+  </data>
+  <data name="Identity_InvalidUserName" xml:space="preserve">
+    <value>Имя пользователя «{0}» недопустимо.</value>
+  </data>
+  <data name="Identity_InvalidToken" xml:space="preserve">
+    <value>Ссылка недействительна или устарела.</value>
+  </data>
+  <data name="Identity_LoginAlreadyAssociated" xml:space="preserve">
+    <value>Аккаунт с этим внешним входом уже существует.</value>
+  </data>
+  <data name="Identity_PasswordTooShort" xml:space="preserve">
+    <value>Пароль должен содержать не менее {0} символов.</value>
+  </data>
+  <data name="Identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Пароль должен содержать хотя бы один специальный символ.</value>
+  </data>
+  <data name="Identity_PasswordRequiresDigit" xml:space="preserve">
+    <value>Пароль должен содержать хотя бы одну цифру.</value>
+  </data>
+  <data name="Identity_PasswordRequiresLower" xml:space="preserve">
+    <value>Пароль должен содержать хотя бы одну строчную букву.</value>
+  </data>
+  <data name="Identity_PasswordRequiresUpper" xml:space="preserve">
+    <value>Пароль должен содержать хотя бы одну заглавную букву.</value>
+  </data>
+  <data name="Identity_PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Пароль должен содержать не менее {0} разных символов.</value>
+  </data>
+  <data name="Identity_UserAlreadyInRole" xml:space="preserve">
+    <value>Пользователь уже имеет роль «{0}».</value>
+  </data>
+  <data name="Identity_UserNotInRole" xml:space="preserve">
+    <value>У пользователя нет роли «{0}».</value>
+  </data>
+  <data name="Field_Name" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Field_Description" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="Field_Category" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="Field_DataType" xml:space="preserve">
+    <value>Тип данных</value>
+  </data>
+  <data name="Field_MinLength" xml:space="preserve">
+    <value>Минимальная длина</value>
+  </data>
+  <data name="Field_MaxLength" xml:space="preserve">
+    <value>Максимальная длина</value>
+  </data>
+  <data name="Field_RegexPattern" xml:space="preserve">
+    <value>Шаблон (regex)</value>
+  </data>
+  <data name="Field_MinValue" xml:space="preserve">
+    <value>Минимальное значение</value>
+  </data>
+  <data name="Field_MaxValue" xml:space="preserve">
+    <value>Максимальное значение</value>
+  </data>
+  <data name="Field_OptionLabel" xml:space="preserve">
+    <value>Название варианта</value>
+  </data>
+  <data name="Field_Title" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Field_ShortDescription" xml:space="preserve">
+    <value>Краткое описание</value>
+  </data>
+  <data name="Field_Company" xml:space="preserve">
+    <value>Компания</value>
+  </data>
+  <data name="Field_Level" xml:space="preserve">
+    <value>Уровень</value>
+  </data>
+  <data name="Field_AccessMode" xml:space="preserve">
+    <value>Доступ</value>
+  </data>
+  <data name="Field_MaxProjects" xml:space="preserve">
+    <value>Макс. число проектов в резюме</value>
+  </data>
+  <data name="Field_Attribute" xml:space="preserve">
+    <value>Атрибут</value>
+  </data>
+  <data name="Field_Operator" xml:space="preserve">
+    <value>Оператор</value>
+  </data>
+  <data name="Field_PeriodStart" xml:space="preserve">
+    <value>Дата начала</value>
+  </data>
+  <data name="Field_PeriodEnd" xml:space="preserve">
+    <value>Дата окончания</value>
+  </data>
+  <data name="DataType_String" xml:space="preserve">
+    <value>Строка (одна строка)</value>
+  </data>
+  <data name="DataType_Text" xml:space="preserve">
+    <value>Текст (Markdown)</value>
+  </data>
+  <data name="DataType_Image" xml:space="preserve">
+    <value>Изображение</value>
+  </data>
+  <data name="DataType_Numeric" xml:space="preserve">
+    <value>Число</value>
+  </data>
+  <data name="DataType_Date" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="DataType_Period" xml:space="preserve">
+    <value>Период (диапазон дат)</value>
+  </data>
+  <data name="DataType_Boolean" xml:space="preserve">
+    <value>Логический (флажок)</value>
+  </data>
+  <data name="DataType_OneOfMany" xml:space="preserve">
+    <value>Один из списка (выпадающий)</value>
+  </data>
+  <data name="Level_None" xml:space="preserve">
+    <value>(не указан)</value>
+  </data>
+  <data name="Role_Candidate" xml:space="preserve">
+    <value>Кандидат</value>
+  </data>
+  <data name="Role_Recruiter" xml:space="preserve">
+    <value>Рекрутер</value>
+  </data>
+  <data name="Role_Administrator" xml:space="preserve">
+    <value>Администратор</value>
+  </data>
+  <data name="Op_Equals" xml:space="preserve">
+    <value>=</value>
+  </data>
+  <data name="Op_NotEquals" xml:space="preserve">
+    <value>≠</value>
+  </data>
+  <data name="Op_GreaterThan" xml:space="preserve">
+    <value>&gt;</value>
+  </data>
+  <data name="Op_GreaterThanOrEqual" xml:space="preserve">
+    <value>≥</value>
+  </data>
+  <data name="Op_LessThan" xml:space="preserve">
+    <value>&lt;</value>
+  </data>
+  <data name="Op_LessThanOrEqual" xml:space="preserve">
+    <value>≤</value>
+  </data>
+  <data name="Op_Contains" xml:space="preserve">
+    <value>содержит</value>
+  </data>
+  <data name="Op_StartsWith" xml:space="preserve">
+    <value>начинается с</value>
+  </data>
+  <data name="Op_IsTrue" xml:space="preserve">
+    <value>отмечено</value>
+  </data>
+  <data name="Op_IsFalse" xml:space="preserve">
+    <value>не отмечено</value>
+  </data>
+  <data name="Op_IsSet" xml:space="preserve">
+    <value>заполнено</value>
+  </data>
+  <data name="Op_IsNotSet" xml:space="preserve">
+    <value>не заполнено</value>
+  </data>
+  <data name="Attr_BuiltInCannotDelete" xml:space="preserve">
+    <value>Встроенный атрибут нельзя удалить.</value>
+  </data>
+  <data name="Attr_InUse" xml:space="preserve">
+    <value>Используется в шаблонах или правилах вакансий ({0}). Сначала удалите его оттуда.</value>
+  </data>
+  <data name="Attr_NameTaken" xml:space="preserve">
+    <value>Атрибут «{0}» уже существует.</value>
+  </data>
+  <data name="Attr_InvalidCategory" xml:space="preserve">
+    <value>Выберите допустимую категорию.</value>
+  </data>
+  <data name="Attr_NeedsOption" xml:space="preserve">
+    <value>Для выпадающего списка нужен хотя бы один вариант.</value>
+  </data>
+  <data name="Attr_OptionsUnique" xml:space="preserve">
+    <value>Варианты списка должны быть уникальными.</value>
+  </data>
+  <data name="Attr_MinLengthNegative" xml:space="preserve">
+    <value>Минимальная длина не может быть отрицательной.</value>
+  </data>
+  <data name="Attr_MaxLengthNegative" xml:space="preserve">
+    <value>Максимальная длина не может быть отрицательной.</value>
+  </data>
+  <data name="Attr_MinLengthExceedsMax" xml:space="preserve">
+    <value>Минимальная длина не может превышать максимальную.</value>
+  </data>
+  <data name="Attr_InvalidRegex" xml:space="preserve">
+    <value>Шаблон не является корректным регулярным выражением.</value>
+  </data>
+  <data name="Attr_MinValueExceedsMax" xml:space="preserve">
+    <value>Минимальное значение не может превышать максимальное.</value>
+  </data>
+  <data name="Pos_MaxProjectsNegative" xml:space="preserve">
+    <value>Максимальное число проектов не может быть отрицательным.</value>
+  </data>
+  <data name="Pos_RestrictedNeedsRule" xml:space="preserve">
+    <value>Для вакансии с ограниченным доступом нужно хотя бы одно правило — иначе ни один кандидат не подойдёт.</value>
+  </data>
+  <data name="Pos_RuleAttributeMissing" xml:space="preserve">
+    <value>Правило доступа ссылается на несуществующий атрибут.</value>
+  </data>
+  <data name="Pos_OperatorNotAllowed" xml:space="preserve">
+    <value>Оператор «{0}» нельзя использовать с «{1}».</value>
+  </data>
+  <data name="Pos_RuleNeedsValue" xml:space="preserve">
+    <value>Для правила по «{0}» нужно значение для сравнения.</value>
+  </data>
+  <data name="Autosave_UnknownAttribute" xml:space="preserve">
+    <value>Неизвестный атрибут.</value>
+  </data>
+  <data name="Autosave_ValueRemoved" xml:space="preserve">
+    <value>Значение удалено из профиля. Перезагрузите страницу.</value>
+  </data>
+  <data name="Upload_MustBeHttps" xml:space="preserve">
+    <value>Изображение должно быть доступно по https.</value>
+  </data>
+  <data name="Upload_MustUseButton" xml:space="preserve">
+    <value>Загрузите изображение с помощью кнопки загрузки.</value>
+  </data>
+  <data name="Upload_AllowedFormats" xml:space="preserve">
+    <value>Допустимые форматы изображений: {0}.</value>
+  </data>
+  <data name="Export_ColCreated" xml:space="preserve">
+    <value>Создано</value>
+  </data>
+  <data name="Pdf_PublishedCv" xml:space="preserve">
+    <value>Опубликованное резюме</value>
+  </data>
+  <data name="Pdf_DraftCv" xml:space="preserve">
+    <value>Черновик резюме</value>
+  </data>
+  <data name="Pdf_ScanToView" xml:space="preserve">
+    <value>Отсканируйте, чтобы открыть онлайн</value>
+  </data>
+  <data name="Cv_NotProvided" xml:space="preserve">
+    <value>(не указано)</value>
+  </data>
+  <data name="Badge_FirstProject" xml:space="preserve">
+    <value>Первый проект</value>
+  </data>
+  <data name="Badge_Projects5" xml:space="preserve">
+    <value>5 проектов</value>
+  </data>
+  <data name="Badge_Projects10" xml:space="preserve">
+    <value>10 проектов</value>
+  </data>
+  <data name="Badge_FirstCv" xml:space="preserve">
+    <value>Первое резюме</value>
+  </data>
+  <data name="Badge_Cvs5" xml:space="preserve">
+    <value>5 резюме</value>
+  </data>
+  <data name="Badge_Likes5" xml:space="preserve">
+    <value>5 лайков</value>
+  </data>
+  <data name="Badge_Likes10" xml:space="preserve">
+    <value>10 лайков</value>
+  </data>
+  <data name="Badge_Likes25" xml:space="preserve">
+    <value>25 лайков</value>
+  </data>
+  <data name="Badge_PanelTitle" xml:space="preserve">
+    <value>{0} — достижения</value>
+  </data>
+  <data name="Badge_None" xml:space="preserve">
+    <value>Пока нет достижений.</value>
+  </data>
+  <data name="Msg_AttributeCreated" xml:space="preserve">
+    <value>Атрибут «{0}» создан.</value>
+  </data>
+  <data name="Msg_AttributeUpdated" xml:space="preserve">
+    <value>Атрибут «{0}» обновлён.</value>
+  </data>
+  <data name="Msg_AttributeConflict" xml:space="preserve">
+    <value>Этот атрибут изменил другой пользователь после того, как вы его открыли. Проверьте данные и сохраните снова.</value>
+  </data>
+  <data name="Msg_AttributesDeleted" xml:space="preserve">
+    <value>Удалено атрибутов: {0}.</value>
+  </data>
+  <data name="Msg_NotDeleted" xml:space="preserve">
+    <value>«{0}» не удалён: {1}</value>
+  </data>
+  <data name="Msg_FillBeforePublish" xml:space="preserve">
+    <value>Заполните все поля перед публикацией.</value>
+  </data>
+  <data name="Msg_CvPublished" xml:space="preserve">
+    <value>Резюме опубликовано — теперь его видят рекрутеры.</value>
+  </data>
+  <data name="Msg_CvsDeleted" xml:space="preserve">
+    <value>Удалено резюме: {0}.</value>
+  </data>
+  <data name="Msg_PositionCreated" xml:space="preserve">
+    <value>Вакансия «{0}» создана.</value>
+  </data>
+  <data name="Msg_PositionUpdated" xml:space="preserve">
+    <value>Вакансия «{0}» обновлена.</value>
+  </data>
+  <data name="Msg_PositionConflict" xml:space="preserve">
+    <value>Эту вакансию изменил другой пользователь после того, как вы её открыли. Проверьте данные и сохраните снова.</value>
+  </data>
+  <data name="Msg_PositionsDeleted" xml:space="preserve">
+    <value>Удалено вакансий: {0}.</value>
+  </data>
+  <data name="Msg_PositionDuplicated" xml:space="preserve">
+    <value>Вакансия скопирована. Проверьте и сохраните копию.</value>
+  </data>
+  <data name="Msg_ProjectAdded" xml:space="preserve">
+    <value>Проект «{0}» добавлен.</value>
+  </data>
+  <data name="Msg_ProjectUpdated" xml:space="preserve">
+    <value>Проект «{0}» обновлён.</value>
+  </data>
+  <data name="Msg_ProjectConflict" xml:space="preserve">
+    <value>Этот проект был изменён в другом месте после того, как вы его открыли. Проверьте данные и сохраните снова.</value>
+  </data>
+  <data name="Msg_ProjectsDeleted" xml:space="preserve">
+    <value>Удалено проектов: {0}.</value>
+  </data>
+  <data name="Msg_RolesUpdated" xml:space="preserve">
+    <value>Роли обновлены.</value>
+  </data>
+  <data name="Msg_UsersBlocked" xml:space="preserve">
+    <value>Заблокировано пользователей: {0}.</value>
+  </data>
+  <data name="Msg_UsersUnblocked" xml:space="preserve">
+    <value>Разблокировано пользователей: {0}.</value>
+  </data>
+  <data name="Msg_UsersDeleted" xml:space="preserve">
+    <value>Удалено пользователей: {0}.</value>
+  </data>
+  <data name="Discussion_Empty" xml:space="preserve">
+    <value>Сообщение не может быть пустым.</value>
+  </data>
+  <data name="Discussion_TooLong" xml:space="preserve">
+    <value>Сообщение не может быть длиннее {0} символов.</value>
+  </data>
+  <data name="Discussion_SaveFailed" xml:space="preserve">
+    <value>Не удалось сохранить сообщение.</value>
+  </data>
+  <data name="Discussion_SendFailed" xml:space="preserve">
+    <value>Не удалось отправить сообщение. Проверьте подключение и попробуйте ещё раз.</value>
+  </data>
+  <data name="Email_ConfirmSubject" xml:space="preserve">
+    <value>Подтвердите аккаунт в CV Management System</value>
+  </data>
+  <data name="Email_ConfirmBody" xml:space="preserve">
+    <value>&lt;p&gt;Добро пожаловать! Подтвердите аккаунт, &lt;a href="{0}"&gt;перейдя по этой ссылке&lt;/a&gt;.&lt;/p&gt;</value>
+  </data>
+  <data name="Login_ConfirmFirst" xml:space="preserve">
+    <value>Подтвердите адрес электронной почты перед входом.</value>
+  </data>
+  <data name="Login_Locked" xml:space="preserve">
+    <value>Аккаунт заблокирован. Попробуйте позже или обратитесь к администратору.</value>
+  </data>
+  <data name="Login_Invalid" xml:space="preserve">
+    <value>Неверный адрес почты или пароль.</value>
+  </data>
+  <data name="Login_ExternalError" xml:space="preserve">
+    <value>Ошибка внешнего провайдера: {0}</value>
+  </data>
+  <data name="Login_ExternalNoEmail" xml:space="preserve">
+    <value>{0} не передал адрес электронной почты, поэтому создать аккаунт нельзя.</value>
+  </data>
+  <data name="Login_AccountLocked" xml:space="preserve">
+    <value>Аккаунт заблокирован.</value>
+  </data>
+  <data name="Picker_Title" xml:space="preserve">
+    <value>Добавить атрибут</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Picker_SearchPlaceholder" xml:space="preserve">
+    <value>Поиск по началу названия...</value>
+  </data>
+  <data name="Picker_AllCategories" xml:space="preserve">
+    <value>Все категории</value>
+  </data>
+  <data name="Picker_RecentlyUsed" xml:space="preserve">
+    <value>Недавно использованные</value>
+  </data>
+  <data name="Picker_AddSelected" xml:space="preserve">
+    <value>Добавить выбранные</value>
+  </data>
+  <data name="Toolbar_Selected" xml:space="preserve">
+    <value>Выбрано: {0}</value>
+  </data>
+  <data name="Nav_Menu" xml:space="preserve">
+    <value>Меню</value>
+  </data>
+  <data name="PositionForm_TagsPlaceholder" xml:space="preserve">
+    <value>например, SQL, R, Python (через запятую)</value>
+  </data>
+  <data name="PositionForm_RemoveRule" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="AttributeForm_OptionPlaceholder" xml:space="preserve">
+    <value>Название варианта</value>
+  </data>
+  <data name="AttributeForm_RemoveOption" xml:space="preserve">
+    <value>Удалить вариант</value>
+  </data>
+  <data name="Error_Title" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Error_Message" xml:space="preserve">
+    <value>При обработке запроса произошла ошибка.</value>
+  </data>
+  <data name="Error_RequestId" xml:space="preserve">
+    <value>ID запроса:</value>
+  </data>
 </root>

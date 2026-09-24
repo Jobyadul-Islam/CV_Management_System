@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Localization;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Position;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,7 +13,8 @@ public class PositionService(
     ApplicationDbContext db,
     IPositionAccessEvaluator accessEvaluator,
     ITagService tagService,
-    ISearchIndexService searchIndex) : IPositionService
+    ISearchIndexService searchIndex,
+    IStringLocalizer<SharedResource> localizer) : IPositionService
 {
     public async Task<IReadOnlyList<PositionListItemViewModel>> GetListForRecruiterAsync(CancellationToken ct = default)
         => await db.Positions
@@ -124,7 +126,7 @@ public class PositionService(
 
     public async Task<PositionSaveOutcome> CreateAsync(PositionFormViewModel form, string userId, CancellationToken ct = default)
     {
-        var validationError = Validate(form);
+        var validationError = await ValidateAsync(form, ct);
         if (validationError is not null) return PositionSaveOutcome.ValidationError(validationError);
 
         var position = new Position
@@ -158,7 +160,7 @@ public class PositionService(
             .FirstOrDefaultAsync(p => p.Id == form.Id, ct);
         if (position is null) return PositionSaveOutcome.NotFound();
 
-        var validationError = Validate(form);
+        var validationError = await ValidateAsync(form, ct);
         if (validationError is not null) return PositionSaveOutcome.ValidationError(validationError);
 
         db.Entry(position).Property(p => p.RowVersion).OriginalValue = Convert.FromBase64String(form.RowVersion ?? string.Empty);
@@ -200,31 +202,23 @@ public class PositionService(
         return PositionSaveOutcome.Success(position.Id);
     }
 
+    /// <summary>
+    /// One DELETE for the whole selection. CVs (and their likes), template attributes, access rules,
+    /// project-tag filters and discussion posts all go with it through ON DELETE CASCADE -- the database
+    /// keeps referential integrity, so there's no application-side "delete children in a loop".
+    /// </summary>
     public async Task<PositionDeleteOutcome> DeleteAsync(IReadOnlyList<int> ids, CancellationToken ct = default)
     {
-        var deleted = new List<int>();
-        var blocked = new List<PositionDeleteBlocked>();
-
-        var positions = await db.Positions
-            .Where(p => ids.Contains(p.Id))
-            .Select(p => new { p.Id, p.Title, CvCount = p.Cvs.Count })
-            .ToListAsync(ct);
-
-        foreach (var position in positions)
+        var existing = await db.Positions.Where(p => ids.Contains(p.Id)).Select(p => p.Id).ToListAsync(ct);
+        if (existing.Count > 0)
         {
-            if (position.CvCount > 0)
+            await db.Positions.Where(p => existing.Contains(p.Id)).ExecuteDeleteAsync(ct);
+            foreach (var id in existing)
             {
-                blocked.Add(new PositionDeleteBlocked(position.Id, position.Title,
-                    $"{position.CvCount} CV(s) exist for this position."));
-                continue;
+                await searchIndex.RemovePositionAsync(id, ct); // in-process Lucene index, not a DB query
             }
-
-            await db.Positions.Where(p => p.Id == position.Id).ExecuteDeleteAsync(ct);
-            await searchIndex.RemovePositionAsync(position.Id, ct);
-            deleted.Add(position.Id);
         }
-
-        return new PositionDeleteOutcome(deleted, blocked);
+        return new PositionDeleteOutcome(existing, []);
     }
 
     public async Task<PositionSaveOutcome> DuplicateAsync(int id, string userId, CancellationToken ct = default)
@@ -308,44 +302,71 @@ public class PositionService(
         }
     }
 
-    private static string? Validate(PositionFormViewModel form)
+    private async Task<string?> ValidateAsync(PositionFormViewModel form, CancellationToken ct)
     {
-        if (form.AccessMode == PositionAccessMode.Restricted && form.AccessRules.Count == 0)
+        if (form.MaxProjects < 0) return localizer["Pos_MaxProjectsNegative"];
+        if (form.AccessMode != PositionAccessMode.Restricted) return null;
+
+        if (form.AccessRules.Count == 0)
         {
-            return "A restricted position needs at least one access rule -- otherwise no candidate could ever qualify.";
+            return localizer["Pos_RestrictedNeedsRule"];
+        }
+
+        // The rule builder only offers valid combinations, but a crafted request must not be able to
+        // store e.g. "Photo > 5" or a dropdown option belonging to a different attribute.
+        var attributeIds = form.AccessRules.Select(r => r.AttributeId).Distinct().ToList();
+        var attributes = await db.Attributes.AsNoTracking()
+            .Where(a => attributeIds.Contains(a.Id))
+            .Select(a => new { a.Id, a.Name, a.DataType, OptionIds = a.Options.Select(o => o.Id).ToList() })
+            .ToDictionaryAsync(a => a.Id, ct);
+
+        foreach (var rule in form.AccessRules)
+        {
+            if (!attributes.TryGetValue(rule.AttributeId, out var attribute))
+                return localizer["Pos_RuleAttributeMissing"];
+            if (!OperatorCatalog.AllowedOperators[attribute.DataType].Contains(rule.Operator))
+                return localizer["Pos_OperatorNotAllowed", localizer[OperatorCatalog.LabelKey(rule.Operator)], attribute.Name];
+
+            if (rule.Operator is ComparisonOperator.IsSet or ComparisonOperator.IsNotSet
+                or ComparisonOperator.IsTrue or ComparisonOperator.IsFalse)
+                continue;
+
+            var missingValue = attribute.DataType switch
+            {
+                AttributeDataType.Numeric => rule.ComparisonValueNumeric is null,
+                AttributeDataType.Date => rule.ComparisonValueDate is null,
+                AttributeDataType.OneOfMany => rule.ComparisonOptionId is not { } optionId || !attribute.OptionIds.Contains(optionId),
+                _ => string.IsNullOrWhiteSpace(rule.ComparisonValueString)
+            };
+            if (missingValue) return localizer["Pos_RuleNeedsValue", attribute.Name];
         }
         return null;
     }
 
-    private static string DescribeRule(PositionAccessRule rule)
+    private string DescribeRule(PositionAccessRule rule)
     {
-        var attributeName = rule.Attribute.Name;
-        return rule.Operator switch
+        // "<attribute> <operator label> [value]" -- attribute names and values are user data and stay as
+        // entered; only the operator wording is localized (Op_* keys).
+        var label = localizer[OperatorCatalog.LabelKey(rule.Operator)].Value;
+        string? value = rule.Operator switch
         {
-            ComparisonOperator.IsSet => $"{attributeName} is filled in",
-            ComparisonOperator.IsNotSet => $"{attributeName} is not filled in",
-            ComparisonOperator.IsTrue => $"{attributeName} is checked",
-            ComparisonOperator.IsFalse => $"{attributeName} is not checked",
-            ComparisonOperator.Equals when rule.ComparisonOption is not null => $"{attributeName} = {rule.ComparisonOption.Label}",
-            ComparisonOperator.NotEquals when rule.ComparisonOption is not null => $"{attributeName} ≠ {rule.ComparisonOption.Label}",
-            ComparisonOperator.Equals => $"{attributeName} = {rule.ComparisonValueString ?? rule.ComparisonValueNumeric?.ToString("0.####") ?? rule.ComparisonValueDate?.ToString()}",
-            ComparisonOperator.NotEquals => $"{attributeName} ≠ {rule.ComparisonValueString ?? rule.ComparisonValueNumeric?.ToString("0.####") ?? rule.ComparisonValueDate?.ToString()}",
-            ComparisonOperator.GreaterThan => $"{attributeName} > {rule.ComparisonValueNumeric?.ToString("0.####") ?? rule.ComparisonValueDate?.ToString()}",
-            ComparisonOperator.GreaterThanOrEqual => $"{attributeName} ≥ {rule.ComparisonValueNumeric?.ToString("0.####") ?? rule.ComparisonValueDate?.ToString()}",
-            ComparisonOperator.LessThan => $"{attributeName} < {rule.ComparisonValueNumeric?.ToString("0.####") ?? rule.ComparisonValueDate?.ToString()}",
-            ComparisonOperator.LessThanOrEqual => $"{attributeName} ≤ {rule.ComparisonValueNumeric?.ToString("0.####") ?? rule.ComparisonValueDate?.ToString()}",
-            ComparisonOperator.Contains => $"{attributeName} contains \"{rule.ComparisonValueString}\"",
-            ComparisonOperator.StartsWith => $"{attributeName} starts with \"{rule.ComparisonValueString}\"",
-            _ => attributeName
+            ComparisonOperator.IsSet or ComparisonOperator.IsNotSet
+                or ComparisonOperator.IsTrue or ComparisonOperator.IsFalse => null,
+            ComparisonOperator.Contains or ComparisonOperator.StartsWith => $"\"{rule.ComparisonValueString}\"",
+            _ when rule.ComparisonOption is not null => rule.ComparisonOption.Label,
+            _ => rule.ComparisonValueString
+                 ?? rule.ComparisonValueNumeric?.ToString("0.####")
+                 ?? rule.ComparisonValueDate?.ToString("yyyy-MM-dd")
         };
+        return value is null ? $"{rule.Attribute.Name} {label}" : $"{rule.Attribute.Name} {label} {value}";
     }
 
-    private static void PopulateLevelOptions(PositionFormViewModel form)
+    private void PopulateLevelOptions(PositionFormViewModel form)
     {
         form.LevelOptions =
         [
-            new SelectListItem("(none)", ""),
-            .. Enum.GetValues<PositionLevel>().Select(l => new SelectListItem(l.ToString(), ((int)l).ToString(), l == form.Level))
+            new SelectListItem(localizer["Level_None"], ""),
+            .. Enum.GetValues<PositionLevel>().Select(l => new SelectListItem(localizer[$"Level_{l}"], ((int)l).ToString(), l == form.Level))
         ];
     }
 }

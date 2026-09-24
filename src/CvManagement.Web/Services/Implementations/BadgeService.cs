@@ -1,26 +1,27 @@
+using Microsoft.Extensions.Localization;
 using CvManagement.Web.Data;
 using CvManagement.Web.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class BadgeService(ApplicationDbContext db) : IBadgeService
+public class BadgeService(ApplicationDbContext db, IStringLocalizer<SharedResource> localizer) : IBadgeService
 {
     private enum Metric { Projects, Cvs, Likes }
 
     // Fixed catalog, not DB-configurable -- this is a stretch feature ("badges/achievements"), not a
     // rule engine. Thresholds mirror the spec's own examples ("10 projects", "5 CVs", "25 likes") plus
     // a lower tier per metric so the panel isn't empty for a candidate who's only just getting started.
-    private static readonly (Metric Metric, int Threshold, string Label, string Icon, string ColorHex)[] Catalog =
+    private static readonly (Metric Metric, int Threshold, string LabelKey, string Icon, string ColorHex)[] Catalog =
     [
-        (Metric.Projects, 1, "First Project", "\U0001F4C1", "#0d6efd"),
-        (Metric.Projects, 5, "5 Projects", "\U0001F4C1", "#0d6efd"),
-        (Metric.Projects, 10, "10 Projects", "\U0001F4C1", "#0d6efd"),
-        (Metric.Cvs, 1, "First CV", "\U0001F4C4", "#198754"),
-        (Metric.Cvs, 5, "5 CVs", "\U0001F4C4", "#198754"),
-        (Metric.Likes, 5, "5 Likes", "⭐", "#fd7e14"),
-        (Metric.Likes, 10, "10 Likes", "⭐", "#fd7e14"),
-        (Metric.Likes, 25, "25 Likes", "⭐", "#fd7e14"),
+        (Metric.Projects, 1, "Badge_FirstProject", "\U0001F4C1", "#0d6efd"),
+        (Metric.Projects, 5, "Badge_Projects5", "\U0001F4C1", "#0d6efd"),
+        (Metric.Projects, 10, "Badge_Projects10", "\U0001F4C1", "#0d6efd"),
+        (Metric.Cvs, 1, "Badge_FirstCv", "\U0001F4C4", "#198754"),
+        (Metric.Cvs, 5, "Badge_Cvs5", "\U0001F4C4", "#198754"),
+        (Metric.Likes, 5, "Badge_Likes5", "⭐", "#fd7e14"),
+        (Metric.Likes, 10, "Badge_Likes10", "⭐", "#fd7e14"),
+        (Metric.Likes, 25, "Badge_Likes25", "⭐", "#fd7e14"),
     ];
 
     public async Task<IReadOnlyList<EarnedBadge>> GetEarnedBadgesAsync(string userId, CancellationToken ct = default)
@@ -39,7 +40,7 @@ public class BadgeService(ApplicationDbContext db) : IBadgeService
 
         return Catalog
             .Where(b => counts[b.Metric] >= b.Threshold)
-            .Select(b => new EarnedBadge(b.Label, b.Icon, b.ColorHex))
+            .Select(b => new EarnedBadge(localizer[b.LabelKey], b.Icon, b.ColorHex))
             .ToList();
     }
 }

@@ -1,5 +1,5 @@
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using CvManagement.Web.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
 

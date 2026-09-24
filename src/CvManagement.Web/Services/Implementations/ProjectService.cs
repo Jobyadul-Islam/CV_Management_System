@@ -1,12 +1,14 @@
+using Microsoft.Extensions.Localization;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Profile;
 using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class ProjectService(ApplicationDbContext db, ITagService tagService, ISearchIndexService searchIndex) : IProjectService
+public class ProjectService(ApplicationDbContext db, ITagService tagService, ISearchIndexService searchIndex,
+    IStringLocalizer<SharedResource> localizer) : IProjectService
 {
     public async Task<IReadOnlyList<ProjectListItemViewModel>> GetListAsync(string userId, CancellationToken ct = default)
         => await db.Projects
@@ -47,7 +49,7 @@ public class ProjectService(ApplicationDbContext db, ITagService tagService, ISe
     {
         if (form.PeriodEnd is not null && form.PeriodEnd < form.PeriodStart)
         {
-            return ProjectSaveOutcome.ValidationError("End date can't be before the start date.");
+            return ProjectSaveOutcome.ValidationError(localizer["Validation_EndBeforeStart"]);
         }
 
         var project = new Project
@@ -80,7 +82,7 @@ public class ProjectService(ApplicationDbContext db, ITagService tagService, ISe
 
         if (form.PeriodEnd is not null && form.PeriodEnd < form.PeriodStart)
         {
-            return ProjectSaveOutcome.ValidationError("End date can't be before the start date.");
+            return ProjectSaveOutcome.ValidationError(localizer["Validation_EndBeforeStart"]);
         }
 
         db.Entry(project).Property(p => p.RowVersion).OriginalValue = Convert.FromBase64String(form.RowVersion ?? string.Empty);

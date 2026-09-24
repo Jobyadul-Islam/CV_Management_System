@@ -1,11 +1,13 @@
 @model IReadOnlyList<CvManagement.Web.ViewModels.Shared.ToolbarAction>
+@inject IStringLocalizer<SharedResource> Localizer
 @{
     var tableId = (string)ViewBag.TableId;
     var toolbarId = $"{tableId}-toolbar";
 }
 
 <div id="@toolbarId" class="table-toolbar" data-table-id="@tableId">
-    <span class="selection-count">0 selected</span>
+    @* table-toolbar.js fills {0} with the live count, so the wording stays localized. *@
+    <span class="selection-count" data-template="@Localizer["Toolbar_Selected"]">@Localizer["Toolbar_Selected", 0]</span>
     @foreach (var action in Model)
     {
         <button type="button"
@@ -14,7 +16,7 @@
                 data-url="@action.Url"
                 data-min-selected="@action.MinSelected"
                 data-max-selected="@(action.MaxSelected?.ToString() ?? "")"
-                @(action.Confirm is not null ? $"data-confirm=\"{action.Confirm}\"" : "")
+                data-confirm="@action.Confirm"
                 disabled>
             @action.Label
         </button>

@@ -3,7 +3,7 @@
 @inject IStringLocalizer<SharedResource> Localizer
 @{
     ViewData["Title"] = Localizer["Attributes_Title"];
-    var categories = (IReadOnlyList<CvManagement.Web.Domain.AttributeCategory>)ViewBag.Categories;
+    var categories = (IReadOnlyList<CvManagement.Web.Models.AttributeCategory>)ViewBag.Categories;
     var prefix = (string?)ViewBag.Prefix;
     var categoryId = (int?)ViewBag.CategoryId;
 

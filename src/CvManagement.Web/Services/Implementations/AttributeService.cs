@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Localization;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Attribute;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class AttributeService(ApplicationDbContext db) : IAttributeService
+public class AttributeService(ApplicationDbContext db, IStringLocalizer<SharedResource> localizer) : IAttributeService
 {
     public async Task<IReadOnlyList<AttributeListItemViewModel>> GetLibraryAsync(
         string? prefix, int? categoryId, CancellationToken ct = default)
@@ -176,26 +177,32 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
 
         foreach (var attribute in attributes)
         {
-            if (attribute.IsBuiltIn)
-            {
-                blocked.Add(new AttributeDeleteBlocked(attribute.Id, attribute.Name, "Built-in attribute cannot be deleted."));
-                continue;
-            }
-
             var totalUsage = attribute.TemplateUsage + attribute.RuleUsage;
-            if (totalUsage > 0)
-            {
+            if (attribute.IsBuiltIn)
+                blocked.Add(new AttributeDeleteBlocked(attribute.Id, attribute.Name, localizer["Attr_BuiltInCannotDelete"]));
+            else if (totalUsage > 0)
                 blocked.Add(new AttributeDeleteBlocked(attribute.Id, attribute.Name,
-                    $"In use by {totalUsage} position template/rule(s). Remove it from those first."));
-                continue;
-            }
+                    localizer["Attr_InUse", totalUsage]));
+            else
+                deleted.Add(attribute.Id);
+        }
 
+        if (deleted.Count > 0)
+        {
+            // Two set-based statements for the whole selection, in one transaction. Values need an explicit
+            // delete because that FK is Restrict (see AttributeDefinitionConfiguration); options and
+            // recently-used entries cascade. Usage is re-checked inside the transaction to narrow the race
+            // with a Recruiter adding the attribute to a position meanwhile; the Restrict FKs from
+            // PositionAttributes/AccessRules remain the final guard.
             await using var tx = await db.Database.BeginTransactionAsync(ct);
-            await db.UserAttributeValues.Where(v => v.AttributeId == attribute.Id).ExecuteDeleteAsync(ct);
-            await db.Attributes.Where(a => a.Id == attribute.Id).ExecuteDeleteAsync(ct);
+            var deletable = await db.Attributes
+                .Where(a => deleted.Contains(a.Id) && !a.IsBuiltIn && !a.PositionAttributes.Any() && !a.AccessRules.Any())
+                .Select(a => a.Id)
+                .ToListAsync(ct);
+            await db.UserAttributeValues.Where(v => deletable.Contains(v.AttributeId)).ExecuteDeleteAsync(ct);
+            await db.Attributes.Where(a => deletable.Contains(a.Id)).ExecuteDeleteAsync(ct);
             await tx.CommitAsync(ct);
-
-            deleted.Add(attribute.Id);
+            deleted = deletable;
         }
 
         return new AttributeDeleteOutcome(deleted, blocked);
@@ -283,17 +290,17 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
     {
         var nameTaken = await db.Attributes
             .AnyAsync(a => a.Name == form.Name.Trim() && a.Id != (existingId ?? -1), ct);
-        if (nameTaken) return $"An attribute named \"{form.Name}\" already exists.";
+        if (nameTaken) return localizer["Attr_NameTaken", form.Name];
 
         var categoryExists = await db.AttributeCategories.AnyAsync(c => c.Id == form.CategoryId, ct);
-        if (!categoryExists) return "Select a valid category.";
+        if (!categoryExists) return localizer["Attr_InvalidCategory"];
 
         if (form.DataType == AttributeDataType.OneOfMany)
         {
             var labels = form.Options.Select(o => o.Label?.Trim() ?? string.Empty).Where(l => l.Length > 0).ToList();
-            if (labels.Count == 0) return "A dropdown attribute needs at least one option.";
+            if (labels.Count == 0) return localizer["Attr_NeedsOption"];
             if (labels.Distinct(StringComparer.OrdinalIgnoreCase).Count() != labels.Count)
-                return "Dropdown options must have unique labels.";
+                return localizer["Attr_OptionsUnique"];
         }
 
         return ValidateTuning(form);
@@ -303,17 +310,17 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
     // the type dropdown was on "String" must not silently survive a switch to "Numeric". Clearing the
     // irrelevant fields here (rather than trusting the form/JS) keeps stored data consistent even if a
     // request is crafted by hand.
-    private static string? ValidateTuning(AttributeFormViewModel form)
+    private string? ValidateTuning(AttributeFormViewModel form)
     {
         if (form.DataType is AttributeDataType.String or AttributeDataType.Text)
         {
             form.MinValue = null;
             form.MaxValue = null;
 
-            if (form.MinLength is < 0) return "Minimum length cannot be negative.";
-            if (form.MaxLength is < 0) return "Maximum length cannot be negative.";
+            if (form.MinLength is < 0) return localizer["Attr_MinLengthNegative"];
+            if (form.MaxLength is < 0) return localizer["Attr_MaxLengthNegative"];
             if (form.MinLength is not null && form.MaxLength is not null && form.MinLength > form.MaxLength)
-                return "Minimum length cannot exceed maximum length.";
+                return localizer["Attr_MinLengthExceedsMax"];
 
             if (!string.IsNullOrWhiteSpace(form.RegexPattern))
             {
@@ -323,7 +330,7 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
                 }
                 catch (ArgumentException)
                 {
-                    return "The regex pattern is not a valid regular expression.";
+                    return localizer["Attr_InvalidRegex"];
                 }
             }
         }
@@ -334,7 +341,7 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
             form.RegexPattern = null;
 
             if (form.MinValue is not null && form.MaxValue is not null && form.MinValue > form.MaxValue)
-                return "Minimum value cannot exceed maximum value.";
+                return localizer["Attr_MinValueExceedsMax"];
         }
         else
         {

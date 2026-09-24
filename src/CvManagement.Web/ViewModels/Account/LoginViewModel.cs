@@ -1,16 +1,17 @@
+using CvManagement.Web.ViewModels;
 using System.ComponentModel.DataAnnotations;
 
 namespace CvManagement.Web.ViewModels.Account;
 
 public class LoginViewModel
 {
-    [Required, EmailAddress, Display(Name = "Email")]
+    [Required(ErrorMessage = ValidationMessages.Required), EmailAddress(ErrorMessage = ValidationMessages.Email), Display(Name = "Account_Email")]
     public string Email { get; set; } = string.Empty;
 
-    [Required, DataType(DataType.Password)]
+    [Required(ErrorMessage = ValidationMessages.Required), DataType(DataType.Password), Display(Name = "Account_Password")]
     public string Password { get; set; } = string.Empty;
 
-    [Display(Name = "Remember me")]
+    [Display(Name = "Account_RememberMe")]
     public bool RememberMe { get; set; }
 
     public string? ReturnUrl { get; set; }

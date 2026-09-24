@@ -13,7 +13,7 @@
         <div class="form-check">
             <input class="form-check-input" type="checkbox" name="roles" value="@role" id="role-@role"
                    checked="@Model.SelectedRoles.Contains(role)" />
-            <label class="form-check-label" for="role-@role">@role</label>
+            <label class="form-check-label" for="role-@role">@Localizer[$"Role_{role}"]</label>
         </div>
     }
 

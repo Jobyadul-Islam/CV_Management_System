@@ -1,4 +1,5 @@
-using CvManagement.Web.Domain;
+using Microsoft.Extensions.Localization;
+using CvManagement.Web.Models;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Attribute;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CvManagement.Web.Controllers;
 
-public class AttributesController(IAttributeService attributes, UserManager<ApplicationUser> userManager) : Controller
+public class AttributesController(IAttributeService attributes, UserManager<ApplicationUser> userManager,
+    IStringLocalizer<SharedResource> localizer) : Controller
 {
     /// <summary>Any authenticated user can record picker usage (Candidates use the picker too, in Phase 5).</summary>
     [HttpPost, ValidateAntiForgeryToken, Authorize]
@@ -58,7 +60,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
             return View(model);
         }
 
-        TempData["StatusMessage"] = $"Attribute \"{model.Name}\" created.";
+        TempData["StatusMessage"] = localizer["Msg_AttributeCreated", model.Name].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -84,7 +86,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
         switch (outcome.Status)
         {
             case AttributeSaveStatus.Success:
-                TempData["StatusMessage"] = $"Attribute \"{model.Name}\" updated.";
+                TempData["StatusMessage"] = localizer["Msg_AttributeUpdated", model.Name].Value;
                 return RedirectToAction(nameof(Index));
 
             case AttributeSaveStatus.NotFound:
@@ -92,7 +94,7 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
 
             case AttributeSaveStatus.Conflict:
                 ModelState.AddModelError(string.Empty,
-                    "This attribute was changed by someone else since you opened it. Review the current version below and save again.");
+                    localizer["Msg_AttributeConflict"]);
                 model.RowVersion = Convert.ToBase64String(outcome.CurrentRowVersion!);
                 await PopulateCategoriesAsync(model);
                 return View(model);
@@ -113,10 +115,10 @@ public class AttributesController(IAttributeService attributes, UserManager<Appl
         var outcome = await attributes.DeleteAsync(ids);
 
         var parts = new List<string>();
-        if (outcome.DeletedIds.Count > 0) parts.Add($"Deleted {outcome.DeletedIds.Count} attribute(s).");
+        if (outcome.DeletedIds.Count > 0) parts.Add(localizer["Msg_AttributesDeleted", outcome.DeletedIds.Count]);
         foreach (var blocked in outcome.Blocked)
         {
-            parts.Add($"\"{blocked.Name}\" not deleted: {blocked.Reason}");
+            parts.Add(localizer["Msg_NotDeleted", blocked.Name, blocked.Reason]);
         }
         TempData["StatusMessage"] = string.Join(" ", parts);
 

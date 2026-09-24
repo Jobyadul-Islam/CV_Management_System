@@ -1,4 +1,5 @@
-using CvManagement.Web.Domain;
+using Microsoft.Extensions.Localization;
+using CvManagement.Web.Models;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Profile;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace CvManagement.Web.Controllers;
 
 [Authorize(Roles = $"{RoleNames.Candidate},{RoleNames.Administrator}")]
-public class ProjectsController(IProjectService projects, ITagService tags, UserManager<ApplicationUser> userManager) : Controller
+public class ProjectsController(IProjectService projects, ITagService tags, UserManager<ApplicationUser> userManager,
+    IStringLocalizer<SharedResource> localizer) : Controller
 {
     /// <summary>Tagify autocomplete source -- previously-used technology tags matching the prefix.</summary>
     [HttpGet]
@@ -33,7 +35,7 @@ public class ProjectsController(IProjectService projects, ITagService tags, User
             return View(model);
         }
 
-        TempData["StatusMessage"] = $"Project \"{model.Name}\" added.";
+        TempData["StatusMessage"] = localizer["Msg_ProjectAdded", model.Name].Value;
         return RedirectToAction("Index", "Profile", new { tab = "projects", userId = OwnerRouteValue(targetUserId) });
     }
 
@@ -59,7 +61,7 @@ public class ProjectsController(IProjectService projects, ITagService tags, User
         switch (outcome.Status)
         {
             case Services.Abstractions.ProjectSaveStatus.Success:
-                TempData["StatusMessage"] = $"Project \"{model.Name}\" updated.";
+                TempData["StatusMessage"] = localizer["Msg_ProjectUpdated", model.Name].Value;
                 return RedirectToAction("Index", "Profile", new { tab = "projects", userId = OwnerRouteValue(targetUserId) });
 
             case Services.Abstractions.ProjectSaveStatus.NotFound:
@@ -67,7 +69,7 @@ public class ProjectsController(IProjectService projects, ITagService tags, User
 
             case Services.Abstractions.ProjectSaveStatus.Conflict:
                 ModelState.AddModelError(string.Empty,
-                    "This project was changed elsewhere since you opened it. Review the current version and save again.");
+                    localizer["Msg_ProjectConflict"]);
                 model.RowVersion = outcome.CurrentRowVersion;
                 return View(model);
 
@@ -82,7 +84,7 @@ public class ProjectsController(IProjectService projects, ITagService tags, User
     {
         var targetUserId = ResolveTargetUserId(userId);
         await projects.DeleteAsync(ids, targetUserId);
-        TempData["StatusMessage"] = $"Deleted {ids.Length} project(s).";
+        TempData["StatusMessage"] = localizer["Msg_ProjectsDeleted", ids.Length].Value;
         return RedirectToAction("Index", "Profile", new { tab = "projects", userId = OwnerRouteValue(targetUserId) });
     }
 

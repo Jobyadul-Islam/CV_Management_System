@@ -2,65 +2,75 @@
 @inject IStringLocalizer<SharedResource> Localizer
 @{
     ViewData["Title"] = Localizer["Account_LoginTitle"];
+    ViewData["BodyClass"] = "auth-page";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <h1 class="h3 mb-4">@Localizer["Account_LoginTitle"]</h1>
-
-        <form asp-controller="Account" asp-action="Login" method="post">
-            <input type="hidden" asp-for="ReturnUrl" />
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
-
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label">@Localizer["Account_Email"]</label>
-                <input asp-for="Email" class="form-control" autocomplete="username" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label">@Localizer["Account_Password"]</label>
-                <input asp-for="Password" class="form-control" autocomplete="current-password" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-check mb-3">
-                <input asp-for="RememberMe" class="form-check-input" />
-                <label asp-for="RememberMe" class="form-check-label">@Localizer["Account_RememberMe"]</label>
+<div class="auth-shell">
+    <div class="auth-card">
+        <section class="auth-main">
+            <div class="auth-card-top">
+                <partial name="_BrandLockup" />
+                <a class="auth-pill" asp-controller="Positions" asp-action="Index">
+                    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13l-1.6-4.4L2 7l4.4-1.6z" fill="currentColor" /></svg>
+                    @Localizer["Auth_BrowsePositions"]
+                </a>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">@Localizer["Account_LoginButton"]</button>
-        </form>
+            <h1 class="auth-title">@Localizer["Account_LoginTitle"]</h1>
+            <p class="auth-subtitle">@Localizer["Auth_SignInSubtitle"]</p>
 
-        @if (ViewBag.UnconfirmedEmail is string unconfirmedEmail)
-        {
-            <form asp-action="ResendConfirmation" method="post" class="mt-2">
-                <input type="hidden" name="email" value="@unconfirmedEmail" />
-                <button type="submit" class="btn btn-sm btn-outline-secondary">Resend confirmation email</button>
+            <form asp-controller="Account" asp-action="Login" method="post">
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label visually-hidden">@Localizer["Account_Email"]</label>
+                    <input asp-for="Email" class="form-control" autocomplete="username" placeholder="@Localizer["Account_Email"]" autofocus />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label visually-hidden">@Localizer["Account_Password"]</label>
+                    <input asp-for="Password" class="form-control" autocomplete="current-password" placeholder="@Localizer["Account_Password"]" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="form-check mb-4">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label small">@Localizer["Account_RememberMe"]</label>
+                </div>
+
+                <button type="submit" class="btn btn-auth">@Localizer["Account_LoginButton"]</button>
             </form>
-        }
 
-        @if (Model.ExternalLogins.Count > 0)
-        {
-            <hr class="my-4" />
-            <p class="text-secondary small mb-2">@Localizer["Account_OrSignInWith"]</p>
-            @foreach (var scheme in Model.ExternalLogins)
+            @if (ViewBag.UnconfirmedEmail is string unconfirmedEmail)
             {
-                <form asp-controller="Account" asp-action="ExternalLogin" method="post" class="d-inline-block me-2">
-                    <input type="hidden" name="provider" value="@scheme.Name" />
-                    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
-                    <button type="submit" class="btn btn-outline-secondary">@scheme.DisplayName</button>
+                <form asp-action="ResendConfirmation" method="post" class="mt-2">
+                    <input type="hidden" name="email" value="@unconfirmedEmail" />
+                    <button type="submit" class="btn btn-link auth-link p-0 small">@Localizer["Auth_ResendConfirmation"]</button>
                 </form>
             }
-        }
 
-        <p class="mt-4 small">
-            @Localizer["Account_NoAccount"]
-            <a asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">@Localizer["Nav_Register"]</a>
-        </p>
+            @if (Model.ExternalLogins.Count > 0)
+            {
+                <div class="auth-section-label">@Localizer["Auth_SignInUsing"]</div>
+                <div class="provider-buttons">
+                    @foreach (var scheme in Model.ExternalLogins)
+                    {
+                        <form asp-controller="Account" asp-action="ExternalLogin" method="post">
+                            <input type="hidden" name="provider" value="@scheme.Name" />
+                            <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+                            <partial name="_ProviderButton" model="scheme" />
+                        </form>
+                    }
+                </div>
+            }
 
-        <div class="alert alert-light border small mt-3">
-            Demo accounts (password <code>Demo@12345</code>):<br />
-            candidate@demo.local &middot; recruiter@demo.local &middot; admin@demo.local
-        </div>
+            <p class="auth-footer-link">
+                @Localizer["Account_NoAccount"]
+                <a asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">@Localizer["Auth_SignUpNow"]</a>
+            </p>
+        </section>
+
+        <partial name="_AuthAside" />
     </div>
 </div>
 

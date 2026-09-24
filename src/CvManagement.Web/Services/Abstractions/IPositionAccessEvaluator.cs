@@ -19,4 +19,12 @@ public interface IPositionAccessEvaluator
     /// </summary>
     Task<IReadOnlyDictionary<string, bool>> IsEligibleForPositionAsync(
         int positionId, IReadOnlyCollection<string> userIds, CancellationToken ct = default);
+
+    /// <summary>
+    /// Fully general bulk shape: arbitrary (candidate, position) pairs -- e.g. every published CV in the
+    /// system. Still exactly two queries total, however many distinct candidates and positions appear.
+    /// Backs CV Browse, full-text search results and the draft-reminder job.
+    /// </summary>
+    Task<IReadOnlySet<(string UserId, int PositionId)>> FilterEligibleAsync(
+        IReadOnlyCollection<(string UserId, int PositionId)> pairs, CancellationToken ct = default);
 }

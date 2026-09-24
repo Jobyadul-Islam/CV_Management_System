@@ -12,6 +12,8 @@
     if (icon) {
       icon.textContent = theme === "dark" ? "☀️" : "\u{1F319}";
     }
+    // Lets theme-aware widgets (the home-page Chart.js charts) re-read their colors.
+    document.dispatchEvent(new CustomEvent("themechange", { detail: { theme: theme } }));
   }
 
   document.addEventListener("DOMContentLoaded", function () {

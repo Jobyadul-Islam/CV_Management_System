@@ -1,4 +1,5 @@
-using CvManagement.Web.Domain.Enums;
+using Microsoft.Extensions.Localization;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Cv;
 using QRCoder;
@@ -8,7 +9,7 @@ using QuestPDF.Infrastructure;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class CvPdfExportService : ICvPdfExportService
+public class CvPdfExportService(IStringLocalizer<SharedResource> localizer) : ICvPdfExportService
 {
     public byte[] Generate(CvDetailsViewModel cv, string qrTargetUrl)
     {
@@ -38,17 +39,17 @@ public class CvPdfExportService : ICvPdfExportService
                             }
                             if (cv.Level is not null)
                             {
-                                text.Span($"  ·  {cv.Level}").FontSize(11);
+                                text.Span($"  ·  {localizer[$"Level_{cv.Level}"]}").FontSize(11);
                             }
                         });
-                        column.Item().PaddingTop(2).Text(cv.Status == CvStatus.Published ? "Published CV" : "Draft CV")
+                        column.Item().PaddingTop(2).Text(localizer[cv.Status == CvStatus.Published ? "Pdf_PublishedCv" : "Pdf_DraftCv"].Value)
                             .FontSize(9).FontColor(Colors.Grey.Medium);
                     });
 
                     row.ConstantItem(80).Column(column =>
                     {
                         column.Item().Image(qrPng);
-                        column.Item().AlignCenter().Text("Scan to view online").FontSize(7).FontColor(Colors.Grey.Medium);
+                        column.Item().AlignCenter().Text(localizer["Pdf_ScanToView"].Value).FontSize(7).FontColor(Colors.Grey.Medium);
                     });
                 });
 
@@ -60,7 +61,7 @@ public class CvPdfExportService : ICvPdfExportService
 
                     if (cv.Projects.Count > 0)
                     {
-                        column.Item().PaddingTop(5).Text("Projects").FontSize(13).SemiBold();
+                        column.Item().PaddingTop(5).Text(localizer["Profile_TabProjects"].Value).FontSize(13).SemiBold();
                         foreach (var project in cv.Projects)
                         {
                             column.Item().Element(c => ComposeProject(c, project));
@@ -80,25 +81,25 @@ public class CvPdfExportService : ICvPdfExportService
         return document.GeneratePdf();
     }
 
-    private static void ComposeFields(IContainer container, CvDetailsViewModel cv)
+    private void ComposeFields(IContainer container, CvDetailsViewModel cv)
     {
         container.Column(column =>
         {
             column.Spacing(6);
             foreach (var field in cv.Fields)
             {
-                var value = AttributeValueFormatter.ToPlainText(field);
+                var value = AttributeValueFormatter.ToPlainText(field, localizer);
                 column.Item().Row(row =>
                 {
                     row.ConstantItem(150).Text(field.AttributeName).SemiBold();
-                    row.RelativeItem().Text(string.IsNullOrWhiteSpace(value) ? "(not provided)" : value)
+                    row.RelativeItem().Text(string.IsNullOrWhiteSpace(value) ? localizer["Cv_NotProvided"].Value : value)
                         .FontColor(string.IsNullOrWhiteSpace(value) ? Colors.Red.Medium : Colors.Black);
                 });
             }
         });
     }
 
-    private static void ComposeProject(IContainer container, ViewModels.Profile.ProjectListItemViewModel project)
+    private void ComposeProject(IContainer container, ViewModels.Profile.ProjectListItemViewModel project)
     {
         container.Border(1).BorderColor(Colors.Grey.Lighten2).Padding(8).Column(column =>
         {
@@ -107,7 +108,7 @@ public class CvPdfExportService : ICvPdfExportService
             {
                 text.Span(project.Name).SemiBold();
                 var period = project.PeriodEnd is null
-                    ? $"  ({project.PeriodStart:yyyy-MM} - present)"
+                    ? $"  ({project.PeriodStart:yyyy-MM} - {localizer["Profile_Present"]})"
                     : $"  ({project.PeriodStart:yyyy-MM} - {project.PeriodEnd:yyyy-MM})";
                 text.Span(period).FontSize(9).FontColor(Colors.Grey.Medium);
             });

@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Account;
 using Microsoft.AspNetCore.Authentication;
@@ -16,7 +17,8 @@ public class AccountController(
     IUserOnboardingService onboarding,
     IAppEmailSender emailSender,
     ApplicationDbContext db,
-    ILogger<AccountController> logger) : Controller
+    ILogger<AccountController> logger,
+    IStringLocalizer<SharedResource> localizer) : Controller
 {
     [HttpGet]
     public IActionResult Register(string? returnUrl = null)
@@ -105,8 +107,9 @@ public class AccountController(
         var link = Url.Action(nameof(ConfirmEmail), "Account",
             new { userId = user.Id, token }, protocol: Request.Scheme)!;
 
-        await emailSender.SendAsync(user.Email!, "Confirm your CV Management System account",
-            $"<p>Welcome! Please confirm your account by <a href=\"{link}\">clicking here</a>.</p>");
+        // Sent in the language the user registered in (the request culture).
+        await emailSender.SendAsync(user.Email!, localizer["Email_ConfirmSubject"],
+            localizer["Email_ConfirmBody", System.Net.WebUtility.HtmlEncode(link)]);
 
         return link;
     }
@@ -142,14 +145,14 @@ public class AccountController(
             // RequireConfirmedAccount blocked this sign-in specifically because the email isn't
             // confirmed yet (as opposed to a wrong password) -- point them at "resend" instead of
             // a generic error.
-            ModelState.AddModelError(string.Empty, "Please confirm your email before signing in.");
+            ModelState.AddModelError(string.Empty, localizer["Login_ConfirmFirst"]);
             ViewBag.UnconfirmedEmail = model.Email;
         }
         else
         {
             ModelState.AddModelError(string.Empty, result.IsLockedOut
-                ? "This account is locked. Try again later or contact an administrator."
-                : "Invalid email or password.");
+                ? localizer["Login_Locked"]
+                : localizer["Login_Invalid"]);
         }
         model.ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         return View(model);
@@ -175,7 +178,7 @@ public class AccountController(
     {
         if (remoteError is not null)
         {
-            ModelState.AddModelError(string.Empty, $"External provider error: {remoteError}");
+            ModelState.AddModelError(string.Empty, localizer["Login_ExternalError", remoteError]);
             return View(nameof(Login), new LoginViewModel { ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
         }
 
@@ -192,7 +195,7 @@ public class AccountController(
         }
         if (signInResult.IsLockedOut)
         {
-            ModelState.AddModelError(string.Empty, "This account is locked.");
+            ModelState.AddModelError(string.Empty, localizer["Login_AccountLocked"]);
             return View(nameof(Login), new LoginViewModel());
         }
 
@@ -200,7 +203,7 @@ public class AccountController(
         var email = info.Principal.FindFirstValue(ClaimTypes.Email);
         if (string.IsNullOrEmpty(email))
         {
-            ModelState.AddModelError(string.Empty, $"{info.LoginProvider} did not provide an email address; cannot create an account.");
+            ModelState.AddModelError(string.Empty, localizer["Login_ExternalNoEmail", info.LoginProvider]);
             return View(nameof(Login), new LoginViewModel { ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
         }
 
@@ -215,6 +218,16 @@ public class AccountController(
         }
 
         var existingUser = await userManager.FindByEmailAsync(email);
+
+        // Linking a new external login to an existing account ends in SignInAsync below, which does not
+        // check lockout itself -- without this, an Administrator-blocked user could get back in simply by
+        // choosing "Sign in with Google" for the first time.
+        if (existingUser is not null && await userManager.IsLockedOutAsync(existingUser))
+        {
+            ModelState.AddModelError(string.Empty, localizer["Login_AccountLocked"]);
+            return View(nameof(Login), new LoginViewModel { ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
+        }
+
         var user = existingUser ?? new ApplicationUser
         {
             UserName = email,
@@ -260,16 +273,16 @@ public class AccountController(
 
     private async Task SetBuiltInNameAsync(string userId, string firstName, string lastName)
     {
-        var names = new[] { "First Name", "Last Name" };
+        string[] keys = [BuiltInAttributeKeys.FirstName, BuiltInAttributeKeys.LastName];
         var rows = await db.UserAttributeValues
             .Include(v => v.Attribute)
-            .Where(v => v.UserId == userId && names.Contains(v.Attribute.Name))
+            .Where(v => v.UserId == userId && keys.Contains(v.Attribute.SystemKey!))
             .ToListAsync();
 
-        var first = rows.FirstOrDefault(r => r.Attribute.Name == "First Name");
+        var first = rows.FirstOrDefault(r => r.Attribute.SystemKey == BuiltInAttributeKeys.FirstName);
         if (first is not null) first.ValueString = firstName;
 
-        var last = rows.FirstOrDefault(r => r.Attribute.Name == "Last Name");
+        var last = rows.FirstOrDefault(r => r.Attribute.SystemKey == BuiltInAttributeKeys.LastName);
         if (last is not null) last.ValueString = lastName;
 
         await db.SaveChangesAsync();

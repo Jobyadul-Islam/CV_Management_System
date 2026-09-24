@@ -1,9 +1,15 @@
-using System.Net;
-using System.Net.Mail;
 using CvManagement.Web.Services.Abstractions;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 
 namespace CvManagement.Web.Services.Implementations;
 
+/// <summary>
+/// MailKit-based SMTP sender (System.Net.Mail.SmtpClient is marked obsolete for new development by
+/// Microsoft, which recommends MailKit). Without Email:SmtpHost configured it only logs the message,
+/// so the confirmation and reminder flows are fully verifiable locally without real credentials.
+/// </summary>
 public class SmtpEmailSender(IConfiguration configuration, ILogger<SmtpEmailSender> logger) : IAppEmailSender
 {
     public bool IsConfigured => !string.IsNullOrWhiteSpace(configuration["Email:SmtpHost"]);
@@ -13,8 +19,6 @@ public class SmtpEmailSender(IConfiguration configuration, ILogger<SmtpEmailSend
         var host = configuration["Email:SmtpHost"];
         if (string.IsNullOrWhiteSpace(host))
         {
-            // No SMTP configured -- log the email (link included) so the confirmation flow is
-            // fully verifiable locally without needing real credentials.
             logger.LogInformation(
                 "Email:SmtpHost not configured -- would have sent to {ToEmail}, subject '{Subject}':\n{Body}",
                 toEmail, subject, htmlBody);
@@ -28,21 +32,24 @@ public class SmtpEmailSender(IConfiguration configuration, ILogger<SmtpEmailSend
         var fromName = configuration["Email:FromName"] ?? "CV Management System";
         var enableSsl = configuration.GetValue("Email:EnableSsl", true);
 
-        using var client = new SmtpClient(host, port)
-        {
-            EnableSsl = enableSsl,
-            Credentials = string.IsNullOrEmpty(username) ? null : new NetworkCredential(username, password)
-        };
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress(fromName, fromAddress));
+        message.To.Add(MailboxAddress.Parse(toEmail));
+        message.Subject = subject;
+        message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
 
-        using var message = new MailMessage
-        {
-            From = new MailAddress(fromAddress, fromName),
-            Subject = subject,
-            Body = htmlBody,
-            IsBodyHtml = true
-        };
-        message.To.Add(toEmail);
+        using var client = new SmtpClient();
+        // Port 465 is implicit TLS; anything else upgrades via STARTTLS when SSL is enabled.
+        var socketOptions = !enableSsl ? SecureSocketOptions.None
+            : port == 465 ? SecureSocketOptions.SslOnConnect
+            : SecureSocketOptions.StartTls;
 
-        await client.SendMailAsync(message, ct);
+        await client.ConnectAsync(host, port, socketOptions, ct);
+        if (!string.IsNullOrEmpty(username))
+        {
+            await client.AuthenticateAsync(username, password ?? string.Empty, ct);
+        }
+        await client.SendAsync(message, ct);
+        await client.DisconnectAsync(quit: true, ct);
     }
 }

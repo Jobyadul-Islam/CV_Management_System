@@ -1,0 +1,79 @@
+@* Home hero illustration: candidate profiles (avatars) flowing through the CV "frame", with a stack of
+   generated CVs. Hand-built inline SVG, so it scales crisply, needs no image asset, and is decorative
+   apart from its accessible label. *@
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    // SVG needs "." decimals regardless of the UI culture (Russian would otherwise print "0,95").
+    static string N(double value) => value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+    void Avatar(string id, double cx, double cy, double r, string bg, string skin, string hair, string shirt)
+    {
+        var headR = r * 0.3;
+        var headY = cy - r * 0.08;
+        var swoosh = $"M{N(cx - r * 0.95)} {N(cy + r * 0.2)} Q{N(cx)} {N(cy - r * 0.35)} {N(cx + r * 0.95)} {N(cy + r * 0.55)}";
+        <clipPath id="@id"><circle cx="@N(cx)" cy="@N(cy)" r="@N(r)" /></clipPath>
+        <circle cx="@N(cx)" cy="@N(cy)" r="@N(r + 5)" fill="#fff" opacity=".9" />
+        <circle cx="@N(cx)" cy="@N(cy)" r="@N(r)" fill="@bg" />
+        <g clip-path="url(#@id)">
+            <path d="@swoosh" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="@N(r * 0.18)" />
+            <ellipse cx="@N(cx)" cy="@N(cy + r * 0.82)" rx="@N(r * 0.62)" ry="@N(r * 0.5)" fill="@shirt" />
+            <rect x="@N(cx - headR * 0.35)" y="@N(headY + headR * 0.6)" width="@N(headR * 0.7)" height="@N(headR * 0.9)" fill="@skin" />
+            <circle cx="@N(cx)" cy="@N(headY - headR * 0.12)" r="@N(headR * 1.12)" fill="@hair" />
+            <circle cx="@N(cx)" cy="@N(headY + headR * 0.12)" r="@N(headR)" fill="@skin" />
+        </g>
+    }
+}
+<svg class="hero-art" viewBox="0 0 560 480" role="img" aria-label="@Localizer["Hero_ArtLabel"]">
+    <defs>
+        <linearGradient id="heroFrame" x1="90" y1="30" x2="490" y2="430" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#ffb01f" />
+            <stop offset=".32" stop-color="#f7662b" />
+            <stop offset=".62" stop-color="#e3262f" />
+            <stop offset="1" stop-color="#a8124f" />
+        </linearGradient>
+        <radialGradient id="heroGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#ffe27a" stop-opacity=".75" />
+            <stop offset="1" stop-color="#ffe27a" stop-opacity="0" />
+        </radialGradient>
+        <linearGradient id="heroPaper" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#d7ecf7" />
+            <stop offset="1" stop-color="#9fcbe4" />
+        </linearGradient>
+    </defs>
+
+    <ellipse cx="300" cy="446" rx="160" ry="13" fill="#6b1d1d" opacity=".08" />
+
+    @* Flying sheets -- profiles on their way in *@
+    <path d="M78 218c18-34 58-44 92-30l-20 52c-24-10-50-6-72 10z" fill="url(#heroPaper)" opacity=".9" />
+    <path d="M118 150c22-24 60-26 86-8l-30 44c-18-12-40-12-58 0z" fill="#c7e3f2" opacity=".75" />
+    <path d="M52 300c4-30 30-52 62-52l2 50c-22 0-40 12-46 30z" fill="#b8dbee" opacity=".7" />
+
+    @* Stack of generated CVs *@
+    <g transform="translate(46 330) skewY(-9)">
+        <rect x="0" y="54" width="148" height="16" rx="3" fill="#8fc0dc" />
+        <rect x="0" y="40" width="148" height="16" rx="3" fill="#a9d1e7" />
+        <rect x="0" y="26" width="148" height="16" rx="3" fill="#8fc0dc" />
+        <rect x="0" y="0" width="148" height="28" rx="3" fill="url(#heroPaper)" />
+        <rect x="16" y="9" width="70" height="4" rx="2" fill="#fff" opacity=".8" />
+        <rect x="16" y="17" width="46" height="4" rx="2" fill="#fff" opacity=".6" />
+        <path d="M110 12l7 7 13-13" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    @* The frame *@
+    <rect x="180" y="120" width="220" height="220" rx="34" transform="rotate(45 290 230)"
+          fill="none" stroke="url(#heroFrame)" stroke-width="64" />
+    <rect x="212" y="152" width="156" height="156" rx="10" transform="rotate(45 290 230)"
+          fill="none" stroke="#7d0f3a" stroke-opacity=".28" stroke-width="5" />
+    <rect x="148" y="88" width="284" height="284" rx="56" transform="rotate(45 290 230)"
+          fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="3" />
+
+    @* Accents *@
+    <rect x="150" y="26" width="32" height="32" rx="4" transform="rotate(45 166 42)" fill="none" stroke="#e42527" stroke-width="6" />
+    <path d="M462 398l32-14-5 34z" fill="none" stroke="#f5b400" stroke-width="6" stroke-linejoin="round" />
+
+    @* Candidates *@
+    <circle cx="290" cy="230" r="70" fill="url(#heroGlow)" />
+    @{ Avatar("heroAv1", 290, 230, 42, "#f6c945", "#b5795a", "#2a1a14", "#2f3140"); }
+    @{ Avatar("heroAv2", 440, 112, 56, "#15b3a3", "#e7b694", "#3b261d", "#1f2230"); }
+    @{ Avatar("heroAv3", 474, 302, 48, "#4fb0f3", "#c98e6b", "#1d1a1a", "#f4f6fb"); }
+</svg>

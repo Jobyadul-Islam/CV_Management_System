@@ -1,5 +1,5 @@
 @model CvManagement.Web.ViewModels.Position.PositionFormViewModel
-@using CvManagement.Web.Domain.Enums
+@using CvManagement.Web.Models.Enums
 @inject IStringLocalizer<SharedResource> Localizer
 
 <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
@@ -62,7 +62,7 @@
 <h2 class="h5">@Localizer["PositionForm_ProjectTags"]</h2>
 <p class="text-secondary small">@Localizer["PositionForm_ProjectTagsHelp"]</p>
 <div class="mb-3">
-    <input type="text" id="projectTagsInput" class="form-control" placeholder="e.g. SQL, R, Python (comma-separated)"
+    <input type="text" id="projectTagsInput" class="form-control" placeholder="@Localizer["PositionForm_TagsPlaceholder"]"
            value="@string.Join(", ", Model.ProjectTags)" />
 </div>
 <div id="projectTagsHidden"></div>
@@ -74,15 +74,15 @@
 <script>
 (function () {
     var operatorCatalog = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-        CvManagement.Web.Domain.Enums.OperatorCatalog.AllowedOperators.ToDictionary(
+        CvManagement.Web.Models.Enums.OperatorCatalog.AllowedOperators.ToDictionary(
             kv => (int)kv.Key,
-            kv => kv.Value.Select(op => new { value = (int)op, label = CvManagement.Web.Domain.Enums.OperatorCatalog.OperatorLabel(op) }))));
+            kv => kv.Value.Select(op => new { value = (int)op, label = Localizer[CvManagement.Web.Models.Enums.OperatorCatalog.LabelKey(op)].Value }))));
     var allAttributes = []; // populated after fetching /Attributes/Picker
     var selectedTemplateAttrs = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
         Model.SelectedAttributes.Select(a => new { id = a.Id, name = a.Name })));
     var existingRules = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AccessRules,
         new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
-    var dataTypeNames = ["String", "Text", "Image", "Numeric", "Date", "Period", "Boolean", "One of many"];
+    var removeRuleText = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["PositionForm_RemoveRule"].Value));
 
     // ---------- Template attribute chips ----------
     var chipsContainer = document.getElementById("templateAttributeChips");
@@ -164,8 +164,9 @@
                 attributeOptionsHtml(rule ? rule.attributeId : null) + '</select></div>' +
             '<div class="col-md-2"><select class="form-select rule-operator" name="AccessRules[' + idx + '].Operator"></select></div>' +
             '<div class="col-md-5 rule-value-container"></div>' +
-            '<div class="col-md-2"><button type="button" class="btn btn-outline-danger btn-sm remove-rule-btn">Remove</button></div>';
+            '<div class="col-md-2"><button type="button" class="btn btn-outline-danger btn-sm remove-rule-btn"></button></div>';
         rulesList.appendChild(row);
+        row.querySelector(".remove-rule-btn").textContent = removeRuleText;
 
         var attrSelect = row.querySelector(".rule-attribute");
         var opSelect = row.querySelector(".rule-operator");

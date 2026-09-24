@@ -30,7 +30,7 @@
 
 <div class="mb-3">
     <label asp-for="DataType" class="form-label"></label>
-    <select asp-for="DataType" asp-items="Html.GetEnumSelectList<CvManagement.Web.Domain.Enums.AttributeDataType>()"
+    <select asp-for="DataType" asp-items="Html.GetEnumSelectList<CvManagement.Web.Models.Enums.AttributeDataType>()"
             class="form-select" id="dataTypeSelect" disabled="@Model.IsBuiltIn"></select>
     @if (Model.IsBuiltIn)
     {
@@ -85,8 +85,8 @@
         <div class="input-group input-group-sm mb-2 option-row">
             <input type="hidden" name="Options[__index__].Id" value="0" />
             <input type="hidden" name="Options[__index__].RowVersion" value="" />
-            <input type="text" name="Options[__index__].Label" class="form-control" placeholder="Option label" />
-            <button type="button" class="btn btn-outline-danger remove-option-btn">&times;</button>
+            <input type="text" name="Options[__index__].Label" class="form-control" placeholder="@Localizer["AttributeForm_OptionPlaceholder"]" aria-label="@Localizer["AttributeForm_OptionPlaceholder"]" />
+            <button type="button" class="btn btn-outline-danger remove-option-btn" aria-label="@Localizer["AttributeForm_RemoveOption"]">&times;</button>
         </div>
     </template>
 </div>
@@ -103,10 +103,10 @@
             var template = document.getElementById("optionRowTemplate");
             var lengthTuningSection = document.getElementById("lengthTuningSection");
             var numericTuningSection = document.getElementById("numericTuningSection");
-            var oneOfManyValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.OneOfMany)";
-            var stringValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.String)";
-            var textValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.Text)";
-            var numericValue = "@((int)CvManagement.Web.Domain.Enums.AttributeDataType.Numeric)";
+            var oneOfManyValue = "@((int)CvManagement.Web.Models.Enums.AttributeDataType.OneOfMany)";
+            var stringValue = "@((int)CvManagement.Web.Models.Enums.AttributeDataType.String)";
+            var textValue = "@((int)CvManagement.Web.Models.Enums.AttributeDataType.Text)";
+            var numericValue = "@((int)CvManagement.Web.Models.Enums.AttributeDataType.Numeric)";
             var rowIndex = optionsList.querySelectorAll(".option-row").length;
 
             function refreshVisibility() {

@@ -5,42 +5,59 @@ templates, Candidates maintain a single profile, and CVs are generated automatic
 that profile for each position they apply to. Built for the course spec in
 [`pr_cv_management.md`](pr_cv_management.md).
 
+## Architecture
+
+A classic layered ASP.NET Core MVC application. Each layer only talks to the one below it:
+
+| Layer | Folder | Responsibility |
+|---|---|---|
+| **Views (Razor)** | `Views/`, `ViewComponents/`, `wwwroot/` | Razor views, Bootstrap 5, role-aware navigation, Chart.js statistics, the shared checkbox + toolbar table component |
+| **Controllers** | `Controllers/`, `Hubs/` | HTTP endpoints, `[Authorize(Roles = ...)]`, ownership checks, orchestration; SignalR hub as thin transport |
+| **Service layer** | `Services/Abstractions` + `Services/Implementations` | One interface per concern: access-rule evaluation, CV rendering, throttled auto-save, search index, PDF/CSV export, badges, email, upload validation, background reminders |
+| **Models & ViewModels** | `Models/`, `ViewModels/` | EF Core entities (see `UserAttributeValue.cs` for the EAV design) and view-facing data shapes |
+| **Data access** | `Data/` | `ApplicationDbContext`, per-entity configurations, EF Core code-first migrations (SQL Server), idempotent seed |
+
+**Cross-cutting:** cookie authentication (ASP.NET Core Identity + Google/GitHub OAuth, email
+confirmation) · role- and ownership-based authorization · centralized image-upload validation ·
+background draft-CV reminders · optimistic locking via `rowversion` · EN/RU localization ·
+light/dark theme · PDF (with QR code) and CSV export.
+
 ## Tech stack
 
-- **ASP.NET Core MVC (.NET 10)**, C#
-- **Entity Framework Core** + **SQL Server** (optimistic concurrency via `rowversion`)
-- **ASP.NET Core Identity** (roles: Candidate / Recruiter / Administrator) + Google/GitHub OAuth
-- **SignalR** for live per-position discussions
-- **Lucene.NET** for full-text search (SQL Server Full-Text Search isn't installed on the
+- **Backend:** .NET 10, ASP.NET Core MVC, C#, Entity Framework Core, ASP.NET Core Identity, SignalR
+- **Data & integrations:** SQL Server Express, Google OAuth 2.0, GitHub OAuth, Cloudinary (direct
+  browser upload), Lucene.NET full-text search (SQL Server Full-Text Search isn't installed on the
   dev machine this was built on; the spec explicitly allows either)
-- **Markdig** + **HtmlSanitizer** for Markdown rendering
-- **Bootstrap 5**, **EasyMDE** (Markdown editor), **Tagify** (technology tags), **Cloudinary**
-  upload widget (Image attribute type)
+- **Frontend:** Razor views, Bootstrap 5, Chart.js, EasyMDE (Markdown editor), Tagify (tags)
+- **Quality & services:** xUnit (43 tests) + EF Core InMemory, QuestPDF + QRCoder, MailKit SMTP,
+  Markdig + HtmlSanitizer
 
 ## Running it locally
 
 1. **Database.** Point `ConnectionStrings:DefaultConnection` in `appsettings.json` (or an
    override in `appsettings.Development.json` / user-secrets) at a SQL Server instance you
    can create a database on. Default assumes a local `SQLEXPRESS` instance with Windows auth.
-2. From `src/CvManagement.Web`, just run:
+2. Restore the local `dotnet-ef` tool (only needed to create new migrations): `dotnet tool restore`.
+3. From `src/CvManagement.Web`, just run:
    ```
    dotnet run
    ```
    Migrations and seed data apply automatically on startup (roles, attribute categories, the
    four built-in Me-tab attributes, a handful of library attributes drawn from the spec's own
-   worked example, and one demo account per role). The Lucene search index also rebuilds from
+   worked example; demo accounts only if enabled -- see below). The Lucene search index also rebuilds from
    the database on every startup, so it's always consistent even after direct DB edits.
-3. Open `http://localhost:5199` (or whatever port `dotnet run` reports).
+4. Open `http://localhost:5150` (the default `http` launch profile; `https://localhost:7170` with
+   `dotnet run --launch-profile https`).
 
-### Demo accounts
+### Accounts
 
-All seeded with password `Demo@12345`:
+No accounts are seeded by default. Register through the app (email confirmation is required),
+then have an existing Administrator grant roles on the **Users** page.
 
-| Email | Role |
-|---|---|
-| `candidate@demo.local` | Candidate |
-| `recruiter@demo.local` | Recruiter |
-| `admin@demo.local` | Administrator |
+**Demo accounts (local testing only).** Setting `Seed:DemoAccounts` to `true` makes startup
+create one account per role, all with the public password `Demo@12345`:
+`candidate@demo.local`, `recruiter@demo.local`, `admin@demo.local`. Never enable this on a real
+installation. With the setting off, deleted demo accounts stay deleted.
 
 ## Optional configuration
 
@@ -50,9 +67,12 @@ The app runs fully without any of this -- these just light up specific features.
 
 Social login is a core requirement, but I can't create OAuth apps on your behalf. To enable:
 
-1. Register an OAuth app with each provider, with a redirect URI of
-   `https://localhost:<port>/signin-google` and `https://localhost:<port>/signin-github`
-   respectively (adjust the port to match your local run).
+1. Register an OAuth app with each provider, with a redirect (callback) URI of
+   `http://localhost:5150/signin-google` (Google Cloud → Google Auth Platform → Clients, type
+   "Web application"; add your account under Audience → Test users while in Testing mode) and
+   `http://localhost:5150/signin-github` (GitHub → Settings → Developer settings → OAuth Apps).
+   Use your deployed address instead of `http://localhost:5150` in production. The GitHub app
+   requests the `user:email` scope, so accounts with a private email still work.
 2. Store the credentials outside source control via user-secrets (from `src/CvManagement.Web`):
    ```
    dotnet user-secrets set "Authentication:Google:ClientId" "..."
@@ -74,21 +94,41 @@ Social login is a core requirement, but I can't create OAuth apps on your behalf
    Until set, Image-type fields show "Image upload isn't configured yet" instead of an upload
    button -- the rest of the app is unaffected.
 
+### Email (confirmation + reminders)
+
+Set `Email:SmtpHost`, `Email:SmtpPort`, `Email:SmtpUsername`, `Email:SmtpPassword`, `Email:FromAddress`
+via user-secrets. Without an SMTP host, emails are written to the log instead (the registration page
+also shows the confirmation link), so every flow still works locally.
+
+### Draft CV reminders
+
+`DraftCvReminderService` (a hosted `BackgroundService`) wakes up every `Reminders:DraftCv:Interval` and
+emails candidates whose CV has been a Draft longer than `DraftAge`, at most once per `RepeatAfter`.
+Set `Reminders:DraftCv:BaseUrl` to include direct links, or `Enabled: false` to switch it off.
+
+### Upload rules
+
+`Uploads:Images` (`AllowedFormats`, `MaxFileSizeBytes`) configures both the Cloudinary widget and the
+server-side check (`IUploadValidator`) that every stored image URL comes from this app's own
+Cloudinary account in an allowed format.
+
 ## Project structure
 
 ```
 src/
   CvManagement.Web/
-    Domain/                  EF Core entities (see UserAttributeValue.cs for the EAV design)
+    Models/                  EF Core entities + enums (see UserAttributeValue.cs for the EAV design)
+    ViewModels/              View-facing data shapes, one folder per feature
     Data/                    DbContext, entity configurations, migrations, seed data
     Services/
       Abstractions/           Interfaces -- one per concern (IPositionAccessEvaluator,
-                               ICvRenderService, IProfileAutoSaveService, ISearchIndexService, ...)
-      Implementations/
+                               ICvRenderService, IProfileAutoSaveService, IUploadValidator, ...)
+      Implementations/        incl. DraftCvReminderService (hosted background job)
     Controllers/, Views/, ViewComponents/
     Hubs/DiscussionHub.cs      SignalR, thin transport only
-    wwwroot/js/                autosave.js, table-toolbar.js, attribute-picker.js, discussion.js
-  CvManagement.Tests/          Unit tests for the access-rule evaluator (the riskiest pure logic)
+    wwwroot/js/                autosave.js, table-toolbar.js, attribute-picker.js, discussion.js, home-charts.js
+  CvManagement.Tests/          xUnit: access rules, bulk eligibility (EF InMemory), auto-save
+                               validation, upload validation, CSV export, search queries
 ```
 
 ## Key design decisions (the "why" behind non-obvious choices)
@@ -110,13 +150,18 @@ src/
   same checkbox-select + toolbar component (`SelectableTableToolbarViewComponent` +
   `table-toolbar.js`), satisfying the spec's explicit -20%-penalty rule in one reusable place.
 
-## What's not implemented
+- **Deletes are set-based and cascade in the database.** Deleting a position removes its CVs, likes,
+  template and discussion via `ON DELETE CASCADE` in one statement -- no "delete children in a loop".
+- **No queries inside loops.** Eligibility for any number of (candidate, position) pairs is evaluated
+  with two queries (`IPositionAccessEvaluator.FilterEligibleAsync`); auto-save loads a whole batch
+  with two queries and commits it in one `SaveChanges`, dropping only the fields whose version is stale.
+- **Built-in attributes are identified by `SystemKey`, not by name**, so Recruiters can rename
+  "First Name" without breaking display-name sync, OAuth sign-up or seeding.
+- **Blocking a user rotates their security stamp**, and stamps are re-validated every minute, so a
+  block or role change also ends sessions that are already open.
 
-The spec's **Optional Requirements** section (PDF+QR export, email-confirmation password auth,
-badges/achievements, per-attribute validation tuning, CSV/Excel export) is explicitly gated on
-the core being fully solid first, and hasn't been built.
+## Optional requirements
 
-Full-page i18n coverage (English/Russian) is in place for the shared layout, navigation, and
-account pages; deeper coverage of every label on every page is a straightforward but large
-mechanical extension of the same `IStringLocalizer<SharedResource>` pattern already used
-throughout, not yet done for every view.
+All five are implemented: PDF export with a QR code back to the CV, email-confirmed password
+registration, SVG badge panel (downloadable), per-attribute validation tuning (length, regex,
+numeric range), and CSV export of a position's CVs (formula-injection safe).

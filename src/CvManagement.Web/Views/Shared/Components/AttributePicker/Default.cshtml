@@ -1,7 +1,8 @@
 @model IReadOnlyList<CvManagement.Web.ViewModels.Attribute.AttributePickerItemViewModel>
+@inject IStringLocalizer<SharedResource> Localizer
 @{
     var modalId = (string)ViewBag.ModalId;
-    var categories = (IReadOnlyList<CvManagement.Web.Domain.AttributeCategory>)ViewBag.Categories;
+    var categories = (IReadOnlyList<CvManagement.Web.Models.AttributeCategory>)ViewBag.Categories;
     var recent = (IReadOnlyList<CvManagement.Web.ViewModels.Attribute.AttributePickerItemViewModel>)ViewBag.Recent;
 }
 
@@ -9,17 +10,17 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add attribute</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title">@Localizer["Picker_Title"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Common_Close"]"></button>
             </div>
             <div class="modal-body">
                 <div class="row g-2 mb-3">
                     <div class="col">
-                        <input type="text" class="form-control attribute-picker-search" placeholder="Search by name prefix..." />
+                        <input type="text" class="form-control attribute-picker-search" placeholder="@Localizer["Picker_SearchPlaceholder"]" />
                     </div>
                     <div class="col-auto">
                         <select class="form-select attribute-picker-category">
-                            <option value="">All categories</option>
+                            <option value="">@Localizer["Picker_AllCategories"]</option>
                             @foreach (var category in categories)
                             {
                                 <option value="@category.Id">@category.Name</option>
@@ -31,7 +32,7 @@
                 @if (recent.Count > 0)
                 {
                     <div class="mb-2">
-                        <div class="small text-secondary mb-1">Recently used</div>
+                        <div class="small text-secondary mb-1">@Localizer["Picker_RecentlyUsed"]</div>
                         <ul class="list-group attribute-picker-list" data-section="recent">
                             @foreach (var item in recent)
                             {
@@ -68,8 +69,8 @@
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary attribute-picker-confirm">Add selected</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">@Localizer["Common_Cancel"]</button>
+                <button type="button" class="btn btn-primary attribute-picker-confirm">@Localizer["Picker_AddSelected"]</button>
             </div>
         </div>
     </div>

@@ -28,7 +28,7 @@ else
                         <tr>
                             <td><a asp-controller="Positions" asp-action="Details" asp-route-id="@position.Id">@position.Title</a></td>
                             <td>@position.Company</td>
-                            <td>@position.Level</td>
+                            <td>@(position.Level is { } level ? Localizer[$"Level_{level}"] : "")</td>
                         </tr>
                     }
                 </tbody>
@@ -36,7 +36,7 @@ else
         </div>
     }
 
-    @if (User.IsInRole(CvManagement.Web.Domain.RoleNames.Recruiter) || User.IsInRole(CvManagement.Web.Domain.RoleNames.Administrator))
+    @if (User.IsInRole(CvManagement.Web.Models.RoleNames.Recruiter) || User.IsInRole(CvManagement.Web.Models.RoleNames.Administrator))
     {
         <h2 class="h5">@Localizer["Search_Cvs"]</h2>
         @if (Model.Cvs.Count == 0)

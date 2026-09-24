@@ -1,0 +1,20 @@
+@model string
+@* Model = the autosave endpoint URL. Shared by the Profile and CV pages so the endpoint, the localized
+   status texts and the script include are wired identically in both places. *@
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    var texts = new Dictionary<string, string>
+    {
+        ["unsaved"] = Localizer["Autosave_Unsaved"],
+        ["saving"] = Localizer["Autosave_Saving"],
+        ["saved"] = Localizer["Autosave_Saved"],
+        ["conflict"] = Localizer["Autosave_Conflict"],
+        ["failed"] = Localizer["Autosave_Failed"],
+        ["offline"] = Localizer["Autosave_Offline"]
+    };
+}
+<script>
+    window.AUTOSAVE_ENDPOINT = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+    window.AUTOSAVE_TEXT = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(texts));
+</script>
+<script src="~/js/autosave.js" asp-append-version="true"></script>

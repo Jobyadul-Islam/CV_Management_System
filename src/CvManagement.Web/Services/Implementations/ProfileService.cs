@@ -1,5 +1,5 @@
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Attribute;
 using CvManagement.Web.ViewModels.Profile;
@@ -21,20 +21,28 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
             .Select(v => v.AttributeId)
             .ToListAsync(ct);
 
-    public async Task AddToInfoAsync(string userId, int attributeId, CancellationToken ct = default)
+    public async Task AddToInfoAsync(string userId, IReadOnlyCollection<int> attributeIds, CancellationToken ct = default)
     {
-        var exists = await db.UserAttributeValues.AnyAsync(v => v.UserId == userId && v.AttributeId == attributeId, ct);
-        if (exists) return;
+        // One query for what's already there and what actually exists, one INSERT batch for the rest.
+        var existing = await db.UserAttributeValues
+            .Where(v => v.UserId == userId && attributeIds.Contains(v.AttributeId))
+            .Select(v => v.AttributeId)
+            .ToListAsync(ct);
+        var toAdd = await db.Attributes
+            .Where(a => attributeIds.Contains(a.Id) && !existing.Contains(a.Id))
+            .Select(a => a.Id)
+            .ToListAsync(ct);
+        if (toAdd.Count == 0) return;
 
-        db.UserAttributeValues.Add(new UserAttributeValue { UserId = userId, AttributeId = attributeId });
+        db.UserAttributeValues.AddRange(toAdd.Select(id => new UserAttributeValue { UserId = userId, AttributeId = id }));
         await db.SaveChangesAsync(ct);
     }
 
-    public async Task RemoveFromInfoAsync(string userId, int attributeId, CancellationToken ct = default)
+    public async Task RemoveFromInfoAsync(string userId, IReadOnlyCollection<int> attributeIds, CancellationToken ct = default)
     {
         // Built-in attributes can't be removed from the profile -- IsBuiltIn is checked, not just DataType.
         await db.UserAttributeValues
-            .Where(v => v.UserId == userId && v.AttributeId == attributeId && !v.Attribute.IsBuiltIn)
+            .Where(v => v.UserId == userId && attributeIds.Contains(v.AttributeId) && !v.Attribute.IsBuiltIn)
             .ExecuteDeleteAsync(ct);
     }
 

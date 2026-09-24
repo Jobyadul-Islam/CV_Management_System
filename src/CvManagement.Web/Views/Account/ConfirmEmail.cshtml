@@ -1,21 +1,29 @@
 @model bool
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Confirm email";
+    ViewData["Title"] = Model ? Localizer["Auth_EmailConfirmedTitle"] : Localizer["Auth_ConfirmFailedTitle"];
+    ViewData["BodyClass"] = "auth-page";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5 text-center py-4">
-        @if (Model)
-        {
-            <h1 class="h3 mb-3 text-success">Email confirmed</h1>
-            <p class="text-secondary">Your account is active. You can now sign in.</p>
-            <a asp-action="Login" class="btn btn-primary">Sign in</a>
-        }
-        else
-        {
-            <h1 class="h3 mb-3 text-danger">Confirmation failed</h1>
-            <p class="text-secondary">This link is invalid or has already been used.</p>
-            <a asp-action="Login" class="btn btn-outline-secondary">Back to sign in</a>
-        }
+<div class="auth-shell">
+    <div class="auth-card auth-card-single">
+        <section class="auth-main">
+            <div class="auth-card-top">
+                <partial name="_BrandLockup" />
+            </div>
+
+            @if (Model)
+            {
+                <h1 class="auth-title text-success">@Localizer["Auth_EmailConfirmedTitle"]</h1>
+                <p class="auth-subtitle">@Localizer["Auth_EmailConfirmedText"]</p>
+                <a asp-action="Login" class="btn btn-auth">@Localizer["Account_LoginButton"]</a>
+            }
+            else
+            {
+                <h1 class="auth-title text-danger">@Localizer["Auth_ConfirmFailedTitle"]</h1>
+                <p class="auth-subtitle">@Localizer["Auth_ConfirmFailedText"]</p>
+                <a asp-action="Login" class="btn btn-auth">@Localizer["Auth_BackToSignIn"]</a>
+            }
+        </section>
     </div>
 </div>
