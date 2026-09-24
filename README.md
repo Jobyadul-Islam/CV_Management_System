@@ -29,8 +29,7 @@ light/dark theme · PDF (with QR code) and CSV export.
   browser upload), Lucene.NET full-text search (SQL Server Full-Text Search isn't installed on the
   dev machine this was built on; the spec explicitly allows either)
 - **Frontend:** Razor views, Bootstrap 5, Chart.js, EasyMDE (Markdown editor), Tagify (tags)
-- **Quality & services:** xUnit (43 tests) + EF Core InMemory, QuestPDF + QRCoder, MailKit SMTP,
-  Markdig + HtmlSanitizer
+- **Services:** QuestPDF + QRCoder (PDF export), MailKit SMTP, Markdig + HtmlSanitizer
 
 ## Running it locally
 
@@ -127,8 +126,6 @@ src/
     Controllers/, Views/, ViewComponents/
     Hubs/DiscussionHub.cs      SignalR, thin transport only
     wwwroot/js/                autosave.js, table-toolbar.js, attribute-picker.js, discussion.js, home-charts.js
-  CvManagement.Tests/          xUnit: access rules, bulk eligibility (EF InMemory), auto-save
-                               validation, upload validation, CSV export, search queries
 ```
 
 ## Key design decisions (the "why" behind non-obvious choices)

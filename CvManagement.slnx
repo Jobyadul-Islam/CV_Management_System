@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/CvManagement.Tests/CvManagement.Tests.csproj" />
     <Project Path="src/CvManagement.Web/CvManagement.Web.csproj" />
   </Folder>
 </Solution>
