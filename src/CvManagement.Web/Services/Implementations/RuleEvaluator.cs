@@ -1,5 +1,5 @@
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 
 namespace CvManagement.Web.Services.Implementations;
 

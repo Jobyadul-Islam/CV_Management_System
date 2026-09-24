@@ -1,0 +1,69 @@
+@* Right half of the split auth card: an illustration and a short product tour (Bootstrap carousel).
+   Hidden below the md breakpoint, where the card collapses to the form alone. *@
+@inject IStringLocalizer<SharedResource> Localizer
+<aside class="auth-aside">
+    <svg class="auth-aside-art" viewBox="0 0 270 220" aria-hidden="true" focusable="false">
+        <g style="fill: var(--bs-tertiary-bg)">
+            <circle cx="92" cy="122" r="54" />
+            <circle cx="158" cy="104" r="66" />
+            <circle cx="210" cy="142" r="44" />
+            <rect x="42" y="132" width="210" height="62" rx="31" />
+        </g>
+
+        @* CV card *@
+        <rect x="118" y="46" width="84" height="124" rx="10" fill="#5856d6" />
+        <rect x="127" y="58" width="66" height="100" rx="5" fill="#fff" />
+        <circle cx="142" cy="75" r="8" fill="#e42527" opacity=".85" />
+        <rect x="155" y="70" width="30" height="4" rx="2" fill="#c9c9d6" />
+        <rect x="155" y="78" width="20" height="4" rx="2" fill="#dcdce6" />
+        <rect x="134" y="94" width="52" height="4" rx="2" fill="#dcdce6" />
+        <rect x="134" y="103" width="44" height="4" rx="2" fill="#dcdce6" />
+        <rect x="134" y="112" width="48" height="4" rx="2" fill="#dcdce6" />
+        <rect x="134" y="128" width="30" height="10" rx="5" fill="#159aff" opacity=".85" />
+        <circle cx="198" cy="160" r="14" fill="#fff" stroke="#5856d6" stroke-width="3" />
+        <path d="M191 160l5 5 9-9" fill="none" stroke="#5856d6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+        @* Person *@
+        <path d="M96 196l6-52M110 196l2-52" stroke="#2c2c3a" stroke-width="7" stroke-linecap="round" />
+        <path d="M92 146c0-22 6-38 13-40 9 0 13 18 13 40z" fill="#6f6cf0" />
+        <path d="M117 118l14-12" stroke="#e8b48f" stroke-width="5" stroke-linecap="round" />
+        <circle cx="106" cy="94" r="10" fill="#e8b48f" />
+        <path d="M95 93c0-10 7-15 13-15 7 0 11 6 10 12-6-1-11-3-14-8-2 5-5 8-9 11z" fill="#2c2c3a" />
+
+        @* Floating features: likes, verified, search, discussion, privacy *@
+        <circle cx="62" cy="68" r="15" fill="#1d9bf0" />
+        <path d="M55 68l5 5 9-9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="120" cy="22" r="14" fill="#e42527" />
+        <path d="M120 29l-6.5-6.2a4 4 0 0 1 6.5-4.6 4 4 0 0 1 6.5 4.6z" fill="#fff" />
+        <circle cx="206" cy="30" r="16" fill="#f5b400" />
+        <path d="M206 21l2.6 5.4 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="#fff" />
+        <circle cx="244" cy="84" r="14" fill="#19b5a5" />
+        <path d="M237 80h14v8h-7l-4 3v-3h-3z" fill="#fff" />
+        <circle cx="40" cy="126" r="14" fill="#4a4ad6" />
+        <rect x="34" y="125" width="12" height="9" rx="2" fill="#fff" />
+        <path d="M36.5 125v-3a3.5 3.5 0 0 1 7 0v3" fill="none" stroke="#fff" stroke-width="2" />
+    </svg>
+
+    <div id="authTour" class="carousel slide" data-bs-ride="carousel" data-bs-interval="6000">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <h2>@Localizer["Auth_Slide1Title"]</h2>
+                <p>@Localizer["Auth_Slide1Text"]</p>
+            </div>
+            <div class="carousel-item">
+                <h2>@Localizer["Auth_Slide2Title"]</h2>
+                <p>@Localizer["Auth_Slide2Text"]</p>
+                <a class="auth-soft-pill" asp-controller="Account" asp-action="Register">@Localizer["Nav_GetStarted"]</a>
+            </div>
+            <div class="carousel-item">
+                <h2>@Localizer["Auth_Slide3Title"]</h2>
+                <p>@Localizer["Auth_Slide3Text"]</p>
+            </div>
+        </div>
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#authTour" data-bs-slide-to="0" class="active" aria-current="true" aria-label="1"></button>
+            <button type="button" data-bs-target="#authTour" data-bs-slide-to="1" aria-label="2"></button>
+            <button type="button" data-bs-target="#authTour" data-bs-slide-to="2" aria-label="3"></button>
+        </div>
+    </div>
+</aside>

@@ -1,6 +1,6 @@
 using System.Globalization;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +25,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         options.User.RequireUniqueEmail = true;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    // Identity's own messages ("Passwords must have...", "Email is already taken") in the UI language.
+    .AddErrorDescriber<CvManagement.Web.Services.Implementations.LocalizedIdentityErrorDescriber>();
+
+// Re-check each auth cookie's security stamp every minute (default 30) so an Administrator's
+// block or role change reaches sessions that are already open almost immediately.
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+    options.ValidationInterval = TimeSpan.FromMinutes(1));
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -55,6 +62,10 @@ if (!string.IsNullOrEmpty(githubClientId) && !string.IsNullOrEmpty(githubClientS
     {
         options.ClientId = githubClientId;
         options.ClientSecret = githubClientSecret;
+        // Without this scope GitHub only returns the *public* profile email, which most users keep
+        // private -- and account creation/linking needs an email. With it, the handler reads the
+        // primary verified address from GitHub's /user/emails endpoint.
+        options.Scope.Add("user:email");
     });
 }
 
@@ -62,7 +73,30 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 builder.Services.AddControllersWithViews()
     .AddViewLocalization()
-    .AddDataAnnotationsLocalization();
+    // One shared resource file for everything: [Display] names, enum labels and validation
+    // ErrorMessage keys all resolve from SharedResource.{culture}.resx (see ViewModels/ValidationMessages).
+    .AddDataAnnotationsLocalization(options =>
+        options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(CvManagement.Web.SharedResource)));
+
+// Model-binding errors (e.g. "The value 'abc' is not valid") are produced by MVC itself, not by
+// DataAnnotations, so they're localized separately. The localizer resolves the culture at call time.
+builder.Services.AddOptions<Microsoft.AspNetCore.Mvc.MvcOptions>()
+    .Configure<Microsoft.Extensions.Localization.IStringLocalizerFactory>((options, factory) =>
+    {
+        var localizer = factory.Create(typeof(CvManagement.Web.SharedResource));
+        var messages = options.ModelBindingMessageProvider;
+        messages.SetValueMustNotBeNullAccessor(value => localizer["Binding_ValueRequired", value]);
+        messages.SetMissingBindRequiredValueAccessor(name => localizer["Binding_MissingValue", name]);
+        messages.SetMissingKeyOrValueAccessor(() => localizer["Binding_KeyOrValueRequired"]);
+        messages.SetMissingRequestBodyRequiredValueAccessor(() => localizer["Binding_BodyRequired"]);
+        messages.SetAttemptedValueIsInvalidAccessor((value, name) => localizer["Binding_InvalidValueFor", value, name]);
+        messages.SetNonPropertyAttemptedValueIsInvalidAccessor(value => localizer["Binding_InvalidValue", value]);
+        messages.SetUnknownValueIsInvalidAccessor(name => localizer["Binding_UnknownValueFor", name]);
+        messages.SetNonPropertyUnknownValueIsInvalidAccessor(() => localizer["Binding_UnknownValue"]);
+        messages.SetValueIsInvalidAccessor(value => localizer["Binding_InvalidValue", value]);
+        messages.SetValueMustBeANumberAccessor(name => localizer["Binding_MustBeNumber", name]);
+        messages.SetNonPropertyValueMustBeANumberAccessor(() => localizer["Binding_MustBeNumberGeneric"]);
+    });
 
 builder.Services.AddSignalR();
 
@@ -110,6 +144,22 @@ builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.IBadgeSvgRe
     CvManagement.Web.Services.Implementations.BadgeSvgRenderer>();
 builder.Services.AddScoped<CvManagement.Web.Services.Abstractions.ICvExportService,
     CvManagement.Web.Services.Implementations.CvExportService>();
+
+// Centralized upload rules: one options object feeds both the Cloudinary widget and server-side URL
+// validation. The older top-level "Cloudinary" keys (documented in the README) still work.
+builder.Services.Configure<CvManagement.Web.Services.Abstractions.ImageUploadOptions>(
+    builder.Configuration.GetSection(CvManagement.Web.Services.Abstractions.ImageUploadOptions.SectionName));
+builder.Services.PostConfigure<CvManagement.Web.Services.Abstractions.ImageUploadOptions>(options =>
+{
+    if (string.IsNullOrWhiteSpace(options.CloudName)) options.CloudName = builder.Configuration["Cloudinary:CloudName"] ?? string.Empty;
+    if (string.IsNullOrWhiteSpace(options.UnsignedUploadPreset)) options.UnsignedUploadPreset = builder.Configuration["Cloudinary:UnsignedUploadPreset"] ?? string.Empty;
+});
+builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.IUploadValidator,
+    CvManagement.Web.Services.Implementations.UploadValidator>();
+
+builder.Services.Configure<CvManagement.Web.Services.Implementations.DraftCvReminderOptions>(
+    builder.Configuration.GetSection(CvManagement.Web.Services.Implementations.DraftCvReminderOptions.SectionName));
+builder.Services.AddHostedService<CvManagement.Web.Services.Implementations.DraftCvReminderService>();
 
 var app = builder.Build();
 

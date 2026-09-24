@@ -36,4 +36,7 @@ public class AutoSaveResultDto
     public string? UpdatedByDisplayName { get; set; }
     public DateTime? UpdatedAtUtc { get; set; }
     public string? ErrorMessage { get; set; }
+
+    /// <summary>Whether the saved value counts as "not filled in" -- drives the red highlight and Publish button live.</summary>
+    public bool IsEmpty { get; set; }
 }

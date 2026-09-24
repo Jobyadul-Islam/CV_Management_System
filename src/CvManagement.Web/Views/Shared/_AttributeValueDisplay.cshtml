@@ -1,12 +1,13 @@
 @model CvManagement.Web.ViewModels.Profile.AttributeValueViewModel
-@using CvManagement.Web.Domain.Enums
+@inject IStringLocalizer<SharedResource> Localizer
+@using CvManagement.Web.Models.Enums
 @inject CvManagement.Web.Services.Abstractions.IMarkdownRenderer MarkdownRenderer
 
 <div class="mb-3">
     <div class="fw-semibold">@Model.AttributeName</div>
     @if (Model.IsEmpty)
     {
-        <div class="value-empty">(not provided)</div>
+        <div class="value-empty">@Localizer["Cv_NotProvided"]</div>
     }
     else
     {
@@ -28,10 +29,10 @@
                 <div>@Model.ValueDate?.ToString("yyyy-MM-dd")</div>
                 break;
             case AttributeDataType.Period:
-                <div>@Model.ValuePeriodStart?.ToString("yyyy-MM") &ndash; @(Model.ValuePeriodEnd?.ToString("yyyy-MM") ?? "present")</div>
+                <div>@Model.ValuePeriodStart?.ToString("yyyy-MM") &ndash; @(Model.ValuePeriodEnd?.ToString("yyyy-MM") ?? Localizer["Profile_Present"].Value)</div>
                 break;
             case AttributeDataType.Boolean:
-                <div>@(Model.ValueBoolean == true ? "Yes" : "No")</div>
+                <div>@(Model.ValueBoolean == true ? Localizer["Common_Yes"] : Localizer["Common_No"])</div>
                 break;
             case AttributeDataType.OneOfMany:
                 <div>@Model.Options.FirstOrDefault(o => o.Id == Model.ValueOptionId)?.Label</div>

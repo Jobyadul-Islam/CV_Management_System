@@ -66,9 +66,9 @@
                     }
                     <td><a asp-action="Details" asp-route-id="@item.Id">@item.Title</a></td>
                     <td>@item.Company</td>
-                    <td>@item.Level</td>
+                    <td>@(item.Level is { } level ? Localizer[$"Level_{level}"] : "")</td>
                     <td>
-                        @if (item.AccessMode == CvManagement.Web.Domain.Enums.PositionAccessMode.Public)
+                        @if (item.AccessMode == CvManagement.Web.Models.Enums.PositionAccessMode.Public)
                         {
                             <span class="badge bg-success">@Localizer["Positions_Public"]</span>
                         }

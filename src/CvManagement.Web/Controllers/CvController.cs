@@ -1,7 +1,8 @@
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Cv;
 using CvManagement.Web.ViewModels.Profile;
@@ -18,14 +19,24 @@ public class CvController(
     IPositionAccessEvaluator accessEvaluator,
     ICvPdfExportService pdfExport,
     ApplicationDbContext db,
-    UserManager<ApplicationUser> userManager) : Controller
+    UserManager<ApplicationUser> userManager,
+    IStringLocalizer<SharedResource> localizer) : Controller
 {
-    [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = RoleNames.Candidate)]
+    /// <summary>
+    /// Creates the caller's own CV for a position. Candidates must satisfy the position's access rules;
+    /// Administrators "perform all Candidate actions" with unrestricted access, so the rules are skipped
+    /// for them (the CV is still their own, built from their own profile).
+    /// </summary>
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Candidate},{RoleNames.Administrator}")]
     public async Task<IActionResult> Create(int positionId)
     {
         var userId = userManager.GetUserId(User)!;
 
-        if (!await accessEvaluator.IsEligibleAsync(userId, positionId))
+        if (User.IsInRole(RoleNames.Administrator))
+        {
+            if (!await db.Positions.AnyAsync(p => p.Id == positionId)) return NotFound();
+        }
+        else if (!await accessEvaluator.IsEligibleAsync(userId, positionId))
         {
             return Forbid();
         }
@@ -118,7 +129,7 @@ public class CvController(
         var model = await cvRender.BuildAsync(id);
         if (model is null || !model.CanPublish)
         {
-            TempData["StatusMessage"] = "Fill in every field before publishing.";
+            TempData["StatusMessage"] = localizer["Msg_FillBeforePublish"].Value;
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -127,7 +138,7 @@ public class CvController(
         cv.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
 
-        TempData["StatusMessage"] = "CV published -- Recruiters can now see it.";
+        TempData["StatusMessage"] = localizer["Msg_CvPublished"].Value;
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -142,14 +153,9 @@ public class CvController(
             .Select(c => new { c.Id, c.UserId, c.PositionId })
             .ToListAsync();
 
-        // Eligibility is evaluated per candidate (their own attribute values), so batch per UserId --
-        // still a handful of queries total, never one per CV.
-        var visibleCvIds = new List<int>();
-        foreach (var group in published.GroupBy(c => c.UserId))
-        {
-            var eligibility = await accessEvaluator.IsEligibleForManyAsync(group.Key, group.Select(c => c.PositionId).ToList());
-            visibleCvIds.AddRange(group.Where(c => eligibility.GetValueOrDefault(c.PositionId)).Select(c => c.Id));
-        }
+        // All (candidate, position) pairs are checked in one bulk call -- two queries total.
+        var eligible = await accessEvaluator.FilterEligibleAsync(published.Select(c => (c.UserId, c.PositionId)).ToList());
+        var visibleCvIds = published.Where(c => eligible.Contains((c.UserId, c.PositionId))).Select(c => c.Id).ToList();
 
         if (!string.IsNullOrWhiteSpace(tag))
         {
@@ -183,6 +189,12 @@ public class CvController(
     [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Recruiter},{RoleNames.Administrator}")]
     public async Task<IActionResult> Like(int id)
     {
+        // Only a CV the Recruiter can actually open may be liked -- not a Draft or a hidden CV guessed by id.
+        var cv = await db.Cvs.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+        if (cv is null) return NotFound();
+        var (canView, _) = await GetAccessAsync(cv, User);
+        if (!canView) return NotFound();
+
         var userId = userManager.GetUserId(User)!;
         var exists = await db.CvLikes.AnyAsync(l => l.CvId == id && l.RecruiterUserId == userId);
         if (!exists)
@@ -203,28 +215,34 @@ public class CvController(
     }
 
     /// <summary>
-    /// "Existing CVs can be edited or deleted" (spec, Profile CVs tab). Bounded to the caller's
-    /// checkbox selection, same per-id-then-set-based-delete shape used by Attribute/Position/User
-    /// bulk delete elsewhere -- CvLikes cascade at the DB level (CvConfiguration), so deleting the Cv
-    /// row is the only statement needed per CV.
+    /// "Existing CVs can be edited or deleted" (spec, Profile CVs tab). Set-based: the selection is
+    /// narrowed to CVs the caller may edit (an Administrator: any; a Candidate: their own, still-visible
+    /// ones), then removed with one DELETE -- CvLikes cascade in the database (CvConfiguration).
     /// </summary>
     [HttpPost, ValidateAntiForgeryToken, Authorize]
     public async Task<IActionResult> Delete(int[] ids, string? userId)
     {
-        var deletedCount = 0;
-        foreach (var id in ids)
+        var selected = await db.Cvs.AsNoTracking()
+            .Where(c => ids.Contains(c.Id))
+            .Select(c => new { c.Id, c.UserId, c.PositionId })
+            .ToListAsync();
+
+        List<int> deletable;
+        if (User.IsInRole(RoleNames.Administrator))
         {
-            var cv = await db.Cvs.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-            if (cv is null) continue;
-
-            var (_, canEdit) = await GetAccessAsync(cv, User);
-            if (!canEdit) continue;
-
-            await db.Cvs.Where(c => c.Id == id).ExecuteDeleteAsync();
-            deletedCount++;
+            deletable = selected.Select(c => c.Id).ToList();
+        }
+        else
+        {
+            var callerId = userManager.GetUserId(User);
+            var own = selected.Where(c => c.UserId == callerId).ToList();
+            var eligible = await accessEvaluator.FilterEligibleAsync(own.Select(c => (c.UserId, c.PositionId)).ToList());
+            deletable = own.Where(c => eligible.Contains((c.UserId, c.PositionId))).Select(c => c.Id).ToList();
         }
 
-        TempData["StatusMessage"] = $"Deleted {deletedCount} CV(s).";
+        var deletedCount = deletable.Count == 0 ? 0 : await db.Cvs.Where(c => deletable.Contains(c.Id)).ExecuteDeleteAsync();
+
+        TempData["StatusMessage"] = localizer["Msg_CvsDeleted", deletedCount].Value;
         return RedirectToAction("Index", "Profile", new { tab = "cvs", userId });
     }
 

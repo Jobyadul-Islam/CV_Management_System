@@ -1,4 +1,4 @@
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,6 +11,8 @@ public class AttributeDefinitionConfiguration : IEntityTypeConfiguration<Attribu
         builder.Property(a => a.Name).HasMaxLength(200).IsRequired();
         builder.Property(a => a.Description).HasMaxLength(1000);
         builder.HasIndex(a => a.Name).IsUnique();
+        builder.Property(a => a.SystemKey).HasMaxLength(50);
+        builder.HasIndex(a => a.SystemKey).IsUnique().HasFilter("[SystemKey] IS NOT NULL");
         builder.Property(a => a.RowVersion).IsRowVersion();
 
         builder.Property(a => a.RegexPattern).HasMaxLength(500);

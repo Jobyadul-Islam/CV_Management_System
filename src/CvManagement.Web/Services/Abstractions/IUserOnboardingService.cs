@@ -1,4 +1,4 @@
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 
 namespace CvManagement.Web.Services.Abstractions;
 

@@ -1,5 +1,5 @@
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Profile;
 using Microsoft.AspNetCore.Authorization;
@@ -71,18 +71,15 @@ public class ProfileController(
     public async Task<IActionResult> AddInfoAttribute(int[] attributeIds, string? userId)
     {
         var targetUserId = ResolveTargetUserId(userId);
-        foreach (var attributeId in attributeIds)
-        {
-            await profile.AddToInfoAsync(targetUserId, attributeId);
-        }
+        await profile.AddToInfoAsync(targetUserId, attributeIds);
         return RedirectToAction(nameof(Index), new { tab = "info", userId = OwnerRouteValue(targetUserId) });
     }
 
     [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = $"{RoleNames.Candidate},{RoleNames.Administrator}")]
-    public async Task<IActionResult> RemoveInfoAttribute(int attributeId, string? userId)
+    public async Task<IActionResult> RemoveInfoAttribute(int[] attributeIds, string? userId)
     {
         var targetUserId = ResolveTargetUserId(userId);
-        await profile.RemoveFromInfoAsync(targetUserId, attributeId);
+        await profile.RemoveFromInfoAsync(targetUserId, attributeIds);
         return RedirectToAction(nameof(Index), new { tab = "info", userId = OwnerRouteValue(targetUserId) });
     }
 
@@ -102,7 +99,7 @@ public class ProfileController(
         if (user is null) return NotFound();
 
         var publishedCvs = await db.Cvs
-            .Where(c => c.UserId == userId && c.Status == Domain.Enums.CvStatus.Published)
+            .Where(c => c.UserId == userId && c.Status == Models.Enums.CvStatus.Published)
             .Select(c => new { Summary = new CvSummaryViewModel
             {
                 Id = c.Id,

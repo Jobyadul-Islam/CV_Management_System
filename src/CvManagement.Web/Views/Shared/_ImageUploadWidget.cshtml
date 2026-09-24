@@ -1,24 +1,26 @@
 @model CvManagement.Web.ViewModels.Profile.AttributeValueViewModel
-@inject IConfiguration Configuration
+@inject CvManagement.Web.Services.Abstractions.IUploadValidator UploadValidator
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    var cloudName = Configuration["Cloudinary:CloudName"];
-    var preset = Configuration["Cloudinary:UnsignedUploadPreset"];
-    var configured = !string.IsNullOrWhiteSpace(cloudName) && !string.IsNullOrWhiteSpace(preset);
+    var upload = UploadValidator.Options;
 }
 <div class="d-flex align-items-center gap-3">
     <img class="image-preview rounded border bg-body-secondary"
          src="@Model.ValueImageUrl"
          style="width:72px;height:72px;object-fit:cover;@(string.IsNullOrEmpty(Model.ValueImageUrl) ? "display:none" : "")" />
     <input type="hidden" class="autosave-input image-url-input" value="@Model.ValueImageUrl" />
-    @if (configured)
+    @if (UploadValidator.IsImageUploadConfigured)
     {
+        @* Client-side limits come from the same ImageUploadOptions the server validates against. *@
         <button type="button" class="btn btn-sm btn-outline-secondary cloudinary-upload-btn"
-                data-cloud-name="@cloudName" data-upload-preset="@preset">
-            Upload photo
+                data-cloud-name="@upload.CloudName" data-upload-preset="@upload.UnsignedUploadPreset"
+                data-allowed-formats="@string.Join(",", upload.AllowedFormats)"
+                data-max-file-size="@upload.MaxFileSizeBytes">
+            @Localizer["Upload_Photo"]
         </button>
     }
     else
     {
-        <span class="text-secondary small">Image upload isn't configured yet (needs a Cloudinary cloud name + unsigned upload preset in appsettings).</span>
+        <span class="text-secondary small">@Localizer["Upload_NotConfigured"]</span>
     }
 </div>

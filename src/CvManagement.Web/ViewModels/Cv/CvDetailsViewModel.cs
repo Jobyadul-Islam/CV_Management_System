@@ -1,4 +1,4 @@
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.ViewModels.Profile;
 
 namespace CvManagement.Web.ViewModels.Cv;

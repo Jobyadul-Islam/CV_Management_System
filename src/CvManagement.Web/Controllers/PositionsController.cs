@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Localization;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Position;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +18,8 @@ public class PositionsController(
     IDiscussionService discussions,
     ICvExportService cvExport,
     ApplicationDbContext db,
-    UserManager<ApplicationUser> userManager) : Controller
+    UserManager<ApplicationUser> userManager,
+    IStringLocalizer<SharedResource> localizer) : Controller
 {
     [HttpGet, AllowAnonymous]
     public async Task<IActionResult> Index(string? tag)
@@ -74,10 +76,13 @@ public class PositionsController(
             return NotFound();
         }
 
-        if (User.IsInRole(RoleNames.Candidate))
+        // Administrators "perform all Candidate actions" with unrestricted access, so they get the
+        // Create CV / view-my-CV block too, and are never shown as ineligible.
+        var isAdmin = User.IsInRole(RoleNames.Administrator);
+        if (User.IsInRole(RoleNames.Candidate) || isAdmin)
         {
             var userId = userManager.GetUserId(User)!;
-            model.ViewerIsEligible = await accessEvaluator.IsEligibleAsync(userId, id);
+            model.ViewerIsEligible = isAdmin || await accessEvaluator.IsEligibleAsync(userId, id);
             // Only surface an existing CV link while still eligible -- otherwise the CV is hidden
             // (per spec, even from its own candidate) and the link would just 404.
             model.ViewerExistingCvId = model.ViewerIsEligible == true
@@ -166,7 +171,7 @@ public class PositionsController(
             return View(model);
         }
 
-        TempData["StatusMessage"] = $"Position \"{model.Title}\" created.";
+        TempData["StatusMessage"] = localizer["Msg_PositionCreated", model.Title].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -193,7 +198,7 @@ public class PositionsController(
         switch (outcome.Status)
         {
             case PositionSaveStatus.Success:
-                TempData["StatusMessage"] = $"Position \"{model.Title}\" updated.";
+                TempData["StatusMessage"] = localizer["Msg_PositionUpdated", model.Title].Value;
                 return RedirectToAction(nameof(Index));
 
             case PositionSaveStatus.NotFound:
@@ -201,7 +206,7 @@ public class PositionsController(
 
             case PositionSaveStatus.Conflict:
                 ModelState.AddModelError(string.Empty,
-                    "This position was changed by someone else since you opened it. Review the current version and save again.");
+                    localizer["Msg_PositionConflict"]);
                 model.RowVersion = outcome.CurrentRowVersion;
                 await RepopulateAsync(model);
                 return View(model);
@@ -219,8 +224,8 @@ public class PositionsController(
         var outcome = await positions.DeleteAsync(ids);
 
         var parts = new List<string>();
-        if (outcome.DeletedIds.Count > 0) parts.Add($"Deleted {outcome.DeletedIds.Count} position(s).");
-        foreach (var blocked in outcome.Blocked) parts.Add($"\"{blocked.Title}\" not deleted: {blocked.Reason}");
+        if (outcome.DeletedIds.Count > 0) parts.Add(localizer["Msg_PositionsDeleted", outcome.DeletedIds.Count]);
+        foreach (var blocked in outcome.Blocked) parts.Add(localizer["Msg_NotDeleted", blocked.Title, blocked.Reason]);
         TempData["StatusMessage"] = string.Join(" ", parts);
 
         return RedirectToAction(nameof(Index));
@@ -235,7 +240,7 @@ public class PositionsController(
         var outcome = await positions.DuplicateAsync(ids[0], userId);
         if (outcome.Status != PositionSaveStatus.Success) return NotFound();
 
-        TempData["StatusMessage"] = "Position duplicated. Review and save the copy.";
+        TempData["StatusMessage"] = localizer["Msg_PositionDuplicated"].Value;
         return RedirectToAction(nameof(Edit), new { id = outcome.Id });
     }
 

@@ -8,7 +8,15 @@ public class HomeIndexViewModel
     public List<PositionListItemViewModel> PopularPositions { get; set; } = [];
     public List<TagCloudEntry> TagCloud { get; set; } = [];
     public SiteStats Stats { get; set; } = new();
+
+    /// <summary>New CVs per UTC day, oldest first, one entry per day (zero-filled) -- Chart.js bar chart.</summary>
+    public List<ChartPoint> CvsPerDay { get; set; } = [];
+
+    /// <summary>Position count per level (plus "unspecified") -- Chart.js bar chart.</summary>
+    public List<ChartPoint> PositionsByLevel { get; set; } = [];
 }
+
+public record ChartPoint(string Label, int Value);
 
 public record TagCloudEntry(string Name, int Count);
 

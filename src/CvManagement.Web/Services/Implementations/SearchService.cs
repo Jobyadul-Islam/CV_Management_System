@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Cv;
 using CvManagement.Web.ViewModels.Home;
@@ -76,12 +76,8 @@ public class SearchService(
             .Select(c => new { c.Id, c.UserId, c.PositionId })
             .ToListAsync(ct);
 
-        var visibleIds = new List<int>();
-        foreach (var group in published.GroupBy(c => c.UserId))
-        {
-            var eligibility = await accessEvaluator.IsEligibleForManyAsync(group.Key, group.Select(c => c.PositionId).ToList(), ct);
-            visibleIds.AddRange(group.Where(c => eligibility.GetValueOrDefault(c.PositionId)).Select(c => c.Id));
-        }
+        var eligible = await accessEvaluator.FilterEligibleAsync(published.Select(c => (c.UserId, c.PositionId)).ToList(), ct);
+        var visibleIds = published.Where(c => eligible.Contains((c.UserId, c.PositionId))).Select(c => c.Id).ToList();
         if (visibleIds.Count == 0) return [];
 
         return await db.Cvs

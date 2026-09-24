@@ -5,87 +5,107 @@
     var isAdmin = User.IsInRole(RoleNames.Administrator);
     var isRecruiter = User.IsInRole(RoleNames.Recruiter) || isAdmin;
     var isCandidate = User.IsInRole(RoleNames.Candidate) || isAdmin;
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    string Active(string name) => string.Equals(controller, name, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+    var uiCulture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var languageName = uiCulture == "ru" ? "Русский" : "English";
 }
 <!DOCTYPE html>
-<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-bs-theme="@theme">
+<html lang="@uiCulture" data-bs-theme="@theme">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - CV Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
+<body class="@ViewData["BodyClass"]">
     <header>
-        <nav class="navbar navbar-expand-lg border-bottom mb-3 sticky-top bg-body">
-            <div class="container-fluid flex-wrap">
-                <a class="navbar-brand fw-semibold" asp-controller="Home" asp-action="Index">CV Management</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <nav class="navbar navbar-expand-lg app-header mb-3 sticky-top">
+            <div class="container-fluid flex-wrap px-lg-4">
+                <div class="navbar-brand me-lg-4">
+                    <partial name="_BrandLockup" />
+                </div>
+                @* Language switcher: outside the collapsible menu, so it stays visible in the top-right corner of
+                   every page at every screen size (on phones it sits beside the menu button). The choice is saved
+                   in the culture cookie for a year (CultureController). *@
+                <div class="dropdown language-switcher ms-auto ms-lg-2 me-2 me-lg-0 order-lg-last">
+                    <button class="btn language-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            aria-label="@Localizer["Nav_Language"]: @languageName" title="@Localizer["Nav_Language"]">
+                        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.3" /><path d="M1.6 8h12.8M8 1.4c1.9 2 2.8 4.2 2.8 6.6S9.9 12.6 8 14.6M8 1.4C6.1 3.4 5.2 5.6 5.2 8s.9 4.6 2.8 6.6" fill="none" stroke="currentColor" stroke-width="1.3" /></svg>
+                        <span>@uiCulture.ToUpperInvariant()</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        @foreach (var (code, name) in new[] { ("en", "English"), ("ru", "Русский") })
+                        {
+                            <li>
+                                <form asp-controller="Culture" asp-action="SetCulture" method="post">
+                                    <input type="hidden" name="culture" value="@code" />
+                                    <input type="hidden" name="returnUrl" value="@currentPath" />
+                                    <button type="submit" class="dropdown-item d-flex justify-content-between align-items-center gap-3 @(code == uiCulture ? "active" : "")"
+                                            lang="@code" aria-current="@(code == uiCulture ? "true" : null)">
+                                        @name
+                                        @if (code == uiCulture)
+                                        {
+                                            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                        }
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="@Localizer["Nav_Menu"]">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">@Localizer["Nav_Home"]</a>
+                            <a class="nav-link @Active("Home")" asp-controller="Home" asp-action="Index">@Localizer["Nav_Home"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Positions" asp-action="Index">@Localizer["Nav_Positions"]</a>
+                            <a class="nav-link @Active("Positions")" asp-controller="Positions" asp-action="Index">@Localizer["Nav_Positions"]</a>
                         </li>
                         @if (isCandidate)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Profile" asp-action="Index">@Localizer["Nav_MyProfile"]</a>
+                                <a class="nav-link @Active("Profile")" asp-controller="Profile" asp-action="Index">@Localizer["Nav_MyProfile"]</a>
                             </li>
                         }
                         @if (isRecruiter)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Attributes" asp-action="Index">@Localizer["Nav_AttributeLibrary"]</a>
+                                <a class="nav-link @Active("Attributes")" asp-controller="Attributes" asp-action="Index">@Localizer["Nav_AttributeLibrary"]</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Cv" asp-action="Browse">@Localizer["Nav_BrowseCvs"]</a>
+                                <a class="nav-link @Active("Cv")" asp-controller="Cv" asp-action="Browse">@Localizer["Nav_BrowseCvs"]</a>
                             </li>
                         }
                         @if (isAdmin)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Users" asp-action="Index">@Localizer["Nav_Users"]</a>
+                                <a class="nav-link @Active("Users")" asp-controller="Users" asp-action="Index">@Localizer["Nav_Users"]</a>
                             </li>
                         }
                     </ul>
 
+                    @* Full-text search -- the spec requires it in the header of every page. *@
                     <form asp-controller="Search" asp-action="Index" method="get" class="d-flex site-search-form mx-lg-3 my-2 my-lg-0" role="search">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5.25" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
                         <input type="search" name="q" class="form-control" placeholder="@Localizer["Search_Placeholder"]" aria-label="@Localizer["Search_Button"]" value="@ViewData["Query"]" />
                     </form>
 
                     <ul class="navbar-nav align-items-lg-center gap-lg-1">
                         <li class="nav-item">
-                            <button id="theme-toggle-btn" type="button" class="btn btn-link nav-link" title="@Localizer["Theme_Toggle"]">
+                            <button id="theme-toggle-btn" type="button" class="btn btn-link nav-link" title="@Localizer["Theme_Toggle"]" aria-label="@Localizer["Theme_Toggle"]">
                                 <span id="theme-toggle-icon">@(theme == "dark" ? "☀️" : "\U0001F319")</span>
                             </button>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                @System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToUpperInvariant()
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <form asp-controller="Culture" asp-action="SetCulture" method="post">
-                                        <input type="hidden" name="culture" value="en" />
-                                        <input type="hidden" name="returnUrl" value="@currentPath" />
-                                        <button type="submit" class="dropdown-item">English</button>
-                                    </form>
-                                </li>
-                                <li>
-                                    <form asp-controller="Culture" asp-action="SetCulture" method="post">
-                                        <input type="hidden" name="culture" value="ru" />
-                                        <input type="hidden" name="returnUrl" value="@currentPath" />
-                                        <button type="submit" class="dropdown-item">Русский</button>
-                                    </form>
-                                </li>
-                            </ul>
                         </li>
                         <partial name="_LoginPartial" />
                     </ul>
@@ -93,6 +113,9 @@
             </div>
         </nav>
     </header>
+
+    @* Full-bleed sections (the home hero) render outside the centered container. *@
+    @await RenderSectionAsync("Hero", required: false)
 
     <div class="container">
         <main class="pb-4">
@@ -107,9 +130,9 @@
         </main>
     </div>
 
-    <footer class="border-top py-3 mt-4 text-secondary">
+    <footer class="app-footer border-top py-3 mt-4 text-secondary">
         <div class="container">
-            <small>&copy; 2026 &middot; @Localizer["Footer_Text"]</small>
+            <small>&copy; 2026, @Localizer["Footer_Text"]. @Localizer["Footer_Rights"]</small>
         </div>
     </footer>
 

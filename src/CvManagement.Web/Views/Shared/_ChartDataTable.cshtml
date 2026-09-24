@@ -1,0 +1,10 @@
+@model List<CvManagement.Web.ViewModels.Home.ChartPoint>
+@* Accessible table view of a chart's data: the canvas itself is opaque to screen readers. *@
+<table class="visually-hidden">
+    <tbody>
+        @foreach (var point in Model)
+        {
+            <tr><th scope="row">@point.Label</th><td>@point.Value</td></tr>
+        }
+    </tbody>
+</table>

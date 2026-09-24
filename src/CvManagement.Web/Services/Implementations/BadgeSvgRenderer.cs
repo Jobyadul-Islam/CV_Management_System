@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Localization;
 using System.Net;
 using System.Text;
 using CvManagement.Web.Services.Abstractions;
@@ -6,7 +7,7 @@ namespace CvManagement.Web.Services.Implementations;
 
 /// <summary>Hand-built SVG (no charting/graphics library needed for a grid of rounded chips) -- kept
 /// deterministic and dependency-free so it can be embedded directly in an &lt;img&gt; tag or downloaded.</summary>
-public class BadgeSvgRenderer : IBadgeSvgRenderer
+public class BadgeSvgRenderer(IStringLocalizer<SharedResource> localizer) : IBadgeSvgRenderer
 {
     private const int ChipWidth = 170;
     private const int ChipHeight = 56;
@@ -25,11 +26,11 @@ public class BadgeSvgRenderer : IBadgeSvgRenderer
         var sb = new StringBuilder();
         sb.Append($"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" font-family="Segoe UI, Arial, sans-serif">""");
         sb.Append($"""<rect width="{width}" height="{height}" rx="12" fill="#f8f9fa" stroke="#dee2e6"/>""");
-        sb.Append($"""<text x="{Padding}" y="{Padding + 16}" font-size="15" font-weight="600" fill="#212529">{Encode(displayName)} — Achievements</text>""");
+        sb.Append($"""<text x="{Padding}" y="{Padding + 16}" font-size="15" font-weight="600" fill="#212529">{Encode(localizer["Badge_PanelTitle", displayName])}</text>""");
 
         if (badges.Count == 0)
         {
-            sb.Append($"""<text x="{Padding}" y="{Padding + TitleHeight + 20}" font-size="12" fill="#6c757d">No badges earned yet.</text>""");
+            sb.Append($"""<text x="{Padding}" y="{Padding + TitleHeight + 20}" font-size="12" fill="#6c757d">{Encode(localizer["Badge_None"])}</text>""");
         }
         else
         {

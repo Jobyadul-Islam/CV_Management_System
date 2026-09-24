@@ -14,7 +14,8 @@
 
     function updateToolbar() {
       var countEl = toolbar.querySelector(".selection-count");
-      if (countEl) countEl.textContent = selected.size + " selected";
+      // The localized wording ("{0} selected" / "Выбрано: {0}") comes from the server-rendered template.
+      if (countEl) countEl.textContent = (countEl.dataset.template || "{0} selected").replace("{0}", selected.size);
 
       Array.prototype.forEach.call(toolbar.querySelectorAll(".toolbar-action"), function (btn) {
         var min = parseInt(btn.dataset.minSelected || "0", 10);

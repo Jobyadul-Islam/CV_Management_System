@@ -22,7 +22,11 @@
       ? '<a href="/Profile/View/' + encodeURIComponent(post.authorUserId) + '">' + authorName + '</a>'
       : authorName;
 
-    var when = new Date(post.createdAtUtc + "Z").toLocaleString();
+    // The server serializes a UTC DateTime; add "Z" only when no offset is present (appending it to a
+    // value that already ends in "Z" produced "Invalid Date").
+    var stamp = post.createdAtUtc || "";
+    if (!/(Z|[+-]\d\d:\d\d)$/.test(stamp)) stamp += "Z";
+    var when = new Date(stamp).toLocaleString();
 
     wrapper.innerHTML =
       '<div class="d-flex justify-content-between">' +
@@ -63,7 +67,11 @@
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "positionId=" + positionId + "&body=" + encodeURIComponent(body) + "&__RequestVerificationToken=" + encodeURIComponent(token)
       })
-        .then(function (r) { if (r.ok) textarea.value = ""; })
+        .then(function (r) {
+          if (r.ok) { textarea.value = ""; return; }
+          return r.text().then(function (message) { alert(message || container.dataset.textSaveFailed); });
+        })
+        .catch(function () { alert(container.dataset.textSendFailed); })
         .finally(function () { submitBtn.disabled = false; });
     });
   }

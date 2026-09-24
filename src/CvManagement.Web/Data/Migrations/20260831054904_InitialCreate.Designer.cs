@@ -25,7 +25,7 @@ namespace CvManagement.Web.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CvManagement.Web.Domain.ApplicationUser", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -100,7 +100,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.AttributeCategory", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.AttributeCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +121,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("AttributeCategories");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.AttributeDefinition", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.AttributeDefinition", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -173,7 +173,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("Attributes");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.AttributeOption", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.AttributeOption", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -206,7 +206,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("AttributeOptions");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Cv", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Cv", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -251,7 +251,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("Cvs");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.CvLike", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.CvLike", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -279,7 +279,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("CvLikes");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.DiscussionPost", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.DiscussionPost", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -314,7 +314,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("DiscussionPosts");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Position", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Position", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -376,7 +376,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("Positions");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.PositionAccessRule", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.PositionAccessRule", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -423,7 +423,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("PositionAccessRules");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.PositionAttribute", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.PositionAttribute", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -456,7 +456,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("PositionAttributes");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.PositionProjectTag", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.PositionProjectTag", b =>
                 {
                     b.Property<int>("PositionId")
                         .HasColumnType("int");
@@ -471,7 +471,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("PositionProjectTags");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Project", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -517,7 +517,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.ProjectTag", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.ProjectTag", b =>
                 {
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
@@ -532,7 +532,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("ProjectTags");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Tag", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Tag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -553,7 +553,7 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.UserAttributeValue", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.UserAttributeValue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -754,9 +754,9 @@ namespace CvManagement.Web.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.AttributeDefinition", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.AttributeDefinition", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.AttributeCategory", "Category")
+                    b.HasOne("CvManagement.Web.Models.AttributeCategory", "Category")
                         .WithMany("Attributes")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -765,9 +765,9 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.AttributeOption", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.AttributeOption", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.AttributeDefinition", "Attribute")
+                    b.HasOne("CvManagement.Web.Models.AttributeDefinition", "Attribute")
                         .WithMany("Options")
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -776,15 +776,15 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Attribute");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Cv", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Cv", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.Position", "Position")
+                    b.HasOne("CvManagement.Web.Models.Position", "Position")
                         .WithMany("Cvs")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", "User")
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", "User")
                         .WithMany("Cvs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -795,15 +795,15 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.CvLike", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.CvLike", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.Cv", "Cv")
+                    b.HasOne("CvManagement.Web.Models.Cv", "Cv")
                         .WithMany("Likes")
                         .HasForeignKey("CvId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", "RecruiterUser")
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", "RecruiterUser")
                         .WithMany()
                         .HasForeignKey("RecruiterUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -814,14 +814,14 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("RecruiterUser");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.DiscussionPost", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.DiscussionPost", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", "AuthorUser")
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", "AuthorUser")
                         .WithMany()
                         .HasForeignKey("AuthorUserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("CvManagement.Web.Domain.Position", "Position")
+                    b.HasOne("CvManagement.Web.Models.Position", "Position")
                         .WithMany("DiscussionPosts")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -832,20 +832,20 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Position");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.PositionAccessRule", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.PositionAccessRule", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.AttributeDefinition", "Attribute")
+                    b.HasOne("CvManagement.Web.Models.AttributeDefinition", "Attribute")
                         .WithMany("AccessRules")
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.AttributeOption", "ComparisonOption")
+                    b.HasOne("CvManagement.Web.Models.AttributeOption", "ComparisonOption")
                         .WithMany()
                         .HasForeignKey("ComparisonOptionId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("CvManagement.Web.Domain.Position", "Position")
+                    b.HasOne("CvManagement.Web.Models.Position", "Position")
                         .WithMany("AccessRules")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -858,15 +858,15 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Position");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.PositionAttribute", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.PositionAttribute", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.AttributeDefinition", "Attribute")
+                    b.HasOne("CvManagement.Web.Models.AttributeDefinition", "Attribute")
                         .WithMany("PositionAttributes")
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.Position", "Position")
+                    b.HasOne("CvManagement.Web.Models.Position", "Position")
                         .WithMany("PositionAttributes")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -877,15 +877,15 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Position");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.PositionProjectTag", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.PositionProjectTag", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.Position", "Position")
+                    b.HasOne("CvManagement.Web.Models.Position", "Position")
                         .WithMany("ProjectTags")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.Tag", "Tag")
+                    b.HasOne("CvManagement.Web.Models.Tag", "Tag")
                         .WithMany("PositionTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -896,9 +896,9 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Project", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Project", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", "User")
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", "User")
                         .WithMany("Projects")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -907,15 +907,15 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.ProjectTag", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.ProjectTag", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.Project", "Project")
+                    b.HasOne("CvManagement.Web.Models.Project", "Project")
                         .WithMany("ProjectTags")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.Tag", "Tag")
+                    b.HasOne("CvManagement.Web.Models.Tag", "Tag")
                         .WithMany("ProjectTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -926,21 +926,21 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.UserAttributeValue", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.UserAttributeValue", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.AttributeDefinition", "Attribute")
+                    b.HasOne("CvManagement.Web.Models.AttributeDefinition", "Attribute")
                         .WithMany("Values")
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", "User")
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", "User")
                         .WithMany("AttributeValues")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.AttributeOption", "ValueOption")
+                    b.HasOne("CvManagement.Web.Models.AttributeOption", "ValueOption")
                         .WithMany()
                         .HasForeignKey("ValueOptionId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -963,7 +963,7 @@ namespace CvManagement.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", null)
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -972,7 +972,7 @@ namespace CvManagement.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", null)
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -987,7 +987,7 @@ namespace CvManagement.Web.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", null)
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -996,14 +996,14 @@ namespace CvManagement.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("CvManagement.Web.Domain.ApplicationUser", null)
+                    b.HasOne("CvManagement.Web.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.ApplicationUser", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.ApplicationUser", b =>
                 {
                     b.Navigation("AttributeValues");
 
@@ -1012,12 +1012,12 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Projects");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.AttributeCategory", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.AttributeCategory", b =>
                 {
                     b.Navigation("Attributes");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.AttributeDefinition", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.AttributeDefinition", b =>
                 {
                     b.Navigation("AccessRules");
 
@@ -1028,12 +1028,12 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("Values");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Cv", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Cv", b =>
                 {
                     b.Navigation("Likes");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Position", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Position", b =>
                 {
                     b.Navigation("AccessRules");
 
@@ -1046,12 +1046,12 @@ namespace CvManagement.Web.Data.Migrations
                     b.Navigation("ProjectTags");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Project", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Project", b =>
                 {
                     b.Navigation("ProjectTags");
                 });
 
-            modelBuilder.Entity("CvManagement.Web.Domain.Tag", b =>
+            modelBuilder.Entity("CvManagement.Web.Models.Tag", b =>
                 {
                     b.Navigation("PositionTags");
 

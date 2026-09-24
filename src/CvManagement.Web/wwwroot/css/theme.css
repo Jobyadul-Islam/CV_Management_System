@@ -1,0 +1,613 @@
+/* =====================================================================
+   Brand theme -- clean product-site look: white header, red accent,
+   warm gradient hero, split sign-in card. Bootstrap is re-skinned through
+   its own CSS variables, so every existing page picks it up; light and
+   dark each get their own values.
+   ===================================================================== */
+
+:root,
+[data-bs-theme="light"] {
+  --brand: #e42527;
+  --brand-hover: #c81d20;
+  --brand-rgb: 228, 37, 39;
+  --auth-blue: #159aff;
+  --auth-blue-hover: #0b86e6;
+  --ink: #111114;
+  --hero-bg: linear-gradient(105deg, #fff8f6 0%, #fdeaec 42%, #fff1ec 100%);
+  --hero-streak: rgba(255, 255, 255, .55);
+  --auth-page-bg: #f1f1f2;
+  --auth-plane: rgba(255, 255, 255, .7);
+  --auth-card-bg: #fff;
+  --auth-input-bg: #fcfcfc;
+  --auth-input-border: #dcdcdf;
+
+  --bs-body-font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bs-primary: var(--brand);
+  --bs-primary-rgb: var(--brand-rgb);
+  --bs-link-color: #d0202a;
+  --bs-link-color-rgb: 208, 32, 42;
+  --bs-link-hover-color: #a3161d;
+  --bs-link-hover-color-rgb: 163, 22, 29;
+}
+
+[data-bs-theme="dark"] {
+  --brand: #f0474a;
+  --brand-hover: #ff5f61;
+  --brand-rgb: 240, 71, 74;
+  --auth-blue: #3aa8ff;
+  --auth-blue-hover: #62b9ff;
+  --ink: #f3f3f5;
+  --hero-bg: linear-gradient(105deg, #1d1718 0%, #2a1a1d 45%, #211816 100%);
+  --hero-streak: rgba(255, 255, 255, .035);
+  --auth-page-bg: #141518;
+  --auth-plane: rgba(255, 255, 255, .025);
+  --auth-card-bg: #1d1f23;
+  --auth-input-bg: #16181b;
+  --auth-input-border: #3a3d44;
+
+  --bs-body-font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bs-primary: var(--brand);
+  --bs-primary-rgb: var(--brand-rgb);
+  --bs-link-color: #ff6b6d;
+  --bs-link-color-rgb: 255, 107, 109;
+  --bs-link-hover-color: #ff9496;
+  --bs-link-hover-color-rgb: 255, 148, 150;
+}
+
+body {
+  font-family: var(--bs-body-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .h1, .h2, .h3 {
+  letter-spacing: -.02em;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-bg: var(--brand-hover);
+  --bs-btn-hover-border-color: var(--brand-hover);
+  --bs-btn-active-bg: var(--brand-hover);
+  --bs-btn-active-border-color: var(--brand-hover);
+  --bs-btn-disabled-bg: var(--brand);
+  --bs-btn-disabled-border-color: var(--brand);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-bg: var(--brand);
+  --bs-btn-hover-border-color: var(--brand);
+  --bs-btn-active-bg: var(--brand-hover);
+  --bs-btn-active-border-color: var(--brand-hover);
+}
+
+.btn:focus-visible, .form-control:focus, .form-select:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 .2rem rgba(var(--brand-rgb), .25);
+}
+
+.form-check-input:checked {
+  background-color: var(--brand);
+  border-color: var(--brand);
+}
+
+.nav-tabs .nav-link.active {
+  border-top: 2px solid var(--brand);
+}
+
+.table > thead th {
+  font-size: .8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--bs-secondary-color);
+}
+
+/* ---------- Header ---------- */
+
+.app-header {
+  background: var(--bs-body-bg);
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+  min-height: 72px;
+}
+
+.app-header .navbar-nav .nav-link {
+  color: var(--ink);
+  font-weight: 500;
+  padding-inline: .75rem;
+}
+
+.app-header .navbar-nav .nav-link:hover,
+.app-header .navbar-nav .nav-link.active {
+  color: var(--brand);
+}
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand-lockup:hover {
+  color: var(--ink);
+}
+
+.brand-lockup .brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.brand-lockup .brand-top {
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+.brand-lockup .brand-bottom {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.site-search-form {
+  position: relative;
+}
+
+.site-search-form .form-control {
+  border-radius: 999px;
+  padding-inline-start: 2.4rem;
+  background-color: var(--bs-tertiary-bg);
+  border-color: transparent;
+}
+
+.site-search-form .form-control:focus {
+  background-color: var(--bs-body-bg);
+  border-color: rgba(var(--brand-rgb), .45);
+}
+
+.site-search-form .search-icon {
+  position: absolute;
+  inset-inline-start: .9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--bs-secondary-color);
+  pointer-events: none;
+}
+
+/* Compact language pill, always top-right (outside the collapsing menu). */
+.language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .65rem;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--ink);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 999px;
+  background: var(--bs-body-bg);
+}
+
+.language-toggle:hover,
+.language-toggle[aria-expanded="true"] {
+  color: var(--brand);
+  border-color: rgba(var(--brand-rgb), .45);
+  background: var(--bs-body-bg);
+}
+
+.language-switcher .dropdown-menu {
+  --bs-dropdown-min-width: 9rem;
+  --bs-dropdown-link-active-bg: rgba(var(--brand-rgb), .1);
+  --bs-dropdown-link-active-color: var(--brand);
+}
+
+.header-action {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.header-signin {
+  color: var(--brand) !important;
+  font-weight: 600;
+}
+
+.btn-brand {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 3px;
+  padding: .45rem 1rem;
+}
+
+.btn-brand:hover, .btn-brand:focus-visible {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+  color: #fff;
+}
+
+/* ---------- Home hero ---------- */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--hero-bg);
+  margin-top: -1rem; /* sits flush under the header */
+  margin-bottom: 2.5rem;
+}
+
+/* Soft diagonal light planes, as in the reference hero. */
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--hero-streak), transparent);
+  transform: rotate(-24deg);
+}
+
+.hero::before { width: 140%; height: 220px; left: -20%; top: 18%; }
+.hero::after  { width: 120%; height: 120px; left: 10%; bottom: -6%; }
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(3rem, 8vw, 6.5rem);
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  color: var(--brand);
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.hero-eyebrow::before {
+  content: "";
+  width: .55rem;
+  height: .55rem;
+  background: var(--brand);
+  transform: rotate(45deg);
+}
+
+.hero-title {
+  color: var(--ink);
+  font-size: clamp(2.6rem, 5.6vw, 4.6rem);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -.045em;
+  margin-bottom: 1.6rem;
+}
+
+.hero-text {
+  color: var(--ink);
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  line-height: 1.55;
+  max-width: 36rem;
+  margin-bottom: 2.2rem;
+  opacity: .9;
+}
+
+.btn-hero {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  border-radius: 3px;
+  padding: 1.05rem 2.5rem;
+  box-shadow: 0 10px 24px -12px rgba(var(--brand-rgb), .8);
+}
+
+.btn-hero:hover, .btn-hero:focus-visible {
+  background: var(--brand-hover);
+  color: #fff;
+}
+
+.hero-art {
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  display: block;
+  margin-inline: auto;
+}
+
+/* ---------- Stat tiles ---------- */
+
+.stat-tile {
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--bs-body-bg);
+  height: 100%;
+}
+
+.stat-tile .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  color: var(--ink);
+}
+
+.stat-tile .stat-label {
+  font-size: .85rem;
+  color: var(--bs-secondary-color);
+}
+
+/* ---------- Auth pages (sign in / register / confirmations) ---------- */
+
+body.auth-page {
+  background-color: var(--auth-page-bg);
+  /* Large faint geometric planes, like the reference sign-in page. */
+  background-image:
+    linear-gradient(118deg, transparent 0 38%, var(--auth-plane) 38% 52%, transparent 52%),
+    linear-gradient(62deg, transparent 0 58%, var(--auth-plane) 58% 71%, transparent 71%),
+    linear-gradient(160deg, var(--auth-plane) 0 16%, transparent 16%);
+  background-attachment: fixed;
+}
+
+.auth-shell {
+  display: flex;
+  justify-content: center;
+  padding-block: clamp(1rem, 5vh, 4rem);
+}
+
+.auth-card {
+  display: grid;
+  /* minmax(0, 1fr): let columns shrink below their content's min-width -- plain 1fr made the card
+     overflow the viewport on phones. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  width: 100%;
+  max-width: 890px;
+  min-height: 540px;
+  background: var(--auth-card-bg);
+  border-radius: 4px;
+  box-shadow: 0 2px 30px rgba(0, 0, 0, .06);
+}
+
+.auth-card.auth-card-single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 480px;
+  min-height: 0;
+}
+
+.auth-main {
+  padding: 3rem 3.1rem 2.5rem;
+}
+
+.auth-aside {
+  border-inline-start: 1px solid var(--bs-border-color-translucent);
+  padding: 3rem 2.5rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.auth-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  background: #2b2fae;
+  color: #fff;
+  border-radius: 999px;
+  padding: .5rem 1rem;
+  font-size: .85rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.auth-pill:hover {
+  background: #22268f;
+  color: #fff;
+}
+
+.auth-title {
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin-bottom: .2rem;
+  color: var(--ink);
+}
+
+.auth-subtitle {
+  color: var(--ink);
+  opacity: .85;
+  margin-bottom: 1.75rem;
+}
+
+.auth-card .form-control {
+  height: 44px;
+  border-radius: 2px;
+  background: var(--auth-input-bg);
+  border-color: var(--auth-input-border);
+}
+
+.auth-card .form-control:focus {
+  border-color: var(--auth-blue);
+  box-shadow: 0 0 0 .15rem rgba(21, 154, 255, .2);
+}
+
+.auth-card .form-label {
+  font-size: .85rem;
+  color: var(--bs-secondary-color);
+  margin-bottom: .3rem;
+}
+
+.btn-auth {
+  background: var(--auth-blue);
+  border-color: var(--auth-blue);
+  color: #fff;
+  font-weight: 600;
+  height: 44px;
+  border-radius: 2px;
+  width: 100%;
+}
+
+.btn-auth:hover, .btn-auth:focus-visible {
+  background: var(--auth-blue-hover);
+  border-color: var(--auth-blue-hover);
+  color: #fff;
+}
+
+.auth-section-label {
+  font-weight: 500;
+  color: var(--ink);
+  margin: 2rem 0 .75rem;
+}
+
+.provider-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+}
+
+.provider-btn {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--auth-input-border);
+  border-radius: 3px;
+  background: var(--auth-card-bg);
+  padding: 0;
+}
+
+.provider-btn:hover {
+  border-color: var(--bs-secondary-color);
+}
+
+.provider-btn.provider-github {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.auth-footer-link {
+  margin-top: 2rem;
+  font-size: .95rem;
+  color: var(--ink);
+}
+
+.auth-footer-link a,
+.auth-link {
+  color: var(--auth-blue);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-footer-link a:hover,
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.auth-aside-art {
+  width: 100%;
+  max-width: 270px;
+  margin: 0 auto 1.5rem;
+  display: block;
+}
+
+.auth-aside .carousel-item h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: .6rem;
+}
+
+.auth-aside .carousel-item p {
+  font-size: .9rem;
+  color: var(--ink);
+  opacity: .85;
+  max-width: 300px;
+  margin-inline: auto;
+}
+
+.auth-soft-pill {
+  display: inline-block;
+  background: rgba(21, 154, 255, .1);
+  color: var(--auth-blue);
+  border-radius: 999px;
+  padding: .45rem 1.2rem;
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-soft-pill:hover {
+  background: rgba(21, 154, 255, .18);
+  color: var(--auth-blue);
+}
+
+.auth-aside .carousel-indicators {
+  position: static;
+  margin: 1.5rem 0 0;
+  gap: 4px;
+}
+
+/* [data-bs-theme] prefix: outranks Bootstrap's dark-mode rule that paints carousel dots black. */
+[data-bs-theme] .auth-aside .carousel-indicators [data-bs-target] {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: 0;
+  margin: 0;
+  background-color: var(--auth-blue);
+  opacity: .3;
+  transition: width .3s ease, opacity .3s ease;
+}
+
+[data-bs-theme] .auth-aside .carousel-indicators .active {
+  width: 22px;
+  opacity: 1;
+}
+
+.app-footer {
+  font-size: .9rem;
+}
+
+body.auth-page .app-footer {
+  text-align: center;
+  border-top: 0 !important;
+  background: transparent;
+}
+
+@media (max-width: 767.98px) {
+  .auth-card {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  /* The tour panel (and the pill that opens it) only exist in the two-column layout. */
+  .auth-aside,
+  .auth-pill {
+    display: none;
+  }
+
+  .auth-main {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-aside .carousel-item {
+    transition: none;
+  }
+}

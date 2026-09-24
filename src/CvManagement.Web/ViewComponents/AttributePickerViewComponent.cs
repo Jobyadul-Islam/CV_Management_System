@@ -1,6 +1,6 @@
 using CvManagement.Web.Services.Abstractions;
 using Microsoft.AspNetCore.Identity;
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CvManagement.Web.ViewComponents;

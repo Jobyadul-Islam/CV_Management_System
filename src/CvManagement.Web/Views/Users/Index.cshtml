@@ -38,7 +38,7 @@
                     <td>
                         @foreach (var role in user.Roles)
                         {
-                            <span class="badge bg-secondary">@role</span>
+                            <span class="badge bg-secondary">@Localizer[$"Role_{role}"]</span>
                         }
                     </td>
                     <td>

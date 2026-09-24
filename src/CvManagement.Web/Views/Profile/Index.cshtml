@@ -42,23 +42,28 @@ else if (Model.ActiveTab == "info")
 {
     <div class="col-lg-8">
         <p class="text-secondary">@Localizer["Profile_InfoHelp"]</p>
-        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" data-bs-toggle="modal" data-bs-target="#infoAttributePicker">@Localizer["Profile_AddAttribute"]</button>
+        @* Toolbar pattern (spec: no per-record buttons): tick attributes, then one "Remove selected". *@
+        <div class="d-flex gap-2 mb-3">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#infoAttributePicker">@Localizer["Profile_AddAttribute"]</button>
+            <button type="submit" form="removeInfoForm" id="removeInfoButton" class="btn btn-sm btn-outline-danger" disabled>@Localizer["Profile_RemoveSelected"]</button>
+        </div>
 
         @await Component.InvokeAsync("AttributePicker", new { modalId = "infoAttributePicker", excludeIds = infoAttributeIds })
         <form id="infoAttributePicker-post-form" method="post" action="@Url.Action("AddInfoAttribute", "Profile")" style="display:none">
             @Html.AntiForgeryToken()
             <input type="hidden" name="userId" value="@uid" />
         </form>
+        <form id="removeInfoForm" method="post" asp-action="RemoveInfoAttribute" asp-route-userId="@uid"
+              data-confirm="@Localizer["Profile_RemoveInfoConfirm"]" onsubmit="return confirm(this.dataset.confirm);"></form>
 
         @foreach (var field in Model.InfoAttributes)
         {
             <div class="d-flex align-items-start gap-2">
+                <input type="checkbox" class="form-check-input mt-1 info-remove-select" name="attributeIds" value="@field.AttributeId"
+                       form="removeInfoForm" aria-label="@Localizer["Profile_SelectAttribute"] @field.AttributeName" />
                 <div class="flex-grow-1">
                     <partial name="_AttributeValueInput" model="field" />
                 </div>
-                <form method="post" asp-action="RemoveInfoAttribute" asp-route-attributeId="@field.AttributeId" asp-route-userId="@uid" class="mt-1">
-                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove from profile">&times;</button>
-                </form>
             </div>
         }
         @if (Model.InfoAttributes.Count == 0)
@@ -68,6 +73,11 @@ else if (Model.ActiveTab == "info")
     </div>
 
     <script>
+        document.addEventListener("change", function (e) {
+            if (!e.target.classList.contains("info-remove-select")) return;
+            document.getElementById("removeInfoButton").disabled =
+                document.querySelectorAll(".info-remove-select:checked").length === 0;
+        });
         AttributePicker.onConfirm("infoAttributePicker", function (selected) {
             var form = document.getElementById("infoAttributePicker-post-form");
             selected.forEach(function (attr) {
@@ -165,14 +175,13 @@ else if (Model.ActiveTab == "cvs")
 }
 
 @section Styles {
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2/dist/easymde.min.css">
 }
 
 @section Scripts {
-    <script>window.AUTOSAVE_ENDPOINT = "/api/profile/autosave/@uid";</script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2/dist/easymde.min.js"></script>
     <script src="~/js/image-upload.js" asp-append-version="true"></script>
     <script src="~/js/markdown-editor-init.js" asp-append-version="true"></script>
-    <script src="~/js/autosave.js" asp-append-version="true"></script>
+    <partial name="_AutoSaveScripts" model="@($"/api/profile/autosave/{Uri.EscapeDataString(uid)}")" />
 }

@@ -1,5 +1,5 @@
 @model CvManagement.Web.ViewModels.Cv.CvDetailsViewModel
-@using CvManagement.Web.Domain.Enums
+@using CvManagement.Web.Models.Enums
 @inject CvManagement.Web.Services.Abstractions.IMarkdownRenderer MarkdownRenderer
 @inject IStringLocalizer<SharedResource> Localizer
 @{
@@ -45,10 +45,12 @@
 
 @if (Model.ViewerCanEdit && Model.Status == CvStatus.Draft)
 {
+    @* autosave.js keeps the hint text and button state in sync as fields are filled in place, and the
+       form flushes pending edits before submitting (data-autosave-flush). *@
     <div class="alert @(Model.CanPublish ? "alert-success" : "alert-warning") d-flex justify-content-between align-items-center">
-        <span>@(Model.CanPublish ? Localizer["Cv_ReadyToPublish"] : Localizer["Cv_FillFieldsToPublish"])</span>
-        <form asp-action="Publish" asp-route-id="@Model.CvId" method="post">
-            <button type="submit" class="btn btn-primary btn-sm" @(Model.CanPublish ? "" : "disabled")>@Localizer["Cv_Publish"]</button>
+        <span id="publishHint" data-text-ready="@Localizer["Cv_ReadyToPublish"]" data-text-incomplete="@Localizer["Cv_FillFieldsToPublish"]">@(Model.CanPublish ? Localizer["Cv_ReadyToPublish"] : Localizer["Cv_FillFieldsToPublish"])</span>
+        <form asp-action="Publish" asp-route-id="@Model.CvId" method="post" data-autosave-flush>
+            <button id="publishButton" type="submit" class="btn btn-primary btn-sm" @(Model.CanPublish ? "" : "disabled")>@Localizer["Cv_Publish"]</button>
         </form>
     </div>
 }
@@ -97,16 +99,15 @@
 </div>
 
 @section Styles {
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2/dist/easymde.min.css">
 }
 @section Scripts {
     @if (Model.ViewerCanEdit)
     {
-        <script>window.AUTOSAVE_ENDPOINT = "/api/cv/@Model.CvId/autosave";</script>
         <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/easymde@2/dist/easymde.min.js"></script>
         <script src="~/js/image-upload.js" asp-append-version="true"></script>
         <script src="~/js/markdown-editor-init.js" asp-append-version="true"></script>
-        <script src="~/js/autosave.js" asp-append-version="true"></script>
+        <partial name="_AutoSaveScripts" model="@($"/api/cv/{Model.CvId}/autosave")" />
     }
 }

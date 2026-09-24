@@ -1,14 +1,12 @@
 @model CvManagement.Web.ViewModels.Profile.AttributeValueViewModel
-@using CvManagement.Web.Domain.Enums
-@inject IConfiguration Configuration
+@using CvManagement.Web.Models.Enums
+@inject IStringLocalizer<SharedResource> Localizer
 
-<div class="autosave-field mb-4" data-attribute-id="@Model.AttributeId" data-type="@((int)Model.DataType)" data-row-version="@Model.RowVersion">
+<div class="autosave-field mb-4" data-attribute-id="@Model.AttributeId" data-type="@((int)Model.DataType)" data-row-version="@Model.RowVersion" data-empty="@(Model.IsEmpty ? "true" : "false")">
     <label class="form-label fw-semibold">
         @Model.AttributeName
-        @if (Model.IsEmpty)
-        {
-            <span class="badge bg-danger ms-1">empty</span>
-        }
+        @* Always rendered; autosave.js toggles it as the value is filled in or cleared. *@
+        <span class="badge bg-danger ms-1 autosave-empty-badge" @(Model.IsEmpty ? "" : "hidden")>@Localizer["Autosave_Empty"]</span>
     </label>
     @if (!string.IsNullOrWhiteSpace(Model.Description))
     {
@@ -43,10 +41,10 @@
         case AttributeDataType.Period:
             <div class="row g-2">
                 <div class="col">
-                    <input type="date" class="form-control period-start @(Model.IsEmpty ? "border-danger" : "")" value="@(Model.ValuePeriodStart?.ToString("yyyy-MM-dd"))" placeholder="Start" />
+                    <input type="date" class="form-control period-start @(Model.IsEmpty ? "border-danger" : "")" value="@(Model.ValuePeriodStart?.ToString("yyyy-MM-dd"))" placeholder="@Localizer["Autosave_PeriodStart"]" />
                 </div>
                 <div class="col">
-                    <input type="date" class="form-control period-end" value="@(Model.ValuePeriodEnd?.ToString("yyyy-MM-dd"))" placeholder="End" />
+                    <input type="date" class="form-control period-end" value="@(Model.ValuePeriodEnd?.ToString("yyyy-MM-dd"))" placeholder="@Localizer["Autosave_PeriodEnd"]" />
                 </div>
             </div>
             break;
@@ -54,13 +52,13 @@
         case AttributeDataType.Boolean:
             <div class="form-check">
                 <input type="checkbox" class="form-check-input autosave-input" @(Model.ValueBoolean == true ? "checked" : "") />
-                <label class="form-check-label small text-secondary">@(Model.ValueBoolean == true ? "Yes" : Model.ValueBoolean == false ? "No" : "Not answered")</label>
+                <label class="form-check-label small text-secondary">@(Model.ValueBoolean == true ? Localizer["Common_Yes"] : Model.ValueBoolean == false ? Localizer["Common_No"] : Localizer["Autosave_NotAnswered"])</label>
             </div>
             break;
 
         case AttributeDataType.OneOfMany:
             <select class="form-select autosave-input @(Model.IsEmpty ? "border-danger" : "")">
-                <option value="">-- select --</option>
+                <option value="">@Localizer["Autosave_Select"]</option>
                 @foreach (var option in Model.Options)
                 {
                     <option value="@option.Id" selected="@(option.Id == Model.ValueOptionId)">@option.Label</option>
@@ -70,9 +68,9 @@
     }
 
     <div class="autosave-conflict alert alert-warning py-1 px-2 small mt-2 mb-0" hidden>
-        Changed elsewhere since you loaded this page.
-        <button type="button" class="btn btn-sm btn-outline-warning autosave-conflict-keep">Keep mine</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary autosave-conflict-reload">Reload page</button>
+        @Localizer["Autosave_ChangedElsewhere"]
+        <button type="button" class="btn btn-sm btn-outline-warning autosave-conflict-keep">@Localizer["Autosave_KeepMine"]</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary autosave-conflict-reload">@Localizer["Autosave_ReloadPage"]</button>
     </div>
     <div class="autosave-status small text-secondary"></div>
 </div>

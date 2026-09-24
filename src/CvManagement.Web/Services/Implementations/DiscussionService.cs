@@ -1,5 +1,5 @@
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using CvManagement.Web.Services.Abstractions;
 using CvManagement.Web.ViewModels.Discussion;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +23,9 @@ public class DiscussionService(ApplicationDbContext db, IMarkdownRenderer markdo
             })
             .ToListAsync(ct);
 
-    public async Task<DiscussionPostViewModel> PostAsync(int positionId, string userId, string bodyMarkdown, CancellationToken ct = default)
+    public async Task<DiscussionPostViewModel?> PostAsync(int positionId, string userId, string bodyMarkdown, CancellationToken ct = default)
     {
+        if (!await db.Positions.AnyAsync(p => p.Id == positionId, ct)) return null;
         var user = await db.Users.FirstAsync(u => u.Id == userId, ct);
 
         var post = new DiscussionPost

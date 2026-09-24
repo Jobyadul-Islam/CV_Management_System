@@ -1,4 +1,4 @@
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

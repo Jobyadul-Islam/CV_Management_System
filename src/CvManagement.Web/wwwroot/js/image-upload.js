@@ -16,6 +16,8 @@
           uploadPreset: btn.dataset.uploadPreset,
           sources: ["local", "url", "camera"],
           multiple: false,
+          clientAllowedFormats: (btn.dataset.allowedFormats || "").split(",").filter(Boolean),
+          maxFileSize: parseInt(btn.dataset.maxFileSize, 10) || undefined,
           cropping: true,
           croppingAspectRatio: 1
         },

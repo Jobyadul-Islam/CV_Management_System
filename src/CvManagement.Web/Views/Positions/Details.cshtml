@@ -12,7 +12,7 @@
             @Model.Company
             @if (Model.Level is not null)
             {
-                <span> &middot; @Model.Level</span>
+                <span> &middot; @Localizer[$"Level_{Model.Level}"]</span>
             }
         </div>
     </div>
@@ -82,7 +82,7 @@ else if (Model.ViewerIsEligible == true)
 
             <div class="col-md-6 mb-4">
                 <h2 class="h5">@Localizer["PositionDetails_Access"]</h2>
-                @if (Model.AccessMode == CvManagement.Web.Domain.Enums.PositionAccessMode.Public)
+                @if (Model.AccessMode == CvManagement.Web.Models.Enums.PositionAccessMode.Public)
                 {
                     <p><span class="badge bg-success">@Localizer["Positions_Public"]</span> @Localizer["PositionDetails_PublicDesc"]</p>
                 }
@@ -119,7 +119,8 @@ else if (Model.ViewerIsEligible == true)
     {
         <div class="tab-pane fade" id="discussionPane">
             @Html.AntiForgeryToken()
-            <div id="discussionPosts" class="mb-3" data-position-id="@Model.Id" data-is-recruiter="@Model.ViewerIsRecruiter.ToString().ToLowerInvariant()" style="max-height:28rem; overflow-y:auto;">
+            <div id="discussionPosts" class="mb-3" data-position-id="@Model.Id" data-is-recruiter="@Model.ViewerIsRecruiter.ToString().ToLowerInvariant()"
+                 data-text-save-failed="@Localizer["Discussion_SaveFailed"]" data-text-send-failed="@Localizer["Discussion_SendFailed"]" style="max-height:28rem; overflow-y:auto;">
                 @foreach (var post in Model.DiscussionPosts)
                 {
                     <div class="discussion-post">

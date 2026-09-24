@@ -1,13 +1,15 @@
+using Microsoft.Extensions.Localization;
 using System.Text;
 using CvManagement.Web.Data;
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CvManagement.Web.Services.Implementations;
 
-public class CvExportService(ApplicationDbContext db, IPositionAccessEvaluator accessEvaluator) : ICvExportService
+public class CvExportService(ApplicationDbContext db, IPositionAccessEvaluator accessEvaluator,
+    IStringLocalizer<SharedResource> localizer) : ICvExportService
 {
     public async Task<string?> BuildCsvAsync(int positionId, bool isAdmin, CancellationToken ct = default)
     {
@@ -55,7 +57,11 @@ public class CvExportService(ApplicationDbContext db, IPositionAccessEvaluator a
 
         var sb = new StringBuilder();
 
-        var headers = new List<string> { "Candidate", "Status", "Likes", "Created", "Published" };
+        var headers = new List<string>
+        {
+            localizer["Cv_ColCandidate"], localizer["Profile_ColStatus"], localizer["Profile_ColLikes"],
+            localizer["Export_ColCreated"], localizer["Cv_Published"]
+        };
         headers.AddRange(attributes.Select(a => a.Name));
         sb.AppendLine(string.Join(',', headers.Select(CsvField)));
 
@@ -65,7 +71,7 @@ public class CvExportService(ApplicationDbContext db, IPositionAccessEvaluator a
             var row = new List<string>
             {
                 cv.DisplayName,
-                cv.Status.ToString(),
+                localizer[cv.Status == CvStatus.Published ? "Cv_Published" : "Cv_Draft"],
                 cv.LikeCount.ToString(),
                 cv.CreatedAt.ToString("yyyy-MM-dd"),
                 cv.PublishedAt?.ToString("yyyy-MM-dd") ?? string.Empty
@@ -74,7 +80,7 @@ public class CvExportService(ApplicationDbContext db, IPositionAccessEvaluator a
             {
                 var value = userValues?.GetValueOrDefault(attribute.Id);
                 var field = AttributeValueMapper.ToViewModel(attribute, value);
-                row.Add(AttributeValueFormatter.ToPlainText(field));
+                row.Add(AttributeValueFormatter.ToPlainText(field, localizer));
             }
             sb.AppendLine(string.Join(',', row.Select(CsvField)));
         }
@@ -82,8 +88,20 @@ public class CvExportService(ApplicationDbContext db, IPositionAccessEvaluator a
         return sb.ToString();
     }
 
-    private static string CsvField(string value)
+    /// <summary>
+    /// RFC 4180 quoting, plus formula-injection protection: every cell is candidate-authored text that a
+    /// Recruiter opens in Excel/Sheets, so a value starting with = + - @ (or tab/CR) is prefixed with an
+    /// apostrophe to be shown as text instead of evaluated (OWASP "CSV Injection").
+    /// </summary>
+    public static string CsvField(string value)
     {
+        // A plain number such as "-3.5" is not a formula, and keeping it numeric keeps it aggregatable.
+        var isPlainNumber = decimal.TryParse(value, System.Globalization.NumberStyles.Number,
+            System.Globalization.CultureInfo.InvariantCulture, out _);
+        if (value.Length > 0 && value[0] is '=' or '+' or '-' or '@' or '\t' or '\r' && !isPlainNumber)
+        {
+            value = "'" + value;
+        }
         if (value.IndexOfAny([',', '"', '\n', '\r']) < 0) return value;
         return $"\"{value.Replace("\"", "\"\"")}\"";
     }

@@ -1,4 +1,4 @@
-using CvManagement.Web.Domain;
+using CvManagement.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -33,10 +33,12 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
             .HasForeignKey(t => t.PositionId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Cascade: deleting a position removes its CVs (and, via CvConfiguration, their likes) in the
+        // same DELETE statement -- the database keeps referential integrity, no application-side loop.
         builder.HasMany(p => p.Cvs)
             .WithOne(c => c.Position)
             .HasForeignKey(c => c.PositionId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(p => p.DiscussionPosts)
             .WithOne(d => d.Position)

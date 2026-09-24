@@ -1,5 +1,5 @@
-using CvManagement.Web.Domain;
-using CvManagement.Web.Domain.Enums;
+using CvManagement.Web.Models;
+using CvManagement.Web.Models.Enums;
 using CvManagement.Web.Services.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,12 +8,15 @@ namespace CvManagement.Web.Data.Seed;
 
 /// <summary>
 /// Idempotent startup seed: roles, attribute categories, the four Me-tab built-in attributes,
-/// a handful of library attributes used throughout the spec's own examples, and one demo account
-/// per role so every role-gated flow is testable without live OAuth credentials.
+/// a handful of library attributes used throughout the spec's own examples, and -- only when
+/// "Seed:DemoAccounts" is true -- one demo account per role for trying role-gated flows locally.
+/// Demo accounts are off by default: they share a public password, so they must never appear on a
+/// real installation, and once deleted they must stay deleted.
 /// </summary>
 public static class DbSeeder
 {
     public const string DemoPassword = "Demo@12345";
+    public const string DemoAccountsSetting = "Seed:DemoAccounts";
 
     public static async Task SeedAsync(IServiceProvider services)
     {
@@ -21,13 +24,18 @@ public static class DbSeeder
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         var onboarding = services.GetRequiredService<IUserOnboardingService>();
+        var configuration = services.GetRequiredService<IConfiguration>();
 
         await SeedRolesAsync(roleManager);
         var categories = await SeedCategoriesAsync(db);
         var builtIns = await SeedBuiltInAttributesAsync(db, categories);
         await SeedLibraryAttributesAsync(db, categories);
         await SeedTagsAsync(db);
-        await SeedDemoUsersAsync(userManager, db, onboarding, builtIns);
+
+        if (configuration.GetValue<bool>(DemoAccountsSetting))
+        {
+            await SeedDemoUsersAsync(userManager, db, onboarding, builtIns);
+        }
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
@@ -64,19 +72,22 @@ public static class DbSeeder
         ApplicationDbContext db, Dictionary<string, AttributeCategory> categories)
     {
         var personalInfo = categories["Personal Information"];
-        var existing = await db.Attributes.Where(a => a.IsBuiltIn).ToDictionaryAsync(a => a.Name);
+        // Keyed by SystemKey, not Name: a Recruiter may have renamed a built-in since it was seeded.
+        var existing = await db.Attributes
+            .Where(a => a.IsBuiltIn && a.SystemKey != null)
+            .ToDictionaryAsync(a => a.SystemKey!);
 
-        (string Name, string Description, AttributeDataType Type)[] builtIns =
+        (string Key, string Name, string Description, AttributeDataType Type)[] builtIns =
         [
-            ("First Name", "Candidate's given name.", AttributeDataType.String),
-            ("Last Name", "Candidate's family name.", AttributeDataType.String),
-            ("Location", "City and country of residence.", AttributeDataType.String),
-            ("Personal Photo", "Profile photo.", AttributeDataType.Image)
+            (BuiltInAttributeKeys.FirstName, "First Name", "Candidate's given name.", AttributeDataType.String),
+            (BuiltInAttributeKeys.LastName, "Last Name", "Candidate's family name.", AttributeDataType.String),
+            (BuiltInAttributeKeys.Location, "Location", "City and country of residence.", AttributeDataType.String),
+            (BuiltInAttributeKeys.PersonalPhoto, "Personal Photo", "Profile photo.", AttributeDataType.Image)
         ];
 
-        foreach (var (name, description, type) in builtIns)
+        foreach (var (key, name, description, type) in builtIns)
         {
-            if (!existing.ContainsKey(name))
+            if (!existing.ContainsKey(key))
             {
                 var attribute = new AttributeDefinition
                 {
@@ -84,10 +95,11 @@ public static class DbSeeder
                     Description = description,
                     DataType = type,
                     CategoryId = personalInfo.Id,
-                    IsBuiltIn = true
+                    IsBuiltIn = true,
+                    SystemKey = key
                 };
                 db.Attributes.Add(attribute);
-                existing[name] = attribute;
+                existing[key] = attribute;
             }
         }
 
@@ -252,9 +264,9 @@ public static class DbSeeder
             .Where(v => v.UserId == user.Id)
             .ToDictionaryAsync(v => v.AttributeId);
 
-        values[builtIns["First Name"].Id].ValueString = firstName;
-        values[builtIns["Last Name"].Id].ValueString = lastName;
-        values[builtIns["Location"].Id].ValueString = location;
+        values[builtIns[BuiltInAttributeKeys.FirstName].Id].ValueString = firstName;
+        values[builtIns[BuiltInAttributeKeys.LastName].Id].ValueString = lastName;
+        values[builtIns[BuiltInAttributeKeys.Location].Id].ValueString = location;
 
         await db.SaveChangesAsync();
     }
