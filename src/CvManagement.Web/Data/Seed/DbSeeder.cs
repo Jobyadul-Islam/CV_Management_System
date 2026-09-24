@@ -36,6 +36,13 @@ public static class DbSeeder
         {
             await SeedDemoUsersAsync(userManager, db, onboarding, builtIns);
         }
+
+        // Bootstrap admins that already registered and confirmed before the setting was added.
+        foreach (var email in Services.Implementations.UserOnboardingService.BootstrapAdminEmails(configuration))
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user is not null) await onboarding.PromoteBootstrapAdminAsync(user);
+        }
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)

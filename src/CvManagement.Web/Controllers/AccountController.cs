@@ -79,6 +79,11 @@ public class AccountController(
         }
 
         var result = await userManager.ConfirmEmailAsync(user, token);
+        if (result.Succeeded)
+        {
+            // A confirmed address listed in Seed:AdminEmails becomes the deployment's first admin.
+            await onboarding.PromoteBootstrapAdminAsync(user);
+        }
         return View("ConfirmEmail", result.Succeeded);
     }
 
@@ -262,6 +267,9 @@ public class AccountController(
             }
             return View(nameof(Login), new LoginViewModel { ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
         }
+
+        // Before SignInAsync, so a newly granted Administrator role is already in this session's cookie.
+        await onboarding.PromoteBootstrapAdminAsync(user);
 
         await signInManager.SignInAsync(user, isPersistent: false);
         logger.LogInformation("User signed in via {Provider}: {Email}", info.LoginProvider, email);

@@ -161,7 +161,21 @@ builder.Services.Configure<CvManagement.Web.Services.Implementations.DraftCvRemi
     builder.Configuration.GetSection(CvManagement.Web.Services.Implementations.DraftCvReminderOptions.SectionName));
 builder.Services.AddHostedService<CvManagement.Web.Services.Implementations.DraftCvReminderService>();
 
+// Hosted behind a reverse proxy (Azure App Service, Render, ...), TLS ends at the proxy and the app
+// sees plain http. Honouring X-Forwarded-Proto/For restores the real scheme and client IP, so HTTPS
+// redirection and the Google/GitHub OAuth redirect URIs use https://<your-domain>. The proxy's address
+// isn't known in advance, hence the cleared lists; the platform only lets traffic in through it.
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+                               | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 using (var scope = app.Services.CreateScope())
 {
