@@ -119,6 +119,92 @@ public class AccountController(
         return link;
     }
 
+    // ---------------------------------------------------------------- Password reset
+    // Standard Identity flow: request a link by email -> single-use, time-limited token -> set a new
+    // password. Responses never reveal whether an address is registered (no account enumeration).
+
+    [HttpGet]
+    public IActionResult ForgotPassword() => View(new ForgotPasswordViewModel());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        string? link = null;
+        var user = await userManager.FindByEmailAsync(model.Email);
+        // Only confirmed accounts: an unconfirmed address hasn't proven ownership of the inbox yet
+        // (it can use "Resend confirmation email" instead). Blocked accounts get nothing either.
+        if (user is not null && await userManager.IsEmailConfirmedAsync(user) && !await userManager.IsLockedOutAsync(user))
+        {
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            // Identity tokens contain '+', '/' and '=' -- Base64Url keeps them intact inside a URL.
+            var encodedToken = Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(System.Text.Encoding.UTF8.GetBytes(token));
+            link = Url.Action(nameof(ResetPassword), "Account", new { email = user.Email, token = encodedToken }, protocol: Request.Scheme)!;
+
+            // Sent in the language the request was made in.
+            await emailSender.SendAsync(user.Email!, localizer["Email_ResetSubject"],
+                localizer["Email_ResetBody", System.Net.WebUtility.HtmlEncode(link)]);
+            logger.LogInformation("Password reset link sent to {Email}", user.Email);
+        }
+
+        return View("ForgotPasswordConfirmation", new ForgotPasswordConfirmationViewModel
+        {
+            Email = model.Email,
+            DevResetLink = emailSender.IsConfigured ? null : link
+        });
+    }
+
+    [HttpGet]
+    public IActionResult ResetPassword(string? email, string? token)
+    {
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
+        {
+            return RedirectToAction(nameof(ForgotPassword));
+        }
+        return View(new ResetPasswordViewModel { Email = email, Token = token });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        var user = await userManager.FindByEmailAsync(model.Email);
+        if (user is null)
+        {
+            // Same outcome as success, so the form can't be used to probe which emails exist.
+            return View("ResetPasswordConfirmation");
+        }
+
+        string token;
+        try
+        {
+            token = System.Text.Encoding.UTF8.GetString(Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlDecode(model.Token));
+        }
+        catch (FormatException)
+        {
+            ModelState.AddModelError(string.Empty, localizer["Identity_InvalidToken"]);
+            return View(model);
+        }
+
+        // Also rotates the security stamp, which signs the account out of every other session.
+        var result = await userManager.ResetPasswordAsync(user, token, model.Password);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+            return View(model);
+        }
+
+        // A lockout from repeated wrong passwords shouldn't outlive a successful reset.
+        await userManager.ResetAccessFailedCountAsync(user);
+        logger.LogInformation("Password reset completed for {Email}", user.Email);
+        return View("ResetPasswordConfirmation");
+    }
+
     [HttpGet]
     public async Task<IActionResult> Login(string? returnUrl = null)
     {

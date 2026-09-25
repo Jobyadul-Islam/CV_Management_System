@@ -887,4 +887,46 @@
   <data name="Error_RequestId" xml:space="preserve">
     <value>Request ID:</value>
   </data>
+  <data name="Reset_ForgotLink" xml:space="preserve">
+    <value>Forgot password?</value>
+  </data>
+  <data name="Reset_ForgotTitle" xml:space="preserve">
+    <value>Forgot your password?</value>
+  </data>
+  <data name="Reset_ForgotSubtitle" xml:space="preserve">
+    <value>Enter your account's email and we'll send you a link to set a new password.</value>
+  </data>
+  <data name="Reset_SendLink" xml:space="preserve">
+    <value>Send reset link</value>
+  </data>
+  <data name="Reset_LinkSentText" xml:space="preserve">
+    <value>If an account with {0} exists, we've sent it a password reset link. Check your inbox (and the spam folder).</value>
+  </data>
+  <data name="Reset_NewPasswordTitle" xml:space="preserve">
+    <value>Set a new password</value>
+  </data>
+  <data name="Reset_NewPasswordSubtitle" xml:space="preserve">
+    <value>for {0}</value>
+  </data>
+  <data name="Reset_NewPassword" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="Reset_SavePassword" xml:space="preserve">
+    <value>Save new password</value>
+  </data>
+  <data name="Reset_RequestNewLink" xml:space="preserve">
+    <value>Link expired? Request a new one</value>
+  </data>
+  <data name="Reset_DoneTitle" xml:space="preserve">
+    <value>Password changed</value>
+  </data>
+  <data name="Reset_DoneText" xml:space="preserve">
+    <value>Your password has been reset and you've been signed out on other devices. You can now sign in with the new password.</value>
+  </data>
+  <data name="Email_ResetSubject" xml:space="preserve">
+    <value>Reset your CV Management System password</value>
+  </data>
+  <data name="Email_ResetBody" xml:space="preserve">
+    <value>&lt;p&gt;We received a request to reset your password.&lt;/p&gt;&lt;p&gt;&lt;a href="{0}"&gt;Set a new password&lt;/a&gt;&lt;/p&gt;&lt;p&gt;The link works once and expires in 24 hours. If you didn't ask for this, ignore this email — your password stays the same.&lt;/p&gt;</value>
+  </data>
 </root>

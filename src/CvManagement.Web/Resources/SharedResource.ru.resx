@@ -887,4 +887,46 @@
   <data name="Error_RequestId" xml:space="preserve">
     <value>ID запроса:</value>
   </data>
+  <data name="Reset_ForgotLink" xml:space="preserve">
+    <value>Забыли пароль?</value>
+  </data>
+  <data name="Reset_ForgotTitle" xml:space="preserve">
+    <value>Забыли пароль?</value>
+  </data>
+  <data name="Reset_ForgotSubtitle" xml:space="preserve">
+    <value>Введите адрес почты вашего аккаунта, и мы отправим ссылку для установки нового пароля.</value>
+  </data>
+  <data name="Reset_SendLink" xml:space="preserve">
+    <value>Отправить ссылку</value>
+  </data>
+  <data name="Reset_LinkSentText" xml:space="preserve">
+    <value>Если аккаунт с адресом {0} существует, мы отправили на него ссылку для сброса пароля. Проверьте почту (и папку «Спам»).</value>
+  </data>
+  <data name="Reset_NewPasswordTitle" xml:space="preserve">
+    <value>Новый пароль</value>
+  </data>
+  <data name="Reset_NewPasswordSubtitle" xml:space="preserve">
+    <value>для {0}</value>
+  </data>
+  <data name="Reset_NewPassword" xml:space="preserve">
+    <value>Новый пароль</value>
+  </data>
+  <data name="Reset_SavePassword" xml:space="preserve">
+    <value>Сохранить пароль</value>
+  </data>
+  <data name="Reset_RequestNewLink" xml:space="preserve">
+    <value>Ссылка устарела? Запросите новую</value>
+  </data>
+  <data name="Reset_DoneTitle" xml:space="preserve">
+    <value>Пароль изменён</value>
+  </data>
+  <data name="Reset_DoneText" xml:space="preserve">
+    <value>Пароль сброшен, а все другие сеансы завершены. Теперь можно войти с новым паролем.</value>
+  </data>
+  <data name="Email_ResetSubject" xml:space="preserve">
+    <value>Сброс пароля в CV Management System</value>
+  </data>
+  <data name="Email_ResetBody" xml:space="preserve">
+    <value>&lt;p&gt;Мы получили запрос на сброс вашего пароля.&lt;/p&gt;&lt;p&gt;&lt;a href="{0}"&gt;Установить новый пароль&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Ссылка одноразовая и действует 24 часа. Если вы не запрашивали сброс, просто проигнорируйте это письмо — пароль не изменится.&lt;/p&gt;</value>
+  </data>
 </root>
