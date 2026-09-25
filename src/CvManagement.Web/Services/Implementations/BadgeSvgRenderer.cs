@@ -18,15 +18,19 @@ public class BadgeSvgRenderer(IStringLocalizer<SharedResource> localizer) : IBad
 
     public string RenderPanel(IReadOnlyList<EarnedBadge> badges, string displayName)
     {
+        var title = localizer["Badge_PanelTitle", displayName].Value;
         var rows = badges.Count == 0 ? 1 : (int)Math.Ceiling(badges.Count / (double)PerRow);
         var columns = Math.Min(PerRow, Math.Max(badges.Count, 1));
-        var width = Padding * 2 + columns * ChipWidth + (columns - 1) * Gap;
+        // Wide enough for the badge grid AND the title: with few badges a long name used to be clipped.
+        // SVG can't measure text itself, so estimate ~9 px per character at 15 px semibold (slightly generous).
+        var titleWidth = Padding * 2 + (int)Math.Ceiling(title.Length * 9.0);
+        var width = Math.Max(Padding * 2 + columns * ChipWidth + (columns - 1) * Gap, titleWidth);
         var height = Padding * 2 + TitleHeight + rows * ChipHeight + (rows - 1) * Gap;
 
         var sb = new StringBuilder();
         sb.Append($"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" font-family="Segoe UI, Arial, sans-serif">""");
         sb.Append($"""<rect width="{width}" height="{height}" rx="12" fill="#f8f9fa" stroke="#dee2e6"/>""");
-        sb.Append($"""<text x="{Padding}" y="{Padding + 16}" font-size="15" font-weight="600" fill="#212529">{Encode(localizer["Badge_PanelTitle", displayName])}</text>""");
+        sb.Append($"""<text x="{Padding}" y="{Padding + 16}" font-size="15" font-weight="600" fill="#212529">{Encode(title)}</text>""");
 
         if (badges.Count == 0)
         {
