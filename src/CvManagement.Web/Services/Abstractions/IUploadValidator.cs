@@ -23,6 +23,10 @@ public class ImageUploadOptions
 
     public string CloudName { get; set; } = string.Empty;
     public string UnsignedUploadPreset { get; set; } = string.Empty;
-    public string[] AllowedFormats { get; set; } = ["jpg", "jpeg", "png", "webp", "gif"];
+    public static readonly string[] DefaultAllowedFormats = ["jpg", "jpeg", "png", "webp", "gif"];
+
+    // Empty here on purpose: the configuration binder *appends* configured array items to an initialized
+    // array, which listed every format twice. Program.cs falls back to DefaultAllowedFormats when unset.
+    public string[] AllowedFormats { get; set; } = [];
     public long MaxFileSizeBytes { get; set; } = 5 * 1024 * 1024;
 }

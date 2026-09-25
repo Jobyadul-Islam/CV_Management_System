@@ -153,6 +153,9 @@ builder.Services.PostConfigure<CvManagement.Web.Services.Abstractions.ImageUploa
 {
     if (string.IsNullOrWhiteSpace(options.CloudName)) options.CloudName = builder.Configuration["Cloudinary:CloudName"] ?? string.Empty;
     if (string.IsNullOrWhiteSpace(options.UnsignedUploadPreset)) options.UnsignedUploadPreset = builder.Configuration["Cloudinary:UnsignedUploadPreset"] ?? string.Empty;
+    options.AllowedFormats = options.AllowedFormats.Length > 0
+        ? options.AllowedFormats.Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
+        : CvManagement.Web.Services.Abstractions.ImageUploadOptions.DefaultAllowedFormats;
 });
 builder.Services.AddSingleton<CvManagement.Web.Services.Abstractions.IUploadValidator,
     CvManagement.Web.Services.Implementations.UploadValidator>();
