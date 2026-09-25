@@ -1,0 +1,38 @@
+@model CvManagement.Web.ViewModels.Profile.ProjectFormViewModel
+@inject IStringLocalizer<SharedResource> Localizer
+@* Rendered from the page's @section Scripts (see Create/Edit), i.e. after the layout's jQuery,
+   Bootstrap and shared scripts -- inline in the form they ran too early and crashed. *@
+<partial name="_ValidationScriptsPartial" />
+<script>
+(function () {
+    var input = document.getElementById("tagsInput");
+    var hiddenContainer = document.getElementById("tagsHidden");
+
+    var tagify = new Tagify(input, {
+        whitelist: [],
+        dropdown: { enabled: 1, maxItems: 10 }
+    });
+
+    fetch("/Projects/TagSuggestions?prefix=")
+        .then(function (r) { return r.json(); })
+        .then(function (names) { tagify.settings.whitelist = names; });
+
+    input.addEventListener("input", function (e) {
+        if (!e.detail || !e.detail.value) return;
+        fetch("/Projects/TagSuggestions?prefix=" + encodeURIComponent(e.detail.value))
+            .then(function (r) { return r.json(); })
+            .then(function (names) { tagify.settings.whitelist = names; tagify.dropdown.show.call(tagify, e.detail.value); });
+    });
+
+    function syncHidden() {
+        hiddenContainer.innerHTML = "";
+        tagify.value.forEach(function (tag, i) {
+            var el = document.createElement("input");
+            el.type = "hidden"; el.name = "Tags[" + i + "]"; el.value = tag.value;
+            hiddenContainer.appendChild(el);
+        });
+    }
+    tagify.on("add", syncHidden).on("remove", syncHidden);
+    syncHidden();
+})();
+</script>

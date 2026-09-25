@@ -71,23 +71,6 @@ else if (Model.ActiveTab == "info")
             <p class="text-secondary">@Localizer["Profile_NoInfoAttributes"]</p>
         }
     </div>
-
-    <script>
-        document.addEventListener("change", function (e) {
-            if (!e.target.classList.contains("info-remove-select")) return;
-            document.getElementById("removeInfoButton").disabled =
-                document.querySelectorAll(".info-remove-select:checked").length === 0;
-        });
-        AttributePicker.onConfirm("infoAttributePicker", function (selected) {
-            var form = document.getElementById("infoAttributePicker-post-form");
-            selected.forEach(function (attr) {
-                var input = document.createElement("input");
-                input.type = "hidden"; input.name = "attributeIds"; input.value = attr.id;
-                form.appendChild(input);
-            });
-            form.submit();
-        });
-    </script>
 }
 else if (Model.ActiveTab == "projects")
 {
@@ -184,4 +167,24 @@ else if (Model.ActiveTab == "cvs")
     <script src="~/js/image-upload.js" asp-append-version="true"></script>
     <script src="~/js/markdown-editor-init.js" asp-append-version="true"></script>
     <partial name="_AutoSaveScripts" model="@($"/api/profile/autosave/{Uri.EscapeDataString(uid)}")" />
+    @if (Model.ActiveTab == "info")
+    {
+        @* Here, not inline in the tab markup: it must run after the layout has loaded attribute-picker.js. *@
+        <script>
+            document.addEventListener("change", function (e) {
+                if (!e.target.classList.contains("info-remove-select")) return;
+                document.getElementById("removeInfoButton").disabled =
+                    document.querySelectorAll(".info-remove-select:checked").length === 0;
+            });
+            AttributePicker.onConfirm("infoAttributePicker", function (selected) {
+                var form = document.getElementById("infoAttributePicker-post-form");
+                selected.forEach(function (attr) {
+                    var input = document.createElement("input");
+                    input.type = "hidden"; input.name = "attributeIds"; input.value = attr.id;
+                    form.appendChild(input);
+                });
+                form.submit();
+            });
+        </script>
+    }
 }
