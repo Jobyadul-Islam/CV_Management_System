@@ -28,6 +28,12 @@ public class AttributeDefinition
     /// <summary>Stable key for built-ins (see <see cref="BuiltInAttributeKeys"/>); null for library attributes.</summary>
     public string? SystemKey { get; set; }
 
+    /// <summary>
+    /// Optional fields may stay empty: no red "empty" highlight, and they don't block publishing a CV
+    /// (the spec's "Publish only if all the attributes are filled out" applies to required fields).
+    /// </summary>
+    public bool IsOptional { get; set; }
+
     // Optional per-attribute "tuning" (spec's optional requirement): String/Text length limits and a
     // regex pattern, Numeric min/max. Enforced server-side in ProfileAutoSaveService and surfaced
     // client-side as native HTML5 validation attributes (maxlength/pattern/min/max) -- never trusted

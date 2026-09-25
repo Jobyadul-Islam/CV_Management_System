@@ -103,7 +103,9 @@ public static class DbSeeder
                     DataType = type,
                     CategoryId = personalInfo.Id,
                     IsBuiltIn = true,
-                    SystemKey = key
+                    SystemKey = key,
+                    // Location is the one built-in a candidate may leave blank.
+                    IsOptional = key == BuiltInAttributeKeys.Location
                 };
                 db.Attributes.Add(attribute);
                 existing[key] = attribute;

@@ -17,6 +17,12 @@ public class AttributeValueViewModel
     public string? RowVersion { get; set; }
     public bool IsEmpty { get; set; }
 
+    /// <summary>May be left empty: no red highlight, doesn't block publishing a CV.</summary>
+    public bool IsOptional { get; set; }
+
+    /// <summary>Empty AND required -- the only case that is highlighted in red and blocks Publish.</summary>
+    public bool NeedsValue => IsEmpty && !IsOptional;
+
     // Optional per-attribute tuning, mirrored client-side as native HTML5 validation attributes
     // (maxlength/pattern/min/max) -- ProfileAutoSaveService re-enforces the same limits server-side.
     public int? MinLength { get; set; }

@@ -64,6 +64,10 @@
             {
                 <partial name="_AttributeValueInput" model="field" />
             }
+            if (Model.Fields.Count > 0)
+            {
+                <partial name="_AutoSaveBar" />
+            }
         }
         else
         {

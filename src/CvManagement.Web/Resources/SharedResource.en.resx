@@ -929,4 +929,25 @@
   <data name="Email_ResetBody" xml:space="preserve">
     <value>&lt;p&gt;We received a request to reset your password.&lt;/p&gt;&lt;p&gt;&lt;a href="{0}"&gt;Set a new password&lt;/a&gt;&lt;/p&gt;&lt;p&gt;The link works once and expires in 24 hours. If you didn't ask for this, ignore this email — your password stays the same.&lt;/p&gt;</value>
   </data>
+  <data name="Field_IsOptional" xml:space="preserve">
+    <value>Optional field</value>
+  </data>
+  <data name="Attributes_OptionalHelp" xml:space="preserve">
+    <value>Candidates may leave it empty: it isn't highlighted in red and doesn't block publishing a CV.</value>
+  </data>
+  <data name="Field_OptionalBadge" xml:space="preserve">
+    <value>optional</value>
+  </data>
+  <data name="Autosave_SaveChanges" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="Autosave_AllSaved" xml:space="preserve">
+    <value>All changes saved.</value>
+  </data>
+  <data name="Autosave_SaveFailedCheck" xml:space="preserve">
+    <value>Some changes weren't saved - check the fields marked in red.</value>
+  </data>
+  <data name="Autosave_AutoHint" xml:space="preserve">
+    <value>Changes also save automatically every few seconds.</value>
+  </data>
 </root>

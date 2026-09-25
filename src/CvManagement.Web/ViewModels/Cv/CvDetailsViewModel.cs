@@ -28,7 +28,7 @@ public class CvDetailsViewModel
     public int LikeCount { get; set; }
     public bool ViewerHasLiked { get; set; }
 
-    public bool CanPublish => Fields.All(f => !f.IsEmpty);
+    public bool CanPublish => Fields.All(f => !f.NeedsValue);
 
     // Set by the controller based on the viewer, not computed here (rendering has no viewer identity).
     public bool ViewerCanEdit { get; set; }

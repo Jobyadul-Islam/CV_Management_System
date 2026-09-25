@@ -39,6 +39,12 @@
     }
 </div>
 
+<div class="form-check mb-3">
+    <input asp-for="IsOptional" class="form-check-input" />
+    <label asp-for="IsOptional" class="form-check-label"></label>
+    <div class="form-text">@Localizer["Attributes_OptionalHelp"]</div>
+</div>
+
 <div id="lengthTuningSection" class="mb-3 border rounded p-3" style="display:none">
     <label class="form-label fw-semibold">@Localizer["Attributes_TuningTitle"]</label>
     <div class="row">

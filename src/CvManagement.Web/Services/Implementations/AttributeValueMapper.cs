@@ -19,6 +19,7 @@ public static class AttributeValueMapper
             AttributeName = attribute.Name,
             Description = attribute.Description,
             DataType = attribute.DataType,
+            IsOptional = attribute.IsOptional,
             Options = attribute.Options.Select(o => new AttributePickerOptionViewModel { Id = o.Id, Label = o.Label }).ToList(),
             MinLength = attribute.MinLength,
             MaxLength = attribute.MaxLength,

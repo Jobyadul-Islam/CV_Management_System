@@ -93,7 +93,7 @@ public class CvPdfExportService(IStringLocalizer<SharedResource> localizer) : IC
                 {
                     row.ConstantItem(150).Text(field.AttributeName).SemiBold();
                     row.RelativeItem().Text(string.IsNullOrWhiteSpace(value) ? localizer["Cv_NotProvided"].Value : value)
-                        .FontColor(string.IsNullOrWhiteSpace(value) ? Colors.Red.Medium : Colors.Black);
+                        .FontColor(field.NeedsValue ? Colors.Red.Medium : string.IsNullOrWhiteSpace(value) ? Colors.Grey.Medium : Colors.Black);
                 });
             }
         });

@@ -2,11 +2,15 @@
 @using CvManagement.Web.Models.Enums
 @inject IStringLocalizer<SharedResource> Localizer
 
-<div class="autosave-field mb-4" data-attribute-id="@Model.AttributeId" data-type="@((int)Model.DataType)" data-row-version="@Model.RowVersion" data-empty="@(Model.IsEmpty ? "true" : "false")">
+<div class="autosave-field mb-4" data-attribute-id="@Model.AttributeId" data-type="@((int)Model.DataType)" data-row-version="@Model.RowVersion" data-empty="@(Model.IsEmpty ? "true" : "false")" data-optional="@(Model.IsOptional ? "true" : "false")">
     <label class="form-label fw-semibold">
         @Model.AttributeName
         @* Always rendered; autosave.js toggles it as the value is filled in or cleared. *@
-        <span class="badge bg-danger ms-1 autosave-empty-badge" @(Model.IsEmpty ? "" : "hidden")>@Localizer["Autosave_Empty"]</span>
+        <span class="badge bg-danger ms-1 autosave-empty-badge" @(Model.NeedsValue ? "" : "hidden")>@Localizer["Autosave_Empty"]</span>
+        @if (Model.IsOptional)
+        {
+            <span class="badge text-bg-light border ms-1 fw-normal">@Localizer["Field_OptionalBadge"]</span>
+        }
     </label>
     @if (!string.IsNullOrWhiteSpace(Model.Description))
     {
@@ -16,12 +20,12 @@
     @switch (Model.DataType)
     {
         case AttributeDataType.String:
-            <input type="text" class="form-control autosave-input @(Model.IsEmpty ? "border-danger" : "")" value="@Model.ValueString"
+            <input type="text" class="form-control autosave-input @(Model.NeedsValue ? "border-danger" : "")" value="@Model.ValueString"
                    minlength="@Model.MinLength" maxlength="@Model.MaxLength" pattern="@Model.RegexPattern" />
             break;
 
         case AttributeDataType.Text:
-            <textarea class="form-control autosave-input markdown-editor @(Model.IsEmpty ? "border-danger" : "")" rows="4"
+            <textarea class="form-control autosave-input markdown-editor @(Model.NeedsValue ? "border-danger" : "")" rows="4"
                       minlength="@Model.MinLength" maxlength="@Model.MaxLength">@Model.ValueText</textarea>
             break;
 
@@ -30,18 +34,18 @@
             break;
 
         case AttributeDataType.Numeric:
-            <input type="number" step="any" class="form-control autosave-input @(Model.IsEmpty ? "border-danger" : "")" value="@Model.ValueNumeric"
+            <input type="number" step="any" class="form-control autosave-input @(Model.NeedsValue ? "border-danger" : "")" value="@Model.ValueNumeric"
                    min="@Model.MinValue" max="@Model.MaxValue" />
             break;
 
         case AttributeDataType.Date:
-            <input type="date" class="form-control autosave-input @(Model.IsEmpty ? "border-danger" : "")" value="@(Model.ValueDate?.ToString("yyyy-MM-dd"))" />
+            <input type="date" class="form-control autosave-input @(Model.NeedsValue ? "border-danger" : "")" value="@(Model.ValueDate?.ToString("yyyy-MM-dd"))" />
             break;
 
         case AttributeDataType.Period:
             <div class="row g-2">
                 <div class="col">
-                    <input type="date" class="form-control period-start @(Model.IsEmpty ? "border-danger" : "")" value="@(Model.ValuePeriodStart?.ToString("yyyy-MM-dd"))" placeholder="@Localizer["Autosave_PeriodStart"]" />
+                    <input type="date" class="form-control period-start @(Model.NeedsValue ? "border-danger" : "")" value="@(Model.ValuePeriodStart?.ToString("yyyy-MM-dd"))" placeholder="@Localizer["Autosave_PeriodStart"]" />
                 </div>
                 <div class="col">
                     <input type="date" class="form-control period-end" value="@(Model.ValuePeriodEnd?.ToString("yyyy-MM-dd"))" placeholder="@Localizer["Autosave_PeriodEnd"]" />
@@ -57,7 +61,7 @@
             break;
 
         case AttributeDataType.OneOfMany:
-            <select class="form-select autosave-input @(Model.IsEmpty ? "border-danger" : "")">
+            <select class="form-select autosave-input @(Model.NeedsValue ? "border-danger" : "")">
                 <option value="">@Localizer["Autosave_Select"]</option>
                 @foreach (var option in Model.Options)
                 {

@@ -7,7 +7,7 @@
     <div class="fw-semibold">@Model.AttributeName</div>
     @if (Model.IsEmpty)
     {
-        <div class="value-empty">@Localizer["Cv_NotProvided"]</div>
+        <div class="@(Model.IsOptional ? "text-secondary fst-italic" : "value-empty")">@Localizer["Cv_NotProvided"]</div>
     }
     else
     {

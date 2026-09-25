@@ -36,6 +36,7 @@
         {
             <partial name="_AttributeValueInput" model="field" />
         }
+        <partial name="_AutoSaveBar" />
     </div>
 }
 else if (Model.ActiveTab == "info")
@@ -69,6 +70,10 @@ else if (Model.ActiveTab == "info")
         @if (Model.InfoAttributes.Count == 0)
         {
             <p class="text-secondary">@Localizer["Profile_NoInfoAttributes"]</p>
+        }
+        else
+        {
+            <partial name="_AutoSaveBar" />
         }
     </div>
 }

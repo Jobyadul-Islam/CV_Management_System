@@ -60,6 +60,7 @@ public class AttributeService(ApplicationDbContext db, IStringLocalizer<SharedRe
             CategoryId = attribute.CategoryId,
             DataType = attribute.DataType,
             IsBuiltIn = attribute.IsBuiltIn,
+            IsOptional = attribute.IsOptional,
             MinLength = attribute.MinLength,
             MaxLength = attribute.MaxLength,
             RegexPattern = attribute.RegexPattern,
@@ -89,6 +90,7 @@ public class AttributeService(ApplicationDbContext db, IStringLocalizer<SharedRe
             CategoryId = form.CategoryId,
             DataType = form.DataType,
             IsBuiltIn = false,
+            IsOptional = form.IsOptional,
             CreatedByUserId = userId,
             MinLength = form.MinLength,
             MaxLength = form.MaxLength,
@@ -127,6 +129,7 @@ public class AttributeService(ApplicationDbContext db, IStringLocalizer<SharedRe
         attribute.RegexPattern = form.RegexPattern;
         attribute.MinValue = form.MinValue;
         attribute.MaxValue = form.MaxValue;
+        attribute.IsOptional = form.IsOptional;
 
         // Built-in attributes keep their original category/type -- changing "Personal Photo" away
         // from Image, for example, would break Me-tab rendering for every user.

@@ -23,6 +23,9 @@ public class AttributeFormViewModel
 
     public bool IsBuiltIn { get; set; }
 
+    [Display(Name = "Field_IsOptional")]
+    public bool IsOptional { get; set; }
+
     // Optional validation tuning -- only meaningful for String/Text (length + regex) and Numeric
     // (min/max) attributes; AttributeService ignores/nulls these out for other data types.
     [Range(0, 100_000, ErrorMessage = ValidationMessages.Range), Display(Name = "Field_MinLength")]

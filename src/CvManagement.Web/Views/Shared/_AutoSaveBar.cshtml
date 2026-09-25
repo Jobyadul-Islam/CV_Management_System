@@ -1,0 +1,11 @@
+@* "Save changes" button for pages whose fields auto-save (profile Me/Info tabs, editable CV).
+   Changes still save automatically every few seconds; this saves them immediately and confirms it.
+   Behaviour lives in autosave.js (.autosave-save-btn). *@
+@inject IStringLocalizer<SharedResource> Localizer
+<div class="autosave-bar d-flex align-items-center gap-3 mt-2 mb-4"
+     data-text-saving="@Localizer["Autosave_Saving"]"
+     data-text-saved="@Localizer["Autosave_AllSaved"]"
+     data-text-failed="@Localizer["Autosave_SaveFailedCheck"]">
+    <button type="button" class="btn btn-primary autosave-save-btn">@Localizer["Autosave_SaveChanges"]</button>
+    <span class="autosave-save-status small text-secondary" role="status" aria-live="polite">@Localizer["Autosave_AutoHint"]</span>
+</div>

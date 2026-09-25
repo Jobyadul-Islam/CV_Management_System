@@ -929,4 +929,25 @@
   <data name="Email_ResetBody" xml:space="preserve">
     <value>&lt;p&gt;Мы получили запрос на сброс вашего пароля.&lt;/p&gt;&lt;p&gt;&lt;a href="{0}"&gt;Установить новый пароль&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Ссылка одноразовая и действует 24 часа. Если вы не запрашивали сброс, просто проигнорируйте это письмо — пароль не изменится.&lt;/p&gt;</value>
   </data>
+  <data name="Field_IsOptional" xml:space="preserve">
+    <value>Необязательное поле</value>
+  </data>
+  <data name="Attributes_OptionalHelp" xml:space="preserve">
+    <value>Кандидат может оставить его пустым: поле не подсвечивается красным и не мешает публикации резюме.</value>
+  </data>
+  <data name="Field_OptionalBadge" xml:space="preserve">
+    <value>необязательно</value>
+  </data>
+  <data name="Autosave_SaveChanges" xml:space="preserve">
+    <value>Сохранить изменения</value>
+  </data>
+  <data name="Autosave_AllSaved" xml:space="preserve">
+    <value>Все изменения сохранены.</value>
+  </data>
+  <data name="Autosave_SaveFailedCheck" xml:space="preserve">
+    <value>Часть изменений не сохранена - проверьте поля, отмеченные красным.</value>
+  </data>
+  <data name="Autosave_AutoHint" xml:space="preserve">
+    <value>Изменения также сохраняются автоматически каждые несколько секунд.</value>
+  </data>
 </root>

@@ -58,20 +58,22 @@
 
   function setEmpty(wrapper, isEmpty) {
     wrapper.dataset.empty = isEmpty ? "true" : "false";
+    // Optional fields may stay empty: never highlighted in red.
+    var needsValue = isEmpty && wrapper.dataset.optional !== "true";
     var badge = wrapper.querySelector(".autosave-empty-badge");
-    if (badge) badge.hidden = !isEmpty;
+    if (badge) badge.hidden = !needsValue;
     wrapper.querySelectorAll(".autosave-input:not([type=checkbox]):not([type=hidden]), .period-start").forEach(function (el) {
-      el.classList.toggle("border-danger", isEmpty);
+      el.classList.toggle("border-danger", needsValue);
     });
     refreshPublishButton();
   }
 
-  // CV page: "Publish" is only available once every field is filled -- kept in sync live, so filling the
-  // last red field enables it without a reload.
+  // CV page: "Publish" is only available once every required field is filled -- kept in sync live, so
+  // filling the last red field enables it without a reload. Optional fields never block it.
   function refreshPublishButton() {
     var button = document.getElementById("publishButton");
     if (!button) return;
-    var anyEmpty = document.querySelector('.autosave-field[data-empty="true"]') !== null;
+    var anyEmpty = document.querySelector('.autosave-field[data-empty="true"]:not([data-optional="true"])') !== null;
     button.disabled = anyEmpty;
     var hint = document.getElementById("publishHint");
     if (hint) {
@@ -168,6 +170,30 @@
   }
 
   window.ProfileAutoSave = { markDirty: markDirty, flushNow: flush };
+
+  // "Save changes" button (_AutoSaveBar): saves pending edits right away instead of waiting for the
+  // timer, then reports the outcome. Texts come from data-* attributes so they're localized.
+  document.addEventListener("click", function (e) {
+    var button = e.target.closest(".autosave-save-btn");
+    if (!button) return;
+    var bar = button.closest(".autosave-bar");
+    var status = bar.querySelector(".autosave-save-status");
+    function show(text, kind) {
+      status.textContent = text;
+      status.className = "autosave-save-status small text-" + kind;
+    }
+
+    button.disabled = true;
+    show(bar.dataset.textSaving, "secondary");
+    if (timer) { clearTimeout(timer); timer = null; }
+    flush().then(function () {
+      // Failed saves are re-queued (dirty) and field errors/conflicts are marked in red on the field.
+      var failed = dirty.size > 0 || document.querySelector(".autosave-status.text-danger") !== null;
+      show(failed ? bar.dataset.textFailed : bar.dataset.textSaved, failed ? "danger" : "success");
+    }).finally(function () {
+      button.disabled = false;
+    });
+  });
 
   function onEdit(e) {
     var wrapper = e.target.closest(".autosave-field");
