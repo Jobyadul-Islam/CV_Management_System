@@ -23,10 +23,10 @@
 @Html.AntiForgeryToken()
 
 <ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "me" ? "active" : "")" href="?tab=me@qs">@Localizer["Profile_TabMe"]</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "info" ? "active" : "")" href="?tab=info@qs">@Localizer["Profile_TabInfo"]</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "projects" ? "active" : "")" href="?tab=projects@qs">@Localizer["Profile_TabProjects"]</a></li>
-    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "cvs" ? "active" : "")" href="?tab=cvs@qs">@Localizer["Profile_TabCvs"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "me" ? "active" : "")" href="?tab=me@(qs)">@Localizer["Profile_TabMe"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "info" ? "active" : "")" href="?tab=info@(qs)">@Localizer["Profile_TabInfo"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "projects" ? "active" : "")" href="?tab=projects@(qs)">@Localizer["Profile_TabProjects"]</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.ActiveTab == "cvs" ? "active" : "")" href="?tab=cvs@(qs)">@Localizer["Profile_TabCvs"]</a></li>
 </ul>
 
 @if (Model.ActiveTab == "me")
